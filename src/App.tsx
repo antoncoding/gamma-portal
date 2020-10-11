@@ -1,25 +1,26 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Main, Layout } from '@aragon/ui'
+import NavBar from "./components/NavBar"
 
+import Create from './pages/CreateOption'
+
+import { HashRouter as Router, Switch, Route } from 'react-router-dom';
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Main layout={false}>
+        <NavBar />
+        <Layout>
+        <Switch>
+
+          {/* All Options */}
+          <Route path="/create">
+            <Create />
+          </Route>
+        </Switch>
+        </Layout>
+      </Main>
+    </Router>
   );
 }
 
