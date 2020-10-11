@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { getPreference, storePreference } from '../utils/storage'
+// import { SupportedNetworks } from '../utils/constants'
 import Onboard from 'bnc-onboard';
 import Web3 from 'web3';
 
@@ -27,28 +28,25 @@ export const useConnection = () => {
     setWeb3(web3Instance)
   }, [])
 
-
-  const onboard = useMemo(() => initOnboard(setAddressCallback, setWalletCallback, 4), [setAddressCallback, setWalletCallback])
+  const onboard = useMemo(() => initOnboard(setAddressCallback, setWalletCallback), [setAddressCallback, setWalletCallback])
 
   // get last connection info and try to set default user to previous connected account.
   useEffect(() => {
-    if (onboard === null) return
     async function getDefault() {
       const previouslySelectedWallet = getPreference('selectedWallet', 'null');
       if (previouslySelectedWallet === 'null') return
-
       const selected = await onboard.walletSelect(previouslySelectedWallet)
 
       if (selected) {
         const address = onboard.getState().address;
-        if(address !== null) setAddressCallback(address);
+        if (address !== null) setAddressCallback(address);
       }
 
     };
     getDefault();
   },
-  [onboard, setAddressCallback]
-)
+    [onboard, setAddressCallback]
+  )
 
   const connect = useCallback(async () => {
     const selected = await onboard.walletSelect();
@@ -65,33 +63,33 @@ export const useConnection = () => {
   return { user, setUser, web3, connect, disconnect }
 }
 
-export const initOnboard = (setAddressCallback, setWalletCallback, networkId:number) => {
-
-  const onboard = Onboard({
-    darkMode: getPreference('theme', 'light') === 'dark',
-    dappId: BLOCKNATIVE_KEY, // [String] The API key created by step one above
-    networkId: networkId, // [Integer] The Ethereum network ID your Dapp uses.
-    subscriptions: {
-      address: setAddressCallback,
-      wallet: setWalletCallback,
-    },
-    walletSelect: {
-      description: 'Please select a wallet to connect to Opyn Monitor',
-      wallets: [
-        { walletName: 'metamask' },
-        {
-          walletName: 'walletConnect',
-          infuraKey: INFURA_KEY,
-        },
-        {
-          walletName: 'fortmatic',
-          apiKey: FORTMATIC_KEY,
-        },
-        { walletName: 'trust' },
-        { walletName: 'coinbase' },
-        { walletName: 'status' },
-      ],
-    },
-  });
-  return onboard
+export const initOnboard = (addressChangeCallback, walletChangeCallback) => {
+    const onboard = Onboard({
+      darkMode: getPreference('theme', 'light') === 'dark',
+      dappId: BLOCKNATIVE_KEY, // [String] The API key created by step one above
+      networkId: 4, // [Integer] The Ethereum network ID your Dapp uses.
+      subscriptions: {
+        address: addressChangeCallback,
+        wallet: walletChangeCallback,
+      },
+      walletSelect: {
+        description: 'Please select a wallet to connect to Opyn Monitor',
+        wallets: [
+          { walletName: 'metamask' },
+          {
+            walletName: 'walletConnect',
+            infuraKey: INFURA_KEY,
+          },
+          {
+            walletName: 'fortmatic',
+            apiKey: FORTMATIC_KEY,
+          },
+          { walletName: 'trust' },
+          { walletName: 'coinbase' },
+          { walletName: 'status' },
+        ],
+      },
+    });
+    return onboard
+  
 };

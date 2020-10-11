@@ -1,10 +1,10 @@
 import React from 'react'
 import { Main, Header } from '@aragon/ui'
 
-export default function CreateOption() {
+export default function Operators() {
   return (
     <>
-      <Header primary="Create" />
+      <Header primary="Operators" />
       
     </>
   )
