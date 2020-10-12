@@ -1,39 +1,55 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useCallback } from 'react'
 import BigNumber from 'bignumber.js'
 import { Header, TextInput, Switch, Button } from '@aragon/ui'
 import LabelText from '../../components/LabelText'
+import Warning from '../../components/Warning'
 
 import { walletContext } from '../../contexts/wallet'
 import useToken from '../../hooks/useToken'
 
+import {OTokenFactory} from '../../utils/contracts/factory'
+
 export default function CreateOption() {
 
-  const { networkId } = useContext(walletContext)
+  const { networkId, web3, user } = useContext(walletContext)
 
   const USDC = useToken('USDC', networkId)
   const WETH = useToken('WETH', networkId)
 
-  const [underlying, setUnderlying] = useState<string>(USDC)
-  const [strike, setStrike] = useState<string>(WETH)
+  const [underlying, setUnderlying] = useState<string>(WETH)
+  const [strike, setStrike] = useState<string>(USDC)
   const [collateral, setCollateral] = useState<string>(USDC)
-  const [strikePrice, setStrikePrice] = useState<BigNumber>(new BigNumber(0))
-  const [expiryDate, setExpiryDate] = useState<Date>(new Date(1606809600000).toISOString().slice(0, 10))
-  const [expiryTimestamp, setExpiryTimestamp] = useState<number>(0)
+  const [strikePrice, setStrikePrice] = useState<BigNumber>(new BigNumber(250))
+  // const [expiryDate, setExpiryDate] = useState<Date>(new Date(1606809600).toISOString().slice(0, 10))
+  const [expiryTimestamp, setExpiryTimestamp] = useState<BigNumber>(new BigNumber(1606809600))
   const [isPut, setIsPut] = useState(true)
 
-  // update date to be UTC 0800
+  const [hasExpiryWarning, setHasWarning] = useState<boolean>(false)
+  const [warning, setWarning] = useState<string>('')
+
+  // make sure expiry to be UTC 0800
   useEffect(() => {
-    const timeStamp = expiryTimestamp
-  }, [expiryDate, expiryTimestamp])
+    if ((expiryTimestamp.minus(28800)).mod(86400).isGreaterThan(0)) {
+      setHasWarning(true)
+      setWarning('Expiry time need to be 08:00 AM UTC')
+    } else {
+      setHasWarning(false)
+    }
+  }, [expiryTimestamp])
 
   useEffect(() => {
     if (isPut) {
-      setCollateral(underlying)
-    } else {
       setCollateral(strike)
+    } else {
+      setCollateral(underlying)
     }
     return () => { }
   }, [isPut, underlying, strike])
+
+  async function createOToken()  {
+      const factory = new OTokenFactory(web3, networkId, user)
+      await factory.createOToken(underlying.address, strike.address, collateral.address, strikePrice, expiryTimestamp, isPut)
+    }
 
   return (
     <>
@@ -71,13 +87,14 @@ export default function CreateOption() {
 
         <div style={{ width: '30%', marginLeft: '5%' }}>
           <LabelText label='Expiry Timestamp' />
-          <TextInput type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} wide />
+          <TextInput type="number" value={expiryTimestamp} onChange={(e) => setExpiryTimestamp(new BigNumber(e.target.value))} wide />
+          <Warning text={warning} show={hasExpiryWarning} />
         </div>
 
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', paddingTop: '2%' }}>
-      <Button label="Create" wide />
+      <Button label="Create" wide onClick={createOToken}/>
       </div>
 
     </>

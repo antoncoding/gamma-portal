@@ -1,4 +1,7 @@
 import React from 'react';
+// import Moment from 'react-moment';
+import 'moment-timezone';
+
 import { Main, Layout } from '@aragon/ui'
 import { walletContext } from './contexts/wallet'
 import NavBar from "./components/NavBar"
