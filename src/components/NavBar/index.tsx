@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useContext } from 'react';
+import React, { useCallback, useContext } from 'react';
 import styled from 'styled-components'
 import { walletContext } from '../../contexts/wallet'
 import { useHistory } from 'react-router-dom';
@@ -10,45 +10,39 @@ function MyBar() {
   const history = useHistory();
   const toast = useToast()
   const { user } = useContext(walletContext)
-  const [isHome, updateIsHome] = useState(true);
 
-  const goBack = useCallback(()=>{
+  const goBack = useCallback(() => {
     history.goBack();
   }, [history])
 
-  useEffect(() => {
-    const home = history.location.pathname === '/';
-    updateIsHome(home);
-  }, [history.location.pathname]);
   return (
     <Bar
       primary={
-        !isHome &&
-          <>
-            <MaxHeightDiv>
-              <BackButton
-                onClick={goBack}
-              />
-            </MaxHeightDiv>
-            <LinkButton
-              title="Create Options"
-              onClick={() => {
-                history.push('/create/');
-              }}
+        <>
+          <MaxHeightDiv>
+            <BackButton
+              onClick={goBack}
             />
-            <LinkButton
-              title="My Account"
-              onClick={() => {
-                if (user === '') {
-                  toast('Please connect wallet')
-                } else {
-                  history.push(`/account/${user}`);
-                }
-                
-              }}
-            />
-          </>
-        
+          </MaxHeightDiv>
+          <LinkButton
+            title="Create Options"
+            onClick={() => {
+              history.push('/create/');
+            }}
+          />
+          <LinkButton
+            title="My Account"
+            onClick={() => {
+              if (user === '') {
+                toast('Please connect wallet')
+              } else {
+                history.push(`/account/${user}`);
+              }
+
+            }}
+          />
+        </>
+
       }
       secondary={
         <>
@@ -84,7 +78,7 @@ const MaxHeightDiv = styled.div`
 
 const Link = styled.div`
   padding: '1%';
-  opacity: ${ props => props.isSelected ? 1 : 0.5 };
+  opacity: ${ props => props.isSelected ? 1 : 0.5};
   font-size: 16px;
 `
 

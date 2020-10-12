@@ -36,6 +36,7 @@ export default function Account() {
     <>
       <Header primary="Account Overview"/>
       <OperatorSection account={account} operatorRelations={operatorRelations} isLoading={isLoading}/>
+      <br/> <br/>
       <SectionTitle title="Vaults"/>
       <Button label={"Open new Vault"} onClick={() => openVault()} />
     </>
