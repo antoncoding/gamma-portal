@@ -46,3 +46,5 @@ export const addressese: GammaAddress = {
     addressBook: '0x7630e7dE53E3d1f298f653d27fcF3710c602331C'
   }
 }
+
+export const ZERO_ADDR = '0x0000000000000000000000000000000000000000'

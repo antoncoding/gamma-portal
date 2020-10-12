@@ -1,14 +1,15 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useContext } from 'react';
 import styled from 'styled-components'
+import { walletContext } from '../../contexts/wallet'
 import { useHistory } from 'react-router-dom';
 
-import {
-  Bar, BackButton, LinkBase,
-} from '@aragon/ui';
+import { Bar, BackButton, LinkBase, useToast } from '@aragon/ui';
 import ConnectButton from './ConnectButton';
 
 function MyBar() {
   const history = useHistory();
+  const toast = useToast()
+  const { user } = useContext(walletContext)
   const [isHome, updateIsHome] = useState(true);
 
   const goBack = useCallback(()=>{
@@ -30,25 +31,21 @@ function MyBar() {
               />
             </MaxHeightDiv>
             <LinkButton
-              title="Home"
-              onClick={() => {
-                history.push('/');
-              }}
-              isSelected={history.location.pathname === '/'}
-            />
-            <LinkButton
               title="Create Options"
               onClick={() => {
                 history.push('/create/');
               }}
-              isSelected={history.location.pathname === '/create/'}
             />
             <LinkButton
-              title="Operators"
+              title="My Account"
               onClick={() => {
-                history.push('/operators/');
+                if (user === '') {
+                  toast('Please connect wallet')
+                } else {
+                  history.push(`/account/${user}`);
+                }
+                
               }}
-              isSelected={history.location.pathname === '/operators/'}
             />
           </>
         

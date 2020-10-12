@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import BigNumber from 'bignumber.js'
 import { Header, TextInput, Switch, Button } from '@aragon/ui'
 import LabelText from '../../components/LabelText'
@@ -7,7 +7,7 @@ import Warning from '../../components/Warning'
 import { walletContext } from '../../contexts/wallet'
 import useToken from '../../hooks/useToken'
 
-import {OTokenFactory} from '../../utils/contracts/factory'
+import { OTokenFactory } from '../../utils/contracts/factory'
 
 export default function CreateOption() {
 
@@ -46,10 +46,10 @@ export default function CreateOption() {
     return () => { }
   }, [isPut, underlying, strike])
 
-  async function createOToken()  {
-      const factory = new OTokenFactory(web3, networkId, user)
-      await factory.createOToken(underlying.address, strike.address, collateral.address, strikePrice, expiryTimestamp, isPut)
-    }
+  async function createOToken() {
+    const factory = new OTokenFactory(web3, networkId, user)
+    await factory.createOToken(underlying.address, strike.address, collateral.address, strikePrice, expiryTimestamp, isPut)
+  }
 
   return (
     <>
@@ -58,17 +58,17 @@ export default function CreateOption() {
 
         <div style={{ width: '30%', marginRight: '5%' }}>
           <LabelText label='underlying' />
-          <TextInput type="text" readOnly value={underlying.address} wide />
+          <TextInput type="text" onChange={setUnderlying} readOnly value={underlying.address} wide />
         </div>
 
         <div style={{ width: '30%' }}>
           <LabelText label='strike' />
-          <TextInput type="text" readOnly value={strike.address} wide />
+          <TextInput type="text" onChange={setStrike} readOnly value={strike.address} wide />
         </div>
 
         <div style={{ width: '30%', marginLeft: '5%' }}>
           <LabelText label='collateral' />
-          <TextInput type="text" readOnly value={collateral.address} wide />
+          <TextInput type="text" onChange={setCollateral} readOnly value={collateral.address} wide />
         </div>
 
       </div>
@@ -94,7 +94,7 @@ export default function CreateOption() {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', paddingTop: '2%' }}>
-      <Button label="Create" wide onClick={createOToken}/>
+        <Button label="Create" wide onClick={createOToken} />
       </div>
 
     </>
