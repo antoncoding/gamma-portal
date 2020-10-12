@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useMemo } from 'react'
 import BigNumber from 'bignumber.js'
 import { Header, TextInput, Switch, Button } from '@aragon/ui'
 import LabelText from '../../components/LabelText'
@@ -19,8 +19,7 @@ export default function CreateOption() {
   const [underlying, setUnderlying] = useState<string>(WETH)
   const [strike, setStrike] = useState<string>(USDC)
   const [collateral, setCollateral] = useState<string>(USDC)
-  const [strikePrice, setStrikePrice] = useState<BigNumber>(new BigNumber(250))
-  // const [expiryDate, setExpiryDate] = useState<Date>(new Date(1606809600).toISOString().slice(0, 10))
+  const [strikePriceReadable, setStrikePriceReadable] = useState<BigNumber>(new BigNumber(250))
   const [expiryTimestamp, setExpiryTimestamp] = useState<BigNumber>(new BigNumber(1606809600))
   const [isPut, setIsPut] = useState(true)
 
@@ -45,6 +44,8 @@ export default function CreateOption() {
     }
     return () => { }
   }, [isPut, underlying, strike])
+
+  const strikePrice = useMemo(() => strikePriceReadable.times(1e8), [strikePriceReadable])
 
   async function createOToken() {
     const factory = new OTokenFactory(web3, networkId, user)
@@ -82,7 +83,7 @@ export default function CreateOption() {
 
         <div style={{ width: '30%' }}>
           <LabelText label='Strike price' />
-          <TextInput type="number" value={strikePrice} onChange={(e) => setStrikePrice(new BigNumber(e.target.value))} wide />
+          <TextInput type="number" value={strikePriceReadable} onChange={(e) => setStrikePriceReadable(new BigNumber(e.target.value))} wide />
         </div>
 
         <div style={{ width: '30%', marginLeft: '5%' }}>

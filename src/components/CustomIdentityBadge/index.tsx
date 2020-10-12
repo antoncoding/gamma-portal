@@ -3,6 +3,8 @@ import styled from 'styled-components'
 import { Modal, TextInput, Button, IdentityBadge, Header, textStyle, useTheme, IconLabel } from '@aragon/ui'
 import { getPreference, storePreference } from '../../utils/storage'
 
+import { ZERO_ADDR } from '../../constants/addresses'
+
 type CustomIdentityBadgeProps = {
   shorten?: boolean
   connectedAccount?: boolean
@@ -21,9 +23,14 @@ function CustomIdentityBadge({ entity, connectedAccount, label, shorten }: Custo
   const [newLabel, setNewLabel] = useState<string | undefined>(displayLabel)
 
   useEffect(() => {
-    const customLabelOrUndefined = storedLabels.find(entry => entry.address === entity)?.label
-    setDisplayLabel(customLabelOrUndefined)
-    setNewLabel(customLabelOrUndefined)
+    if (entity === ZERO_ADDR) {
+      setDisplayLabel('Empty')
+    } else {
+      const customLabelOrUndefined = storedLabels.find(entry => entry.address === entity)?.label
+      setDisplayLabel(customLabelOrUndefined)
+      setNewLabel(customLabelOrUndefined)
+    }
+    
     return () => {
       
     }
