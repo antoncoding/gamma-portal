@@ -1,20 +1,11 @@
+import {configType} from '../types'
+
 export enum SupportedNetworks {
   Mainnet = 1,
   Rinkeby = 4
 }
 
-type Token = {
-  address: string,
-  name: string,
-  symbol: string,
-  decimals: 6
-}
-
-type configType = {
-  [key in SupportedNetworks]: {controller: string, tokens:Token[]}
-}
-
-const config: configType = {
+const addressese: configType = {
   '1' : {
     controller: '',
     tokens: [
@@ -34,9 +25,15 @@ const config: configType = {
         address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
         symbol: 'USDC',
         decimals: 6
+      },
+      {
+        name: 'Wrapped Ether',
+        address: '0xc778417e063141139fce010982780140aa0cd5ab',
+        symbol: 'WETH',
+        decimals: 18
       }
     ]
   }
 }
 
-export default config
+export default addressese

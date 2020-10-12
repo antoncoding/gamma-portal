@@ -12,6 +12,8 @@ export const useConnection = () => {
   const [user, setUser] = useState<string>('')
   const [web3, setWeb3] = useState<Web3>(null)
 
+  const networkId = 4
+
   // function for block native sdk when address is updated
   const setAddressCallback = useCallback((address: string | undefined) => {
     if (!address) {
@@ -53,43 +55,46 @@ export const useConnection = () => {
     if (!selected) return false;
     const checked = await onboard.walletCheck();
     if (!checked) return false;
-    return onboard.getState().address;
+    const account = onboard.getState().address;
+    setUser(account)
+    return account
   }, [onboard]);
 
   const disconnect = useCallback(async () => {
     onboard.walletReset();
+    setUser('')
   }, [onboard]);
 
-  return { user, setUser, web3, connect, disconnect }
+  return { networkId, user, setUser, web3, connect, disconnect }
 }
 
 export const initOnboard = (addressChangeCallback, walletChangeCallback) => {
-    const onboard = Onboard({
-      darkMode: getPreference('theme', 'light') === 'dark',
-      dappId: BLOCKNATIVE_KEY, // [String] The API key created by step one above
-      networkId: 4, // [Integer] The Ethereum network ID your Dapp uses.
-      subscriptions: {
-        address: addressChangeCallback,
-        wallet: walletChangeCallback,
-      },
-      walletSelect: {
-        description: 'Please select a wallet to connect to Opyn Monitor',
-        wallets: [
-          { walletName: 'metamask' },
-          {
-            walletName: 'walletConnect',
-            infuraKey: INFURA_KEY,
-          },
-          {
-            walletName: 'fortmatic',
-            apiKey: FORTMATIC_KEY,
-          },
-          { walletName: 'trust' },
-          { walletName: 'coinbase' },
-          { walletName: 'status' },
-        ],
-      },
-    });
-    return onboard
-  
+  const onboard = Onboard({
+    darkMode: getPreference('theme', 'light') === 'dark',
+    dappId: BLOCKNATIVE_KEY, // [String] The API key created by step one above
+    networkId: 4, // [Integer] The Ethereum network ID your Dapp uses.
+    subscriptions: {
+      address: addressChangeCallback,
+      wallet: walletChangeCallback,
+    },
+    walletSelect: {
+      description: 'Please select a wallet to connect to Opyn Monitor',
+      wallets: [
+        { walletName: 'metamask' },
+        {
+          walletName: 'walletConnect',
+          infuraKey: INFURA_KEY,
+        },
+        {
+          walletName: 'fortmatic',
+          apiKey: FORTMATIC_KEY,
+        },
+        { walletName: 'trust' },
+        { walletName: 'coinbase' },
+        { walletName: 'status' },
+      ],
+    },
+  });
+  return onboard
+
 };

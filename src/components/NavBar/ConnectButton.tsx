@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 
 import {
   Button, IconConnect, Box, IconPower, LinkBase,
@@ -7,16 +7,15 @@ import {
 import CustomIdentityBadge from '../CustomIdentityBadge'
 
 import { checkAddressAndAddToStorage } from '../../utils/storage';
-import {useConnection} from '../../hooks/useConnection'
+import { walletContext } from '../../contexts/wallet'
 
 function ConnectButton() {
 
-  const {connect, disconnect, user} = useConnection()
+  const {connect, disconnect, user} = useContext(walletContext)
 
   const connectWeb3 = async () => {
     const address = await connect();
     if (address === false) return;
-    console.log(`checkAddressAndAddToStorage`, address)
     checkAddressAndAddToStorage(address);
   };
 
