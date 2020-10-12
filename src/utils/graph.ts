@@ -11,7 +11,7 @@ export async function getAccount(
 ): Promise<
   {
     operatorCount: string;
-    operators: string[];
+    operators: {operator: {id:string}}[];
     vaultCount: string;
     vaults: SubgraphVault[];
   } | null
@@ -35,7 +35,9 @@ export async function getAccount(
       }
       operatorCount
       operators {
-        id
+        operator {
+          id
+        }
       }
     }
   }`;
@@ -43,7 +45,7 @@ export async function getAccount(
     const response = await postQuery(endpoints[networkId], query);
     return response.data.account;
   } catch (error) {
-    errorCallback(error)
+    errorCallback(error.toString())
     return null
   }
   
@@ -81,7 +83,7 @@ export async function getOTokens(networkId: SupportedNetworks, errorCallback: Fu
     const response = await postQuery(endpoints[networkId], query);
     return response.data.otokens;
   } catch (error) {
-    errorCallback(error)
+    errorCallback(error.toString())
     return null
   }
 }

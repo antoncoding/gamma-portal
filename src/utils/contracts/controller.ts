@@ -37,4 +37,11 @@ export class Controller extends SmartContract {
       .send({from: this.account})
       .on('transactionHash', this.getCallback());
   }
+
+  async updateOperator(operator: string, isOperator: boolean) {
+    await this.contract.methods
+      .setOperator(operator, isOperator)
+      .send({from: this.account})
+      .on('transactionHash', this.getCallback())
+  }
 }
