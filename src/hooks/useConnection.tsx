@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { getPreference, storePreference } from '../utils/storage'
-// import { SupportedNetworks } from '../utils/constants'
 import Onboard from 'bnc-onboard';
 import Web3 from 'web3';
 

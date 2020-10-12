@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import addressese from '../utils/constants'
+import addressese from '../constants/addresses'
 import {Token} from '../types'
 
 function useToken(symbol: string, networkId: number): Token | null {

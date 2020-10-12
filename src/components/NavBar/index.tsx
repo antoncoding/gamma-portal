@@ -6,7 +6,6 @@ import {
   Bar, BackButton, LinkBase,
 } from '@aragon/ui';
 import ConnectButton from './ConnectButton';
-// import ChangeModeButton from './SwitchTheme';
 
 function MyBar() {
   const history = useHistory();

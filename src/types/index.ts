@@ -1,4 +1,4 @@
-import {SupportedNetworks} from '../utils/constants'
+import {SupportedNetworks} from '../constants/addresses'
 
 export type Token = {
   address: string,
