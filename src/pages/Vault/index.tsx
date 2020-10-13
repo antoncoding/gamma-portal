@@ -53,12 +53,12 @@ export default function VaultDetail() {
   }, [vaultDetail, owner, user])
 
 
-  const collateralToken = useTokenByAddress(vaultDetail && vaultDetail.collateralAsset ? vaultDetail.collateralAsset : ZERO_ADDR, networkId)
+  const collateralToken = useTokenByAddress(vaultDetail && vaultDetail.collateralAsset ? vaultDetail.collateralAsset : tokens[networkId][selectedCollateralIndex].address, networkId)
 
   const simpleAddCollateral = useCallback(async () => {
     await controller.simpleAddCollateral(user, vaultId, user, collateralToken.address, fromTokenAmount(changeCollateralAmount, collateralToken.decimals))
     setChangeCollateralAmount(new BigNumber(0))
-  }, [controller, user, vaultId, collateralToken.address, collateralToken.decimals, changeCollateralAmount])
+  }, [collateralToken, controller, user, vaultId, changeCollateralAmount])
 
   const simpleRemoveCollateral = useCallback(async () => {
     await controller.simpleRemoveCollateral(user, vaultId, user, collateralToken.address, fromTokenAmount(changeCollateralAmount, collateralToken.decimals))
@@ -79,7 +79,6 @@ export default function VaultDetail() {
 
   const simpleMint = useCallback(async () => {
     const oToken = vaultDetail && vaultDetail.shortOToken ? vaultDetail.shortOToken.id : allOtokens ? allOtokens[selectedShortIndex].id : ZERO_ADDR
-    console.log(`oToken`, oToken)
     await controller.simpleMint(user, vaultId, user, oToken, fromTokenAmount(changeShortAmount, 8))
     setChangeCollateralAmount(new BigNumber(0))
   }, [vaultDetail, allOtokens, selectedShortIndex, controller, user, vaultId, changeShortAmount])
