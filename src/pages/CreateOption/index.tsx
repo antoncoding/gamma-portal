@@ -10,6 +10,7 @@ import { useTokenBySymbol } from '../../hooks/useToken'
 import { OTokenFactory } from '../../utils/contracts/factory'
 import { Token } from '../../types'
 import { ZERO_ADDR } from '../../constants/addresses'
+import { fromTokenAmount } from '../../utils/math'
 
 export default function CreateOption() {
 
@@ -47,7 +48,7 @@ export default function CreateOption() {
     return () => { }
   }, [isPut, underlying, strike])
 
-  const strikePrice = useMemo(() => strikePriceReadable.times(1e8), [strikePriceReadable])
+  const strikePrice = useMemo(() => fromTokenAmount(new BigNumber(strikePriceReadable), 8), [strikePriceReadable])
 
   async function createOToken() {
     const factory = new OTokenFactory(web3, networkId, user)

@@ -22,7 +22,7 @@ export class OTokenFactory extends SmartContract {
     isPut: boolean
   ) {
     await this.contract.methods
-      .createOtoken(underlying, strike, collateral, strikePrice, expiry, isPut)
+      .createOtoken(underlying, strike, collateral, strikePrice.toString(), expiry.toString(), isPut)
       .send({from: this.account})
       .on('transactionHash', this.getCallback());
   }
