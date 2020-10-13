@@ -56,7 +56,6 @@ export default function OperatorSection({ account, operatorRelations, isLoading 
         onChange={(e) => { setNewOperatorAddr(e.target.value) }}
         adornment={addOperatorButton}
         adornmentPosition="end"
-        adornmentSettings={{ width: '200px' }}
         readOnly={user !== account}
       />
     </>

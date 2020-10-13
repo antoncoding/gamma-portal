@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState, useCallback } from 'react'
+import React, { useContext, useMemo, useCallback } from 'react'
 import { useHistory } from 'react-router-dom';
 
 import { Button, DataView } from '@aragon/ui'
@@ -10,9 +10,9 @@ import { SubgraphVault } from '../../types'
 import SectionTitle from '../../components/SectionHeader'
 import CustomIdentityBadge from '../../components/CustomIdentityBadge'
 import Status from '../../components/DataViewStatusEmpty'
-import { ZERO_ADDR, addressese, tokens } from '../../constants/addresses'
-import { useTokenBySymbol} from '../../hooks/useToken'
-import { toTokenAmount, fromTokenAmount } from '../../utils/math'
+import { ZERO_ADDR } from '../../constants/addresses'
+import { useTokenByAddress} from '../../hooks/useToken'
+import { toTokenAmount } from '../../utils/math'
 
 type VaultSectionProps = { account: string, isLoading: boolean, vaults: SubgraphVault[] }
 
@@ -26,21 +26,7 @@ export default function VaultSection({ account, vaults, isLoading }: VaultSectio
     await controller.openVault(account)
   }, [account, controller])
 
-  const USDC = useTokenBySymbol('USDC', networkId)
-
-  const simpleAddCollateral = useCallback(async() => {
-    const vaultId = new BigNumber(1)
-    const collateral = USDC ? USDC.address : ZERO_ADDR
-    await controller.simpleAddCollateral(account, vaultId, account, collateral, new BigNumber(1e6))
-  }, [USDC, controller, account])
-
-  // const simpleAddLong = useCallback(async() => {
-  //   await controller.simpleAddLong()
-  // }, [controller])
-
-  // const simpleMint = useCallback(async () =>  {
-  //   await controller.simpleMint()
-  // }, [controller])
+  const collateralToken = useTokenByAddress(vaults.length > 0 && vaults[0].collateralAsset ? vaults[0].collateralAsset : ZERO_ADDR, networkId)
 
   const renderRow = useCallback((vault: SubgraphVault, index) => {
     const collateralAsset = vault.collateralAsset ? vault.collateralAsset : ZERO_ADDR
@@ -51,14 +37,14 @@ export default function VaultSection({ account, vaults, isLoading }: VaultSectio
     const shortAmount = vault.shortAmount ? vault.shortAmount : '0'
     return [
       <CustomIdentityBadge shorten={true} entity={collateralAsset} />,
-      toTokenAmount(new BigNumber(collateralAmount), USDC? USDC.decimals: 6).toString(),
+      toTokenAmount(new BigNumber(collateralAmount), collateralToken.decimals).toString(),
       <CustomIdentityBadge shorten={true} entity={longAsset} />,
       toTokenAmount(new BigNumber(longAmount), 8).toString(),
       <CustomIdentityBadge shorten={true} entity={shortAsset} />,
       toTokenAmount(new BigNumber(shortAmount), 8).toString(),
       <Button label={"Detail"} onClick={()=>{ history.push(`/vault/${account}/${index + 1}`);}} />
     ]
-  }, [USDC, account, history])
+  }, [account, collateralToken.decimals, history])
 
   return (
     <>

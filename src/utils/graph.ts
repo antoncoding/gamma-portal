@@ -111,6 +111,8 @@ export async function getOTokens(
 ): Promise<
   | {
       id: string;
+      symbol: string,
+      name: string;
       strikeAsset: string;
       underlyingAsset: string;
       collateralAsset: string;
@@ -125,6 +127,8 @@ export async function getOTokens(
   {
     otokens {
       id
+      symbol
+      name
       strikeAsset
       underlyingAsset
       collateralAsset

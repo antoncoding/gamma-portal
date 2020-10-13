@@ -1,17 +1,16 @@
 import React, { useContext, useMemo, useState, useCallback } from 'react'
 import { useParams } from 'react-router-dom';
 
-import { TextInput, Button, DataView, useToast, Tag, Header, IconCirclePlus, IconCircleMinus } from '@aragon/ui'
+import { TextInput, Button, DataView, useToast, Tag, Header, IconCirclePlus, IconCircleMinus, DropDown } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
 
 import { walletContext } from '../../contexts/wallet'
 import { Controller } from '../../utils/contracts/controller'
-import { SubgraphVault } from '../../types'
-import { getVault } from '../../utils/graph'
+import { getVault, getOTokens } from '../../utils/graph'
 import SectionTitle from '../../components/SectionHeader'
 import CustomIdentityBadge from '../../components/CustomIdentityBadge'
 import Status from '../../components/DataViewStatusEmpty'
-import { ZERO_ADDR, emptyToken } from '../../constants/addresses'
+import { ZERO_ADDR, tokens } from '../../constants/addresses'
 import { useTokenByAddress } from '../../hooks/useToken'
 import { toTokenAmount, fromTokenAmount } from '../../utils/math'
 
@@ -25,6 +24,11 @@ export default function VaultDetail() {
   const [changeLongAmount, setChangeLongAmount] = useState(new BigNumber(0))
   const [changeShortAmount, setChangeShortAmount] = useState(new BigNumber(0))
 
+  // for dropdown options
+  const [selectedCollateralIndex, setSelectedCollateralIndex] = useState(0)
+  const [selectedLongIndex, setSelectedLongIndex] = useState(-1)
+  const [selectedShortIndex, setSelectedShortIndex] = useState(-1)
+
   const { web3, networkId, user } = useContext(walletContext)
   const { owner, vaultId } = useParams()
   const toast = useToast()
@@ -34,6 +38,11 @@ export default function VaultDetail() {
     setIsLoading(false)
     return result
   }, null, [networkId, owner, toast, vaultId])
+
+  const allOtokens = useAsyncMemo(async () => {
+    const result = await getOTokens(networkId, toast)
+    return result
+  }, [networkId, toast])
 
   const controller = useMemo(() => new Controller(web3, networkId, user), [networkId, user, web3])
 
@@ -57,31 +66,39 @@ export default function VaultDetail() {
   }, [controller, user, vaultId, collateralToken.address, collateralToken.decimals, changeCollateralAmount])
 
   const simpleAddLong = useCallback(async () => {
-    await controller.simpleAddLong(user, vaultId, user, collateralToken.address, fromTokenAmount(changeLongAmount, 8))
+    const oToken = allOtokens ? allOtokens[selectedLongIndex].id : ZERO_ADDR
+    await controller.simpleAddLong(user, vaultId, user, oToken, fromTokenAmount(changeLongAmount, 8))
     setChangeCollateralAmount(new BigNumber(0))
-  }, [controller, user, vaultId, collateralToken.address, changeLongAmount])
+  }, [controller, user, vaultId, allOtokens, selectedLongIndex, changeLongAmount])
 
   const simpleRemoveLong = useCallback(async () => {
-    await controller.simpleRemoveLong(user, vaultId, user, collateralToken.address, fromTokenAmount(changeLongAmount, 8))
+    const oToken = allOtokens ? allOtokens[selectedLongIndex].id : ZERO_ADDR
+    await controller.simpleRemoveLong(user, vaultId, user, oToken, fromTokenAmount(changeLongAmount, 8))
     setChangeCollateralAmount(new BigNumber(0))
-  }, [controller, user, vaultId, collateralToken.address, changeLongAmount])
+  }, [controller, user, vaultId, allOtokens, selectedLongIndex, changeLongAmount])
 
   const simpleMint = useCallback(async () => {
-    await controller.simpleMint(user, vaultId, user, collateralToken.address, fromTokenAmount(changeShortAmount, 8))
+    const oToken = allOtokens ? allOtokens[selectedShortIndex].id : ZERO_ADDR
+    await controller.simpleMint(user, vaultId, user, oToken, fromTokenAmount(changeShortAmount, 8))
     setChangeCollateralAmount(new BigNumber(0))
-  }, [controller, user, vaultId, collateralToken.address, changeShortAmount])
+  }, [controller, user, vaultId, allOtokens, selectedShortIndex, changeShortAmount])
 
   const simpleBurn = useCallback(async () => {
-    await controller.simpleBurn(user, vaultId, user, collateralToken.address, fromTokenAmount(changeShortAmount, 8))
+    const oToken = allOtokens ? allOtokens[selectedShortIndex].id : ZERO_ADDR
+    await controller.simpleBurn(user, vaultId, user, oToken, fromTokenAmount(changeShortAmount, 8))
     setChangeCollateralAmount(new BigNumber(0))
-  }, [controller, user, vaultId, collateralToken.address, changeShortAmount])
+  }, [controller, user, vaultId, allOtokens, selectedShortIndex, changeShortAmount])
 
-  const renderRow = useCallback(({ label, symbol, asset, amount, decimals, onInputChange, inputValue, onClickAdd, onClickMinus }) => {
+  const renderRow = useCallback(({ label, symbol, asset, amount, decimals, onInputChange, inputValue, onClickAdd, onClickMinus, dropdownSelected, dropdownOnChange, dropdownItems }) => {
     return [
       <div style={{ opacity: 0.8 }}> {label} </div>,
       asset
         ? <CustomIdentityBadge shorten={true} entity={asset} label={symbol} />
-        : <CustomIdentityBadge shorten={true} entity={ZERO_ADDR} label={emptyToken.symbol} />,
+        : <DropDown
+          items={dropdownItems}
+          selected={dropdownSelected}
+          onChange={dropdownOnChange}
+        />,
       amount
         ? toTokenAmount(new BigNumber(amount), decimals).toString()
         : 0,
@@ -112,6 +129,9 @@ export default function VaultDetail() {
             onInputChange: (e) => (setChangeCollateralAmount(new BigNumber(e.target.value))),
             onClickAdd: simpleAddCollateral,
             onClickMinus: simpleRemoveCollateral,
+            dropdownSelected: selectedCollateralIndex,
+            dropdownOnChange: setSelectedCollateralIndex,
+            dropdownItems: tokens[networkId]?.map(o => o.symbol)
           },
           {
             label: 'Long',
@@ -123,6 +143,9 @@ export default function VaultDetail() {
             onInputChange: (e) => (setChangeLongAmount(new BigNumber(e.target.value))),
             onClickAdd: simpleAddLong,
             onClickMinus: simpleRemoveLong,
+            dropdownSelected: selectedLongIndex,
+            dropdownOnChange: setSelectedLongIndex,
+            dropdownItems: allOtokens?.map(o => o.symbol)
           },
           {
             label: 'Short',
@@ -134,6 +157,9 @@ export default function VaultDetail() {
             onInputChange: (e) => (setChangeShortAmount(new BigNumber(e.target.value))),
             onClickAdd: simpleMint,
             onClickMinus: simpleBurn,
+            dropdownSelected: selectedShortIndex,
+            dropdownOnChange: setSelectedShortIndex,
+            dropdownItems: allOtokens?.map(o => o.symbol)
           }
         ]}
         renderEntry={renderRow}
