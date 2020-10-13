@@ -23,7 +23,7 @@ export class Controller extends SmartContract {
     await this.operate([openArg])
   }
 
-  async addOwnCollateral(account: string, vaultId: BigNumber, from: string, asset:string, amount: BigNumber) {
+  async simpleAddCollateral(account: string, vaultId: BigNumber, from: string, asset:string, amount: BigNumber) {
     if (this.web3 === null) return
     const collateral = new this.web3.eth.Contract(erc20Abi, asset)
     const pool = addressese[this.networkId].pool;
@@ -35,9 +35,39 @@ export class Controller extends SmartContract {
     await this.operate([arg])
   }
 
-  async removeOwnCollateral(account: string, vaultId: BigNumber, to: string, asset:string, amount: BigNumber) {
+  async simpleRemoveCollateral(account: string, vaultId: BigNumber, to: string, asset:string, amount: BigNumber) {
     if (this.web3 === null) return
     const arg = createWithdrawCollateralArg(account, to, vaultId, asset, amount)
+    await this.operate([arg])
+  }
+
+  async simpleAddLong(account: string, vaultId: BigNumber, from: string, asset:string, amount: BigNumber) {
+    if (this.web3 === null) return
+    const oToken = new this.web3.eth.Contract(erc20Abi, asset)
+    const pool = addressese[this.networkId].pool;
+    const allowance = await oToken.methods.allowance(from, pool)
+    if (new BigNumber(allowance).lt(new BigNumber(amount))) {
+      await oToken.methods.approve(pool, amount)
+    }
+    const arg = createDepositLongArg(account, from, vaultId, asset, amount)
+    await this.operate([arg])
+  }
+
+  async simpleRemoveLong(account: string, vaultId: BigNumber, to: string, asset:string, amount: BigNumber) {
+    if (this.web3 === null) return
+    const arg = createWithdrawLongArg(account, to, vaultId, asset, amount)
+    await this.operate([arg])
+  }
+
+  async simpleBurn(account: string, vaultId: BigNumber, from: string, asset:string, amount: BigNumber) {
+    if (this.web3 === null) return
+    const arg = createBurnShortArg(account, from, vaultId, asset, amount)
+    await this.operate([arg])
+  }
+
+  async simpleMint(account: string, vaultId: BigNumber, to: string, asset:string, amount: BigNumber) {
+    if (this.web3 === null) return
+    const arg = createMintShortArg(account, to, vaultId, asset, amount)
     await this.operate([arg])
   }
 

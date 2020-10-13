@@ -28,18 +28,18 @@ export default function VaultSection({ account, vaults, isLoading }: VaultSectio
 
   const USDC = useTokenBySymbol('USDC', networkId)
 
-  const addOwnCollateral = useCallback(async() => {
+  const simpleAddCollateral = useCallback(async() => {
     const vaultId = new BigNumber(1)
     const collateral = USDC ? USDC.address : ZERO_ADDR
-    await controller.addOwnCollateral(account, vaultId, account, collateral, new BigNumber(1e6))
+    await controller.simpleAddCollateral(account, vaultId, account, collateral, new BigNumber(1e6))
   }, [USDC, controller, account])
 
-  // const addOwnLong = useCallback(async() => {
-  //   await controller.addOwnLong()
+  // const simpleAddLong = useCallback(async() => {
+  //   await controller.simpleAddLong()
   // }, [controller])
 
-  // const mintOwnShort = useCallback(async () =>  {
-  //   await controller.mintOwnShort()
+  // const simpleMint = useCallback(async () =>  {
+  //   await controller.simpleMint()
   // }, [controller])
 
   const renderRow = useCallback((vault: SubgraphVault, index) => {

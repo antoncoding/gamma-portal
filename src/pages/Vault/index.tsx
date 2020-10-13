@@ -46,16 +46,35 @@ export default function VaultDetail() {
 
   const collateralToken = useTokenByAddress(vaultDetail && vaultDetail.collateralAsset ? vaultDetail.collateralAsset : ZERO_ADDR, networkId)
 
-  const addOwnCollateral = useCallback(async () => {
-    
-    await controller.addOwnCollateral(user, vaultId, user, collateralToken.address, fromTokenAmount(changeCollateralAmount, collateralToken.decimals))
+  const simpleAddCollateral = useCallback(async () => {
+    await controller.simpleAddCollateral(user, vaultId, user, collateralToken.address, fromTokenAmount(changeCollateralAmount, collateralToken.decimals))
     setChangeCollateralAmount(new BigNumber(0))
   }, [controller, user, vaultId, collateralToken.address, collateralToken.decimals, changeCollateralAmount])
 
-  const removeOwnCollateral = useCallback(async () => {
-    await controller.removeOwnCollateral(user, vaultId, user, collateralToken.address, fromTokenAmount(changeCollateralAmount, collateralToken.decimals))
+  const simpleRemoveCollateral = useCallback(async () => {
+    await controller.simpleRemoveCollateral(user, vaultId, user, collateralToken.address, fromTokenAmount(changeCollateralAmount, collateralToken.decimals))
     setChangeCollateralAmount(new BigNumber(0))
   }, [controller, user, vaultId, collateralToken.address, collateralToken.decimals, changeCollateralAmount])
+
+  const simpleAddLong = useCallback(async () => {
+    await controller.simpleAddLong(user, vaultId, user, collateralToken.address, fromTokenAmount(changeLongAmount, 8))
+    setChangeCollateralAmount(new BigNumber(0))
+  }, [controller, user, vaultId, collateralToken.address, changeLongAmount])
+
+  const simpleRemoveLong = useCallback(async () => {
+    await controller.simpleRemoveLong(user, vaultId, user, collateralToken.address, fromTokenAmount(changeLongAmount, 8))
+    setChangeCollateralAmount(new BigNumber(0))
+  }, [controller, user, vaultId, collateralToken.address, changeLongAmount])
+
+  const simpleMint = useCallback(async () => {
+    await controller.simpleMint(user, vaultId, user, collateralToken.address, fromTokenAmount(changeShortAmount, 8))
+    setChangeCollateralAmount(new BigNumber(0))
+  }, [controller, user, vaultId, collateralToken.address, changeShortAmount])
+
+  const simpleBurn = useCallback(async () => {
+    await controller.simpleBurn(user, vaultId, user, collateralToken.address, fromTokenAmount(changeShortAmount, 8))
+    setChangeCollateralAmount(new BigNumber(0))
+  }, [controller, user, vaultId, collateralToken.address, changeShortAmount])
 
   const renderRow = useCallback(({ label, symbol, asset, amount, decimals, onInputChange, inputValue, onClickAdd, onClickMinus }) => {
     return [
@@ -91,8 +110,8 @@ export default function VaultDetail() {
             amount: vaultDetail?.collateralAmount,
             inputValue: changeCollateralAmount,
             onInputChange: (e) => (setChangeCollateralAmount(new BigNumber(e.target.value))),
-            onClickAdd: addOwnCollateral,
-            onClickMinus: removeOwnCollateral,
+            onClickAdd: simpleAddCollateral,
+            onClickMinus: simpleRemoveCollateral,
           },
           {
             label: 'Long',
@@ -102,8 +121,8 @@ export default function VaultDetail() {
             amount: vaultDetail?.longAmount,
             inputValue: changeLongAmount,
             onInputChange: (e) => (setChangeLongAmount(new BigNumber(e.target.value))),
-            onClickAdd: addOwnCollateral,
-            onClickMinus: removeOwnCollateral,
+            onClickAdd: simpleAddLong,
+            onClickMinus: simpleRemoveLong,
           },
           {
             label: 'Short',
@@ -113,8 +132,8 @@ export default function VaultDetail() {
             amount: vaultDetail?.shortAmount,
             inputValue: changeShortAmount,
             onInputChange: (e) => (setChangeShortAmount(new BigNumber(e.target.value))),
-            onClickAdd: addOwnCollateral,
-            onClickMinus: removeOwnCollateral,
+            onClickAdd: simpleMint,
+            onClickMinus: simpleBurn,
           }
         ]}
         renderEntry={renderRow}

@@ -143,6 +143,70 @@ export async function getOTokens(
   }
 }
 
+export const getVaultHistory = async (networkId: SupportedNetworks,
+  owner: string,
+  vaultId: number,
+  errorCallback: Function) => {
+  const query = `{
+    depositCollateralActions (where: {vault_contains: "${owner}-${vaultId}"}) {
+      asset
+      amount
+      timestamp
+      transactionHash
+    }
+    withdrawCollateralActions (where: {vault_contains: "${owner}-${vaultId}"}) {
+      asset
+      amount
+      timestamp
+      transactionHash
+    }
+    depositLongActions (where: {vault_contains: "${owner}-${vaultId}"}) {
+      oToken {
+        symbol
+        id
+      }
+      amount
+      timestamp
+      transactionHash
+    }
+    withdrawLongActions (where: {vault_contains: "${owner}-${vaultId}"}) {
+      oToken {
+        symbol
+        id
+      }
+      amount
+      timestamp
+      transactionHash
+    }
+    mintShortActions (where: {vault_contains: "${owner}-${vaultId}"}) {
+      oToken {
+        symbol
+        id
+      }
+      amount
+      timestamp
+      transactionHash
+    }
+    burnShortActions (where: {vault_contains: "${owner}-${vaultId}"}) {
+      oToken {
+        symbol
+        id
+      }
+      amount
+      timestamp
+      transactionHash
+    }
+  }
+  `
+  try {
+    const response = await postQuery(endpoints[networkId], query);
+    return response.data;
+  } catch (error) {
+    errorCallback(error.toString());
+    return null;
+  }
+}
+
 const postQuery = async (endpoint: string, query: string) => {
   const options = {
     method: 'POST',
