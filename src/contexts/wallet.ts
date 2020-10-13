@@ -3,11 +3,10 @@ import Web3 from 'web3'
 
 export interface Wallet {
   web3: Web3 | null,
-  onboard: any,
   user: string,
   setUser: (user: string) => void;
   networkId: number,
-  connect: () => string | null,
+  connect: () => Promise<string | false>,
   disconnect: Function
 }
 
@@ -15,9 +14,8 @@ export const DEFAULT : Wallet = {
   networkId: 4,
   web3: null,
   user: '',
-  onboard: null, 
   setUser: (user: string):void => {},
-  connect: () => '',
+  connect: async () => '',
   disconnect: () => {}
 }
 

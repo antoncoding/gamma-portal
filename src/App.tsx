@@ -9,6 +9,7 @@ import NavBar from "./components/NavBar"
 import Create from './pages/CreateOption'
 import Account from './pages/Account'
 import Operators from './pages/OperatorManagement'
+import Vault from './pages/Vault'
 import { useConnection } from './hooks/useConnection'
 
 import { HashRouter as Router, Switch, Route } from 'react-router-dom';
@@ -31,6 +32,9 @@ function App() {
               </Route>
               <Route path="/operators">
                 <Operators />
+              </Route>
+              <Route path="/vault/:owner/:vaultId">
+                <Vault />
               </Route>
             </Switch>
           </Layout>

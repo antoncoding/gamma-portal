@@ -1,6 +1,6 @@
-import { subgraph as endpoints} from '../constants/endpoints'
+import { subgraph as endpoints } from '../constants/endpoints';
 import { SupportedNetworks } from '../constants/networks';
-import { SubgraphVault } from '../types'
+import { SubgraphVault } from '../types';
 /**
  * Get all oTokens
  */
@@ -8,14 +8,12 @@ export async function getAccount(
   networkId: SupportedNetworks,
   account: string,
   errorCallback: Function
-): Promise<
-  {
-    operatorCount: string;
-    operators: {operator: {id:string}}[];
-    vaultCount: string;
-    vaults: SubgraphVault[];
-  } | null
-> {
+): Promise<{
+  operatorCount: string;
+  operators: { operator: { id: string } }[];
+  vaultCount: string;
+  vaults: SubgraphVault[];
+} | null> {
   const query = `
   {
     account(id: "${account}") {
@@ -45,26 +43,83 @@ export async function getAccount(
     const response = await postQuery(endpoints[networkId], query);
     return response.data.account;
   } catch (error) {
-    errorCallback(error.toString())
-    return null
+    errorCallback(error.toString());
+    return null;
   }
-  
+}
+
+export async function getVault(
+  networkId: SupportedNetworks,
+  accountOwner: string,
+  vaultId: number,
+  errorCallback: Function
+): Promise< null | {
+  collateralAmount: string | null;
+  collateralAsset: string | null;
+  longAmount: string | null;
+  longOToken: null | { id: string, symbol: string };
+  owner: {
+    operators: {
+      operator: {
+        id: string;
+      };
+    }[];
+  };
+  shortAmount: null | string;
+  shortOToken: null | { id: string, symbol: string };
+}> {
+  const query = `{
+    vault(id: "${accountOwner}-${vaultId}")
+    {
+      owner {
+        operators {
+          operator {
+            id
+          }
+        }
+      }
+      shortOToken {
+        id
+        symbol
+      }
+      shortAmount
+      collateralAsset
+      collateralAmount
+      longOToken {
+        id
+        symbol
+      }
+      longAmount 
+    }
+  }
+  `;
+  try {
+    const response = await postQuery(endpoints[networkId], query);
+    return response.data.vault;
+  } catch (error) {
+    errorCallback(error.toString());
+    return null;
+  }
 }
 
 /**
  * Get all oTokens
  */
-export async function getOTokens(networkId: SupportedNetworks, errorCallback: Function): Promise<
-  {
-    id: string;
-    strikeAsset: string;
-    underlyingAsset: string;
-    collateralAsset: string;
-    isPut: boolean;
-    expiryTimestamp: string;
-    createdAt: string;
-    createdTx: string
-  }[] | null
+export async function getOTokens(
+  networkId: SupportedNetworks,
+  errorCallback: Function
+): Promise<
+  | {
+      id: string;
+      strikeAsset: string;
+      underlyingAsset: string;
+      collateralAsset: string;
+      isPut: boolean;
+      expiryTimestamp: string;
+      createdAt: string;
+      createdTx: string;
+    }[]
+  | null
 > {
   const query = `
   {
@@ -83,8 +138,8 @@ export async function getOTokens(networkId: SupportedNetworks, errorCallback: Fu
     const response = await postQuery(endpoints[networkId], query);
     return response.data.otokens;
   } catch (error) {
-    errorCallback(error.toString())
-    return null
+    errorCallback(error.toString());
+    return null;
   }
 }
 
@@ -96,10 +151,10 @@ const postQuery = async (endpoint: string, query: string) => {
   };
   const url = endpoint;
   const response = await fetch(url, options);
-  const data =  await response.json();
+  const data = await response.json();
   if (data.errors) {
-    throw new Error(data.errors[0].message)
+    throw new Error(data.errors[0].message);
   } else {
-    return data
+    return data;
   }
 };

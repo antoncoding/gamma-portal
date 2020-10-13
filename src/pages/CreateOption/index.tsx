@@ -5,20 +5,22 @@ import LabelText from '../../components/LabelText'
 import Warning from '../../components/Warning'
 
 import { walletContext } from '../../contexts/wallet'
-import useToken from '../../hooks/useToken'
+import { useTokenBySymbol } from '../../hooks/useToken'
 
 import { OTokenFactory } from '../../utils/contracts/factory'
+import { Token } from '../../types'
+import { ZERO_ADDR } from '../../constants/addresses'
 
 export default function CreateOption() {
 
   const { networkId, web3, user } = useContext(walletContext)
 
-  const USDC = useToken('USDC', networkId)
-  const WETH = useToken('WETH', networkId)
+  const USDC = useTokenBySymbol('USDC', networkId)
+  const WETH = useTokenBySymbol('WETH', networkId)
 
-  const [underlying, setUnderlying] = useState<string>(WETH)
-  const [strike, setStrike] = useState<string>(USDC)
-  const [collateral, setCollateral] = useState<string>(USDC)
+  const [underlying, setUnderlying] = useState<Token|null>(WETH)
+  const [strike, setStrike] = useState<Token|null>(USDC)
+  const [collateral, setCollateral] = useState<Token|null>(USDC)
   const [strikePriceReadable, setStrikePriceReadable] = useState<BigNumber>(new BigNumber(250))
   const [expiryTimestamp, setExpiryTimestamp] = useState<BigNumber>(new BigNumber(1606809600))
   const [isPut, setIsPut] = useState(true)
@@ -49,6 +51,7 @@ export default function CreateOption() {
 
   async function createOToken() {
     const factory = new OTokenFactory(web3, networkId, user)
+    if (!underlying || !strike || !collateral) return 
     await factory.createOToken(underlying.address, strike.address, collateral.address, strikePrice, expiryTimestamp, isPut)
   }
 
@@ -59,17 +62,17 @@ export default function CreateOption() {
 
         <div style={{ width: '30%', marginRight: '5%' }}>
           <LabelText label='underlying' />
-          <TextInput type="text" onChange={setUnderlying} readOnly value={underlying.address} wide />
+          <TextInput type="text" onChange={setUnderlying} readOnly value={underlying ?  underlying.address : ZERO_ADDR } wide />
         </div>
 
         <div style={{ width: '30%' }}>
           <LabelText label='strike' />
-          <TextInput type="text" onChange={setStrike} readOnly value={strike.address} wide />
+          <TextInput type="text" onChange={setStrike} readOnly value={strike ? strike.address : ZERO_ADDR} wide />
         </div>
 
         <div style={{ width: '30%', marginLeft: '5%' }}>
           <LabelText label='collateral' />
-          <TextInput type="text" onChange={setCollateral} readOnly value={collateral.address} wide />
+          <TextInput type="text" onChange={setCollateral} readOnly value={collateral ? collateral.address : ZERO_ADDR} wide />
         </div>
 
       </div>

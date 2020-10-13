@@ -15,7 +15,7 @@ function ConnectButton() {
 
   const connectWeb3 = async () => {
     const address = await connect();
-    if (address === false) return;
+    if (!address) return;
     checkAddressAndAddToStorage(address);
   };
 

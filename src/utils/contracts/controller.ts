@@ -5,6 +5,7 @@ import {addressese, ZERO_ADDR} from '../../constants/addresses'
 import {actionArg, ActionType} from '../../types'
 
 const abi = require('../../constants/abis/controller.json')
+const erc20Abi = require('../../constants/abis/erc20.json')
 
 export class Controller extends SmartContract {
   public contract: any
@@ -17,18 +18,21 @@ export class Controller extends SmartContract {
 
   async openVault (account) {
     const counter = await this.contract.methods.getAccountVaultCounter(account).call()
-    console.log(`counter`, counter)
-    const openArg = {
-      actionType: ActionType.OpenVault,
-      owner: account,
-      secondAddress: account,
-      asset: ZERO_ADDR,
-      vaultId: new BigNumber(counter).plus(1).toString(),
-      amount: '0',
-      index: '0',
-      data: ZERO_ADDR,
-    }
+    const newVulatId = new BigNumber(counter).plus(1)
+    const openArg = createOpenVaultArg(account, newVulatId)
     await this.operate([openArg])
+  }
+
+  async addOwnCollateral(account: string, vaultId: BigNumber, from: string, asset:string, amount: BigNumber) {
+    if (this.web3 === null) return
+    const collateral = new this.web3.eth.Contract(erc20Abi, asset)
+    const pool = addressese[this.networkId].pool;
+    const allowance = await collateral.methods.allowance(from, pool)
+    if (new BigNumber(allowance).lt(new BigNumber(amount))) {
+      await collateral.methods.approve(pool, amount)
+    }
+    const arg = createDepositCollateralArg(account, from, vaultId, asset, amount)
+    await this.operate([arg])
   }
 
   async operate (args: actionArg[]) {
@@ -43,5 +47,98 @@ export class Controller extends SmartContract {
       .setOperator(operator, isOperator)
       .send({from: this.account})
       .on('transactionHash', this.getCallback())
+  }
+}
+
+// util functions for action library
+
+function createOpenVaultArg(account: string, vaultId: BigNumber) : actionArg {
+  return {
+    actionType: ActionType.OpenVault,
+    owner: account,
+    secondAddress: account,
+    asset: ZERO_ADDR,
+    vaultId: vaultId.toString(),
+    amount: '0',
+    index: '0',
+    data: ZERO_ADDR,
+  }
+}
+
+function createDepositCollateralArg(account: string, from:string, vaultId: BigNumber, asset: string, amount: BigNumber) : actionArg {
+  return {
+    actionType: ActionType.DepositCollateral,
+    owner: account,
+    secondAddress: from,
+    asset: asset,
+    vaultId: vaultId.toString(),
+    amount: amount.toString(),
+    index: '0',
+    data: ZERO_ADDR,
+  }
+}
+
+function createWithdrawCollateralArg(account: string, to: string, vaultId: BigNumber, asset: string, amount: BigNumber) : actionArg {
+  return {
+    actionType: ActionType.WithdrawCollateral,
+    owner: account,
+    secondAddress: to,
+    asset: asset,
+    vaultId: vaultId.toString(),
+    amount: amount.toString(),
+    index: '0',
+    data: ZERO_ADDR,
+  }
+}
+
+function createMintShortArg(account: string, to:string, vaultId: BigNumber, oToken: string, amount: BigNumber) : actionArg {
+  return {
+    actionType: ActionType.MintShortOption,
+    owner: account,
+    secondAddress: to,
+    asset: oToken,
+    vaultId: vaultId.toString(),
+    amount: amount.toString(),
+    index: '0',
+    data: ZERO_ADDR,
+  }
+}
+
+function createBurnShortArg(account: string, from: string, vaultId: BigNumber, oToken: string, amount: BigNumber) : actionArg {
+  return {
+    actionType: ActionType.BurnShortOption,
+    owner: account,
+    secondAddress: from,
+    asset: oToken,
+    vaultId: vaultId.toString(),
+    amount: amount.toString(),
+    index: '0',
+    data: ZERO_ADDR,
+  }
+}
+
+function createDepositLongArg(account: string, from:string, vaultId: BigNumber, oToken: string, amount: BigNumber) : actionArg {
+  return {
+    actionType: ActionType.DepositLongOption,
+    owner: account,
+    secondAddress: from,
+    asset: oToken,
+    vaultId: vaultId.toString(),
+    amount: amount.toString(),
+    index: '0',
+    data: ZERO_ADDR,
+  }
+}
+
+function createWithdrawLongArg(account: string, to: string, vaultId: BigNumber, oToken: string, amount: BigNumber) : actionArg {
+  return {
+    actionType: ActionType.WithdrawLongOption,
+    owner: account,
+    secondAddress: to,
+    asset: oToken,
+    vaultId: vaultId.toString(),
+    amount: amount.toString(),
+    index: '0',
+    data: ZERO_ADDR,
   }
 }
