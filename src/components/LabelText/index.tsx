@@ -6,7 +6,7 @@ function LabelText({ label }:{label: string}) {
 
   const theme = useTheme()
 
-  return <div style={{ fontSize: 18, color: theme.contentSecondary }}>{label}</div>;
+  return <div style={{ fontSize: 15, color: theme.contentSecondary }}>{label}</div>;
 }
 
 export default LabelText;

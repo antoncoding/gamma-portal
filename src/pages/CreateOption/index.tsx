@@ -62,17 +62,17 @@ export default function CreateOption() {
       <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '3%' }}>
 
         <div style={{ width: '30%', marginRight: '5%' }}>
-          <LabelText label='underlying' />
+          <LabelText label='Underlying' />
           <TextInput type="text" onChange={setUnderlying} readOnly value={underlying ?  underlying.address : ZERO_ADDR } wide />
         </div>
 
         <div style={{ width: '30%' }}>
-          <LabelText label='strike' />
+          <LabelText label='Strike' />
           <TextInput type="text" onChange={setStrike} readOnly value={strike ? strike.address : ZERO_ADDR} wide />
         </div>
 
         <div style={{ width: '30%', marginLeft: '5%' }}>
-          <LabelText label='collateral' />
+          <LabelText label='Collateral' />
           <TextInput type="text" onChange={setCollateral} readOnly value={collateral ? collateral.address : ZERO_ADDR} wide />
         </div>
 
@@ -81,12 +81,12 @@ export default function CreateOption() {
       <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '1%' }}>
 
         <div style={{ width: '30%', marginRight: '5%' }}>
-          <LabelText label="Is Put" />
+          <LabelText label="IsPut" />
           <Switch checked={isPut} onChange={setIsPut} />
         </div>
 
         <div style={{ width: '30%' }}>
-          <LabelText label='Strike price' />
+          <LabelText label='Strike Price' />
           <TextInput type="number" value={strikePriceReadable} onChange={(e) => setStrikePriceReadable(new BigNumber(e.target.value))} wide />
         </div>
 

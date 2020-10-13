@@ -52,7 +52,6 @@ export default function VaultDetail() {
     else return vaultDetail.owner.operators.map(o => o.operator.id).includes(user)
   }, [vaultDetail, owner, user])
 
-
   const collateralToken = useTokenByAddress(vaultDetail && vaultDetail.collateralAsset ? vaultDetail.collateralAsset : tokens[networkId][selectedCollateralIndex].address, networkId)
 
   const simpleAddCollateral = useCallback(async () => {
@@ -66,7 +65,7 @@ export default function VaultDetail() {
   }, [controller, user, vaultId, collateralToken.address, collateralToken.decimals, changeCollateralAmount])
 
   const simpleAddLong = useCallback(async () => {
-    const oToken = vaultDetail && vaultDetail.longOToken ? vaultDetail.longOToken.id :  allOtokens ? allOtokens[selectedLongIndex].id : ZERO_ADDR
+    const oToken = vaultDetail && vaultDetail.longOToken ? vaultDetail.longOToken.id : allOtokens ? allOtokens[selectedLongIndex].id : ZERO_ADDR
     await controller.simpleAddLong(user, vaultId, user, oToken, fromTokenAmount(changeLongAmount, 8))
     setChangeCollateralAmount(new BigNumber(0))
   }, [vaultDetail, allOtokens, selectedLongIndex, controller, user, vaultId, changeLongAmount])
@@ -103,7 +102,7 @@ export default function VaultDetail() {
         ? toTokenAmount(new BigNumber(amount), decimals).toString()
         : 0,
       <>
-        <TextInput onChange={onInputChange} value={inputValue} />
+        <TextInput type="number" onChange={onInputChange} value={inputValue} />
         <Button label="Add" display="icon" icon={<IconCirclePlus />} onClick={onClickAdd} />
         <Button label="Remove" display="icon" icon={<IconCircleMinus />} onClick={onClickMinus} />
       </>
@@ -126,7 +125,9 @@ export default function VaultDetail() {
             asset: vaultDetail?.collateralAsset,
             amount: vaultDetail?.collateralAmount,
             inputValue: changeCollateralAmount,
-            onInputChange: (e) => (setChangeCollateralAmount(new BigNumber(e.target.value))),
+            onInputChange: (e) => (e.target.value ? setChangeCollateralAmount(new BigNumber(e.target.value)) 
+              : setChangeCollateralAmount(new BigNumber(0))
+            ),
             onClickAdd: simpleAddCollateral,
             onClickMinus: simpleRemoveCollateral,
             dropdownSelected: selectedCollateralIndex,
@@ -140,7 +141,9 @@ export default function VaultDetail() {
             asset: vaultDetail?.longOToken?.id,
             amount: vaultDetail?.longAmount,
             inputValue: changeLongAmount,
-            onInputChange: (e) => (setChangeLongAmount(new BigNumber(e.target.value))),
+            onInputChange: (e) => ( e.target.value ? setChangeLongAmount(new BigNumber(e.target.value))
+              : setChangeLongAmount(new BigNumber(0))
+            ),
             onClickAdd: simpleAddLong,
             onClickMinus: simpleRemoveLong,
             dropdownSelected: selectedLongIndex,
@@ -154,7 +157,9 @@ export default function VaultDetail() {
             asset: vaultDetail?.shortOToken?.id,
             amount: vaultDetail?.shortAmount,
             inputValue: changeShortAmount,
-            onInputChange: (e) => (setChangeShortAmount(new BigNumber(e.target.value))),
+            onInputChange: (e) => ( e.target.value ? setChangeShortAmount(e.target.value) 
+            : setChangeShortAmount(new BigNumber(0))
+          ),
             onClickAdd: simpleMint,
             onClickMinus: simpleBurn,
             dropdownSelected: selectedShortIndex,

@@ -2,7 +2,7 @@ import { subgraph as endpoints } from '../constants/endpoints';
 import { blacklistOTokens } from '../constants/addresses'
 import { SupportedNetworks } from '../constants/networks';
 import { SubgraphVault } from '../types';
-import {BigNumber} from 'bignumber.js'
+
 /**
  * Get all oTokens
  */
