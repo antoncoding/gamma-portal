@@ -35,6 +35,12 @@ export class Controller extends SmartContract {
     await this.operate([arg])
   }
 
+  async removeOwnCollateral(account: string, vaultId: BigNumber, to: string, asset:string, amount: BigNumber) {
+    if (this.web3 === null) return
+    const arg = createWithdrawCollateralArg(account, to, vaultId, asset, amount)
+    await this.operate([arg])
+  }
+
   async operate (args: actionArg[]) {
     await this.contract.methods
       .operate(args)
