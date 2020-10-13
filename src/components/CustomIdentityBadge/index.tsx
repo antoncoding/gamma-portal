@@ -24,7 +24,7 @@ function CustomIdentityBadge({ entity, connectedAccount, label, shorten }: Custo
 
   useEffect(() => {
     if (entity === ZERO_ADDR) {
-      setDisplayLabel('Empty')
+      setDisplayLabel('N/A')
     } else {
       const customLabelOrUndefined = storedLabels.find(entry => entry.address === entity)?.label
       if (customLabelOrUndefined !== undefined) {

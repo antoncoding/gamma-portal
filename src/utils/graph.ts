@@ -1,6 +1,8 @@
 import { subgraph as endpoints } from '../constants/endpoints';
+import { blacklistOTokens } from '../constants/addresses'
 import { SupportedNetworks } from '../constants/networks';
 import { SubgraphVault } from '../types';
+import {BigNumber} from 'bignumber.js'
 /**
  * Get all oTokens
  */
@@ -116,6 +118,7 @@ export async function getOTokens(
       symbol: string,
       name: string;
       strikeAsset: string;
+      strikePrice: string
       underlyingAsset: string;
       collateralAsset: string;
       isPut: boolean;
@@ -134,6 +137,7 @@ export async function getOTokens(
       strikeAsset
       underlyingAsset
       collateralAsset
+      strikePrice
       isPut
       expiryTimestamp
       createdAt
@@ -142,7 +146,9 @@ export async function getOTokens(
   }`;
   try {
     const response = await postQuery(endpoints[networkId], query);
-    return response.data.otokens;
+    
+    const oTokens = response.data.otokens.filter((otoken: {id: string}) => !blacklistOTokens[networkId].includes(otoken.id));
+    return oTokens
   } catch (error) {
     errorCallback(error.toString());
     return null;
