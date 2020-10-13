@@ -66,28 +66,29 @@ export default function VaultDetail() {
   }, [controller, user, vaultId, collateralToken.address, collateralToken.decimals, changeCollateralAmount])
 
   const simpleAddLong = useCallback(async () => {
-    const oToken = allOtokens ? allOtokens[selectedLongIndex].id : ZERO_ADDR
+    const oToken = vaultDetail && vaultDetail.longOToken ? vaultDetail.longOToken.id :  allOtokens ? allOtokens[selectedLongIndex].id : ZERO_ADDR
     await controller.simpleAddLong(user, vaultId, user, oToken, fromTokenAmount(changeLongAmount, 8))
     setChangeCollateralAmount(new BigNumber(0))
-  }, [controller, user, vaultId, allOtokens, selectedLongIndex, changeLongAmount])
+  }, [vaultDetail, allOtokens, selectedLongIndex, controller, user, vaultId, changeLongAmount])
 
   const simpleRemoveLong = useCallback(async () => {
-    const oToken = allOtokens ? allOtokens[selectedLongIndex].id : ZERO_ADDR
+    const oToken = vaultDetail && vaultDetail.longOToken ? vaultDetail.longOToken.id : allOtokens ? allOtokens[selectedLongIndex].id : ZERO_ADDR
     await controller.simpleRemoveLong(user, vaultId, user, oToken, fromTokenAmount(changeLongAmount, 8))
     setChangeCollateralAmount(new BigNumber(0))
-  }, [controller, user, vaultId, allOtokens, selectedLongIndex, changeLongAmount])
+  }, [vaultDetail, allOtokens, selectedLongIndex, controller, user, vaultId, changeLongAmount])
 
   const simpleMint = useCallback(async () => {
-    const oToken = allOtokens ? allOtokens[selectedShortIndex].id : ZERO_ADDR
+    const oToken = vaultDetail && vaultDetail.shortOToken ? vaultDetail.shortOToken.id : allOtokens ? allOtokens[selectedShortIndex].id : ZERO_ADDR
+    console.log(`oToken`, oToken)
     await controller.simpleMint(user, vaultId, user, oToken, fromTokenAmount(changeShortAmount, 8))
     setChangeCollateralAmount(new BigNumber(0))
-  }, [controller, user, vaultId, allOtokens, selectedShortIndex, changeShortAmount])
+  }, [vaultDetail, allOtokens, selectedShortIndex, controller, user, vaultId, changeShortAmount])
 
   const simpleBurn = useCallback(async () => {
-    const oToken = allOtokens ? allOtokens[selectedShortIndex].id : ZERO_ADDR
+    const oToken = vaultDetail && vaultDetail.shortOToken ? vaultDetail.shortOToken.id : allOtokens ? allOtokens[selectedShortIndex].id : ZERO_ADDR
     await controller.simpleBurn(user, vaultId, user, oToken, fromTokenAmount(changeShortAmount, 8))
     setChangeCollateralAmount(new BigNumber(0))
-  }, [controller, user, vaultId, allOtokens, selectedShortIndex, changeShortAmount])
+  }, [vaultDetail, allOtokens, selectedShortIndex, controller, user, vaultId, changeShortAmount])
 
   const renderRow = useCallback(({ label, symbol, asset, amount, decimals, onInputChange, inputValue, onClickAdd, onClickMinus, dropdownSelected, dropdownOnChange, dropdownItems }) => {
     return [
