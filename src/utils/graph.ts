@@ -24,10 +24,12 @@ export async function getAccount(
         collateralAmount
         shortOToken{
           id
+          symbol
         }
         shortAmount
         longOToken {
           id
+          symbol
         }
         longAmount
       }

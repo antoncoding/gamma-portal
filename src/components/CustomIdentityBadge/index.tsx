@@ -27,8 +27,10 @@ function CustomIdentityBadge({ entity, connectedAccount, label, shorten }: Custo
       setDisplayLabel('Empty')
     } else {
       const customLabelOrUndefined = storedLabels.find(entry => entry.address === entity)?.label
-      setDisplayLabel(customLabelOrUndefined)
-      setNewLabel(customLabelOrUndefined)
+      if (customLabelOrUndefined !== undefined) {
+        setDisplayLabel(customLabelOrUndefined)
+        setNewLabel(customLabelOrUndefined)
+      }
     }
     
     return () => {

@@ -31,20 +31,22 @@ export default function VaultSection({ account, vaults, isLoading }: VaultSectio
   const renderRow = useCallback((vault: SubgraphVault, index) => {
     const collateralAsset = vault.collateralAsset ? vault.collateralAsset : ZERO_ADDR
     const longAsset = vault.longOToken ? vault.longOToken.id : ZERO_ADDR
+    const longSymbol = vault.longOToken ? vault.longOToken.symbol : 'N/A'
     const shortAsset = vault.shortOToken ? vault.shortOToken.id : ZERO_ADDR
+    const shortSymbol = vault.shortOToken ? vault.shortOToken.symbol : 'N/A'
     const collateralAmount = vault.collateralAmount ? vault.collateralAmount : '0'
     const longAmount = vault.longAmount ? vault.longAmount : '0'
     const shortAmount = vault.shortAmount ? vault.shortAmount : '0'
     return [
-      <CustomIdentityBadge shorten={true} entity={collateralAsset} />,
+      <CustomIdentityBadge shorten={true} label={collateralToken.symbol} entity={collateralAsset} />,
       toTokenAmount(new BigNumber(collateralAmount), collateralToken.decimals).toString(),
-      <CustomIdentityBadge shorten={true} entity={longAsset} />,
+      <CustomIdentityBadge shorten={true} entity={longAsset} label={longSymbol} />,
       toTokenAmount(new BigNumber(longAmount), 8).toString(),
-      <CustomIdentityBadge shorten={true} entity={shortAsset} />,
+      <CustomIdentityBadge shorten={true} entity={shortAsset} label={shortSymbol}/>,
       toTokenAmount(new BigNumber(shortAmount), 8).toString(),
       <Button label={"Detail"} onClick={()=>{ history.push(`/vault/${account}/${index + 1}`);}} />
     ]
-  }, [account, collateralToken.decimals, history])
+  }, [account, collateralToken.decimals, collateralToken.symbol, history])
 
   return (
     <>

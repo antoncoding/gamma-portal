@@ -34,7 +34,7 @@ export type SubgraphVault = {
   collateralAmount: string | null
   collateralAsset: string | null
   longAmount: string | null
-  longOToken: {id: string} | null
+  longOToken: {id: string, symbol:string} | null
   shortAmount: string | null
-  shortOToken: {id: string} | null
+  shortOToken: {id: string, symbol:string} | null
 }
