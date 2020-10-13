@@ -27,9 +27,9 @@ export class Controller extends SmartContract {
     if (this.web3 === null) return
     const collateral = new this.web3.eth.Contract(erc20Abi, asset)
     const pool = addressese[this.networkId].pool;
-    const allowance = await collateral.methods.allowance(from, pool)
+    const allowance = await collateral.methods.allowance(from, pool).call()
     if (new BigNumber(allowance).lt(new BigNumber(amount))) {
-      await collateral.methods.approve(pool, amount)
+      await collateral.methods.approve(pool, amount).send({from: this.account}).on('transactionHash', this.getCallback())
     }
     const arg = createDepositCollateralArg(account, from, vaultId, asset, amount)
     await this.operate([arg])
@@ -45,9 +45,9 @@ export class Controller extends SmartContract {
     if (this.web3 === null) return
     const oToken = new this.web3.eth.Contract(erc20Abi, asset)
     const pool = addressese[this.networkId].pool;
-    const allowance = await oToken.methods.allowance(from, pool)
+    const allowance = await oToken.methods.allowance(from, pool).call()
     if (new BigNumber(allowance).lt(new BigNumber(amount))) {
-      await oToken.methods.approve(pool, amount)
+      await oToken.methods.approve(pool, amount).send({from: this.account}).on('transactionHash', this.getCallback())
     }
     const arg = createDepositLongArg(account, from, vaultId, asset, amount)
     await this.operate([arg])
