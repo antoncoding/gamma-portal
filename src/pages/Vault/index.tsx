@@ -157,7 +157,7 @@ export default function VaultDetail() {
             asset: vaultDetail?.shortOToken?.id,
             amount: vaultDetail?.shortAmount,
             inputValue: changeShortAmount,
-            onInputChange: (e) => ( e.target.value ? setChangeShortAmount(e.target.value) 
+            onInputChange: (e) => ( e.target.value ? setChangeShortAmount(new BigNumber(e.target.value))
             : setChangeShortAmount(new BigNumber(0))
           ),
             onClickAdd: simpleMint,
