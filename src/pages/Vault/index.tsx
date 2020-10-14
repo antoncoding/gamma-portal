@@ -1,13 +1,13 @@
 import React, { useContext, useMemo, useState, useCallback } from 'react'
+import BigNumber from 'bignumber.js'
 import { useParams } from 'react-router-dom';
 
 import { TextInput, Button, DataView, useToast, Tag, Header, IconCirclePlus, IconCircleMinus, DropDown } from '@aragon/ui'
-import BigNumber from 'bignumber.js'
+import History from './history'
 
 import { walletContext } from '../../contexts/wallet'
 import { Controller } from '../../utils/contracts/controller'
 import { getVault, getOTokens } from '../../utils/graph'
-import SectionTitle from '../../components/SectionHeader'
 import CustomIdentityBadge from '../../components/CustomIdentityBadge'
 import Status from '../../components/DataViewStatusEmpty'
 import { ZERO_ADDR, tokens } from '../../constants/addresses'
@@ -39,6 +39,8 @@ export default function VaultDetail() {
     return result
   }, null, [networkId, owner, toast, vaultId])
 
+  console.log(`vaultDetail`, vaultDetail)
+
   const allOtokens = useAsyncMemo(async () => {
     const result = await getOTokens(networkId, toast)
     return result
@@ -52,7 +54,7 @@ export default function VaultDetail() {
     else return vaultDetail.owner.operators.map(o => o.operator.id).includes(user)
   }, [vaultDetail, owner, user])
 
-  const collateralToken = useTokenByAddress(vaultDetail && vaultDetail.collateralAsset ? vaultDetail.collateralAsset : tokens[networkId][selectedCollateralIndex].address, networkId)
+  const collateralToken = useTokenByAddress(vaultDetail && vaultDetail.collateralAsset ? vaultDetail.collateralAsset.id : tokens[networkId][selectedCollateralIndex].address, networkId)
 
   const simpleAddCollateral = useCallback(async () => {
     await controller.simpleAddCollateral(user, vaultId, user, collateralToken.address, fromTokenAmount(changeCollateralAmount, collateralToken.decimals))
@@ -122,7 +124,7 @@ export default function VaultDetail() {
             label: 'Collateral',
             decimals: collateralToken.decimals,
             symbol: collateralToken.symbol,
-            asset: vaultDetail?.collateralAsset,
+            asset: vaultDetail?.collateralAsset?.id,
             amount: vaultDetail?.collateralAmount,
             inputValue: changeCollateralAmount,
             onInputChange: (e) => (e.target.value ? setChangeCollateralAmount(new BigNumber(e.target.value)) 
@@ -170,7 +172,7 @@ export default function VaultDetail() {
         renderEntry={renderRow}
       />
       <br /><br />
-      <SectionTitle title={'History'} />
+      <History/>
 
     </>
   )

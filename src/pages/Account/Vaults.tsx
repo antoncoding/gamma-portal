@@ -18,6 +18,8 @@ type VaultSectionProps = { account: string, isLoading: boolean, vaults: Subgraph
 
 export default function VaultSection({ account, vaults, isLoading }: VaultSectionProps ) {
 
+  console.log(vaults)
+
   const { web3, networkId, user } = useContext(walletContext)
 
   const controller = useMemo(() => new Controller(web3, networkId, user), [networkId, user, web3])
@@ -26,10 +28,11 @@ export default function VaultSection({ account, vaults, isLoading }: VaultSectio
     await controller.openVault(account)
   }, [account, controller])
 
-  const collateralToken = useTokenByAddress(vaults.length > 0 && vaults[0].collateralAsset ? vaults[0].collateralAsset : ZERO_ADDR, networkId)
+  const collateralToken = useTokenByAddress(vaults.length > 0 && vaults[0].collateralAsset ? vaults[0].collateralAsset.id : ZERO_ADDR, networkId)
 
   const renderRow = useCallback((vault: SubgraphVault, index) => {
-    const collateralAsset = vault.collateralAsset ? vault.collateralAsset : ZERO_ADDR
+    const collateralAsset = vault.collateralAsset ? vault.collateralAsset.id : ZERO_ADDR
+    const collateralSymbol = vault.collateralAsset ? vault.collateralAsset.symbol : 'N/A'
     const longAsset = vault.longOToken ? vault.longOToken.id : ZERO_ADDR
     const longSymbol = vault.longOToken ? vault.longOToken.symbol : 'N/A'
     const shortAsset = vault.shortOToken ? vault.shortOToken.id : ZERO_ADDR
@@ -38,7 +41,7 @@ export default function VaultSection({ account, vaults, isLoading }: VaultSectio
     const longAmount = vault.longAmount ? vault.longAmount : '0'
     const shortAmount = vault.shortAmount ? vault.shortAmount : '0'
     return [
-      <CustomIdentityBadge shorten={true} label={collateralToken.symbol} entity={collateralAsset} />,
+      <CustomIdentityBadge shorten={true} label={collateralSymbol} entity={collateralAsset} />,
       toTokenAmount(new BigNumber(collateralAmount), collateralToken.decimals).toString(),
       <CustomIdentityBadge shorten={true} entity={longAsset} label={longSymbol} />,
       toTokenAmount(new BigNumber(longAmount), 8).toString(),
@@ -46,7 +49,7 @@ export default function VaultSection({ account, vaults, isLoading }: VaultSectio
       toTokenAmount(new BigNumber(shortAmount), 8).toString(),
       <Button label={"Detail"} onClick={()=>{ history.push(`/vault/${account}/${index + 1}`);}} />
     ]
-  }, [account, collateralToken.decimals, collateralToken.symbol, history])
+  }, [account, collateralToken.decimals, history])
 
   return (
     <>

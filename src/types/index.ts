@@ -32,7 +32,7 @@ export type actionArg = {
 
 export type SubgraphVault = {
   collateralAmount: string | null
-  collateralAsset: string | null
+  collateralAsset: {id: string, symbol:string} | null
   longAmount: string | null
   longOToken: {id: string, symbol:string} | null
   shortAmount: string | null

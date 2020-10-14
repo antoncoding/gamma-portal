@@ -22,7 +22,10 @@ export async function getAccount(
       vaultCount
       vaults {
         id
-        collateralAsset
+        collateralAsset {
+          id
+          symbol
+        }
         collateralAmount
         shortOToken{
           id
@@ -59,7 +62,7 @@ export async function getVault(
   errorCallback: Function
 ): Promise< null | {
   collateralAmount: string | null;
-  collateralAsset: string | null;
+  collateralAsset: null | { id: string, symbol: string };
   longAmount: string | null;
   longOToken: null | { id: string, symbol: string };
   owner: {
@@ -87,7 +90,10 @@ export async function getVault(
         symbol
       }
       shortAmount
-      collateralAsset
+      collateralAsset {
+        id
+        symbol
+      }
       collateralAmount
       longOToken {
         id
@@ -117,10 +123,10 @@ export async function getOTokens(
       id: string;
       symbol: string,
       name: string;
-      strikeAsset: string;
+      strikeAsset: {id:string, symbol:string};
       strikePrice: string
-      underlyingAsset: string;
-      collateralAsset: string;
+      underlyingAsset: {id:string, symbol:string};
+      collateralAsset: {id:string, symbol:string};
       isPut: boolean;
       expiryTimestamp: string;
       createdAt: string;
@@ -134,9 +140,18 @@ export async function getOTokens(
       id
       symbol
       name
-      strikeAsset
-      underlyingAsset
-      collateralAsset
+      strikeAsset {
+        id
+        symbol
+      }
+      underlyingAsset {
+        id
+        symbol
+      }
+      collateralAsset {
+        id
+        symbol
+      }
       strikePrice
       isPut
       expiryTimestamp
@@ -161,18 +176,27 @@ export const getVaultHistory = async (networkId: SupportedNetworks,
   errorCallback: Function) => {
   const query = `{
     depositCollateralActions (where: {vault_contains: "${owner}-${vaultId}"}) {
-      asset
+      id
+      asset {
+        id
+        symbol
+      }
       amount
       timestamp
       transactionHash
     }
     withdrawCollateralActions (where: {vault_contains: "${owner}-${vaultId}"}) {
-      asset
+      id
+      asset {
+        id
+        symbol
+      }
       amount
       timestamp
       transactionHash
     }
     depositLongActions (where: {vault_contains: "${owner}-${vaultId}"}) {
+      id
       oToken {
         symbol
         id
@@ -182,6 +206,7 @@ export const getVaultHistory = async (networkId: SupportedNetworks,
       transactionHash
     }
     withdrawLongActions (where: {vault_contains: "${owner}-${vaultId}"}) {
+      id
       oToken {
         symbol
         id
@@ -191,6 +216,7 @@ export const getVaultHistory = async (networkId: SupportedNetworks,
       transactionHash
     }
     mintShortActions (where: {vault_contains: "${owner}-${vaultId}"}) {
+      id
       oToken {
         symbol
         id
@@ -200,6 +226,7 @@ export const getVaultHistory = async (networkId: SupportedNetworks,
       transactionHash
     }
     burnShortActions (where: {vault_contains: "${owner}-${vaultId}"}) {
+      id
       oToken {
         symbol
         id
