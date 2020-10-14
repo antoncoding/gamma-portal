@@ -93,6 +93,7 @@ export async function getVault(
       collateralAsset {
         id
         symbol
+        decimals
       }
       collateralAmount
       longOToken {
@@ -143,14 +144,17 @@ export async function getOTokens(
       strikeAsset {
         id
         symbol
+        decimals
       }
       underlyingAsset {
         id
         symbol
+        decimals
       }
       collateralAsset {
         id
         symbol
+        decimals
       }
       strikePrice
       isPut
@@ -180,6 +184,7 @@ export const getVaultHistory = async (networkId: SupportedNetworks,
       asset {
         id
         symbol
+        decimals
       }
       amount
       timestamp
@@ -190,6 +195,7 @@ export const getVaultHistory = async (networkId: SupportedNetworks,
       asset {
         id
         symbol
+        decimals
       }
       amount
       timestamp

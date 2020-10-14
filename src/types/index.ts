@@ -1,9 +1,9 @@
 export type Token = {
-  address: string,
-  name: string,
-  symbol: string,
-  decimals: number
-}
+  address: string;
+  name: string;
+  symbol: string;
+  decimals: number;
+};
 
 export enum ActionType {
   OpenVault,
@@ -20,7 +20,7 @@ export enum ActionType {
 }
 
 export type actionArg = {
-  actionType:ActionType;
+  actionType: ActionType;
   owner: string;
   secondAddress: string;
   asset: string;
@@ -28,13 +28,22 @@ export type actionArg = {
   amount: string;
   index: string;
   data: string;
-} 
+};
 
 export type SubgraphVault = {
-  collateralAmount: string | null
-  collateralAsset: {id: string, symbol:string} | null
-  longAmount: string | null
-  longOToken: {id: string, symbol:string} | null
-  shortAmount: string | null
-  shortOToken: {id: string, symbol:string} | null
-}
+  collateralAmount: string | null;
+  collateralAsset: { id: string; symbol: string } | null;
+  longAmount: string | null;
+  longOToken: { id: string; symbol: string } | null;
+  shortAmount: string | null;
+  shortOToken: { id: string; symbol: string } | null;
+};
+
+export type SubgraphVaultAction = {
+  id: string
+  transactionHash: string;
+  timestamp: string;
+  oToken: null | { id: string; symbol: string; decimals: number };
+  asset: { id: string; symbol: string; decimals: number };
+  amount: null| string;
+};
