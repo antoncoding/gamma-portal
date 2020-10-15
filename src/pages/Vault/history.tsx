@@ -8,7 +8,7 @@ import { walletContext } from '../../contexts/wallet'
 
 import { getVaultHistory } from '../../utils/graph'
 import SectionTitle from '../../components/SectionHeader'
-import CustomIdentityBadge from '../../components/CustomIdentityBadge'
+import TokenAddress from '../../components/TokenAddress'
 import { timeSince } from '../../utils/math'
 import {ActionBadgeFromId} from '../../components/ActionBadge'
 import {SubgraphVaultAction} from '../../types'
@@ -42,7 +42,7 @@ export default function VaultHistory() {
       <TransactionBadge transaction={hash} networkType={networkId === 1 ? 'main' : 'rinkeby'} />,
       badge,
       amount,
-      <CustomIdentityBadge entity={assetToken.id} label={assetToken.symbol} />,
+      <TokenAddress token={assetToken}/>,
       timeSince(timestamp)
     ]
   }, [networkId])

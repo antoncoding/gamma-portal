@@ -8,7 +8,7 @@ import { walletContext } from '../../contexts/wallet'
 import { Controller } from '../../utils/contracts/controller'
 import { SubgraphVault } from '../../types'
 import SectionTitle from '../../components/SectionHeader'
-import CustomIdentityBadge from '../../components/CustomIdentityBadge'
+import TokenAddress from '../../components/TokenAddress'
 import Status from '../../components/DataViewStatusEmpty'
 import { ZERO_ADDR } from '../../constants/addresses'
 import { useTokenByAddress} from '../../hooks/useToken'
@@ -17,9 +17,6 @@ import { toTokenAmount } from '../../utils/math'
 type VaultSectionProps = { account: string, isLoading: boolean, vaults: SubgraphVault[] }
 
 export default function VaultSection({ account, vaults, isLoading }: VaultSectionProps ) {
-
-  console.log(vaults)
-
   const { web3, networkId, user } = useContext(walletContext)
 
   const controller = useMemo(() => new Controller(web3, networkId, user), [networkId, user, web3])
@@ -31,21 +28,15 @@ export default function VaultSection({ account, vaults, isLoading }: VaultSectio
   const collateralToken = useTokenByAddress(vaults.length > 0 && vaults[0].collateralAsset ? vaults[0].collateralAsset.id : ZERO_ADDR, networkId)
 
   const renderRow = useCallback((vault: SubgraphVault, index) => {
-    const collateralAsset = vault.collateralAsset ? vault.collateralAsset.id : ZERO_ADDR
-    const collateralSymbol = vault.collateralAsset ? vault.collateralAsset.symbol : 'N/A'
-    const longAsset = vault.longOToken ? vault.longOToken.id : ZERO_ADDR
-    const longSymbol = vault.longOToken ? vault.longOToken.symbol : 'N/A'
-    const shortAsset = vault.shortOToken ? vault.shortOToken.id : ZERO_ADDR
-    const shortSymbol = vault.shortOToken ? vault.shortOToken.symbol : 'N/A'
     const collateralAmount = vault.collateralAmount ? vault.collateralAmount : '0'
     const longAmount = vault.longAmount ? vault.longAmount : '0'
     const shortAmount = vault.shortAmount ? vault.shortAmount : '0'
     return [
-      <CustomIdentityBadge shorten={true} label={collateralSymbol} entity={collateralAsset} />,
+      <TokenAddress token={vault.collateralAsset} />,
       toTokenAmount(new BigNumber(collateralAmount), collateralToken.decimals).toString(),
-      <CustomIdentityBadge shorten={true} entity={longAsset} label={longSymbol} />,
+      <TokenAddress token={vault.longOToken} />,
       toTokenAmount(new BigNumber(longAmount), 8).toString(),
-      <CustomIdentityBadge shorten={true} entity={shortAsset} label={shortSymbol}/>,
+      <TokenAddress token={vault.shortOToken} />,
       toTokenAmount(new BigNumber(shortAmount), 8).toString(),
       <Button label={"Detail"} onClick={()=>{ history.push(`/vault/${account}/${index + 1}`);}} />
     ]

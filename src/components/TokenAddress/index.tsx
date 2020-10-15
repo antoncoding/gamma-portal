@@ -5,7 +5,7 @@ import { SubgraphToken, Token } from '../../types'
 import CustomIdentityBadge from '../CustomIdentityBadge'
 import { ZERO_ADDR } from '../../constants/addresses'
  
-function TokenBadge({ token, nullLabel='Empty' } : { token : null | SubgraphToken | Token, nullLabel?: string} ) {
+function TokenBadge({ token, nullLabel='Empty' } : { token : null | { symbol:string, address: string } | { symbol:string, id: string }, nullLabel?: string} ) {
   let address = ZERO_ADDR
   let label = nullLabel
   if (token !== null) {

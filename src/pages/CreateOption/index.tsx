@@ -17,7 +17,7 @@ export default function CreateOption() {
   const { networkId, web3, user } = useContext(walletContext)
   const toast = useToast()
   const [selectedProductIndex, setSelectedProductIndex] = useState(-1)
-  
+
   const [strikePriceReadable, setStrikePriceReadable] = useState<BigNumber>(new BigNumber(250))
   const [expiryTimestamp, setExpiryTimestamp] = useState<BigNumber>(new BigNumber(1606809600))
   const [hasExpiryWarning, setHasWarning] = useState<boolean>(false)
@@ -77,22 +77,22 @@ export default function CreateOption() {
 
         <div style={{ width: '20%', marginRight: '5%' }}>
           <LabelText label='Underlying' />
-          <TokenAddress token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].underlying : null} />
+          <TokenAddress token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].underlying : null} nullLabel="N/A" />
         </div>
 
         <div style={{ width: '20%', marginRight: '5%' }}>
           <LabelText label='Strike' />
-          <TokenAddress token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].strike : null} />
+          <TokenAddress token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].strike : null} nullLabel="N/A" />
         </div>
 
         <div style={{ width: '20%', marginRight: '5%' }}>
           <LabelText label='Collateral' />
-          <TokenAddress token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].collateral : null} />
+          <TokenAddress token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].collateral : null} nullLabel="N/A" />
         </div>
 
         <div style={{ width: '20%', marginRight: '5%' }}>
           <LabelText label="Type" />
-          {allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].isPut ? "Put" : "Call": 'Put'}
+          {allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].isPut ? "Put" : "Call": 'Put'} Option
         </div>
 
       </div>
