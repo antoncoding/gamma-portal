@@ -1,7 +1,7 @@
 import { subgraph as endpoints } from '../constants/endpoints';
 import { blacklistOTokens } from '../constants/addresses'
 import { SupportedNetworks } from '../constants/networks';
-import { SubgraphVault } from '../types';
+import { SubgraphVault, SubgraphToken } from '../types';
 
 /**
  * Get all oTokens
@@ -54,6 +54,41 @@ export async function getAccount(
     return null;
   }
 }
+
+export async function getWhitelistedProducts(networkId: SupportedNetworks, errorCallback: Function) : Promise <{
+  id: string,
+  strike: SubgraphToken
+  collateral: SubgraphToken
+  underlying: SubgraphToken
+  isPut: boolean
+}[] | null> {
+  const query = `
+  {
+    whitelistedProducts (where:{isWhitelisted: true}) {
+      id
+      strike {
+        symbol
+        id
+      }
+      underlying {
+        symbol
+        id
+      }
+      collateral {
+        symbol
+        id
+      }
+      isPut
+    }
+  }`
+  try {
+    const response = await postQuery(endpoints[networkId], query);
+    return response.data.whitelistedProducts;
+  } catch (error) {
+    errorCallback(error.toString());
+    return null;
+  }
+} 
 
 export async function getVault(
   networkId: SupportedNetworks,

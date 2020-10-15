@@ -24,19 +24,21 @@ function CustomIdentityBadge({ entity, connectedAccount, label, shorten }: Custo
 
   useEffect(() => {
     if (entity === ZERO_ADDR) {
-      setDisplayLabel('N/A')
+      setDisplayLabel(label)
     } else {
       const customLabelOrUndefined = storedLabels.find(entry => entry.address === entity)?.label
       if (customLabelOrUndefined !== undefined) {
         setDisplayLabel(customLabelOrUndefined)
         setNewLabel(customLabelOrUndefined)
+      } else {
+        setDisplayLabel(label)
       }
     }
     
     return () => {
       
     }
-  }, [storedLabels, entity])
+  }, [storedLabels, entity, label])
 
   const onClickSave = () => {
     if (!entity || !newLabel) return;

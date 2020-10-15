@@ -5,6 +5,13 @@ export type Token = {
   decimals: number;
 };
 
+export type Product = {
+  collateral: Token
+  stike: Token
+  underlying: Token
+  isPut: Token
+}
+
 export enum ActionType {
   OpenVault,
   MintShortOption,
@@ -47,3 +54,10 @@ export type SubgraphVaultAction = {
   asset: { id: string; symbol: string; decimals: number };
   amount: null| string;
 };
+
+export type SubgraphToken = {
+  id: string
+  symbol: string
+  name: string
+  decimals: number
+}

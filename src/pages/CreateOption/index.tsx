@@ -1,33 +1,41 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react'
 import BigNumber from 'bignumber.js'
-import { Header, TextInput, Switch, Button } from '@aragon/ui'
+import { Header, TextInput, Button, DropDown, useToast } from '@aragon/ui'
 import LabelText from '../../components/LabelText'
 import Warning from '../../components/Warning'
-
 import { walletContext } from '../../contexts/wallet'
-import { useTokenBySymbol } from '../../hooks/useToken'
-
+import { useAsyncMemo } from '../../hooks/useAsyncMemo'
 import { OTokenFactory } from '../../utils/contracts/factory'
-import { Token } from '../../types'
-import { ZERO_ADDR } from '../../constants/addresses'
 import { fromTokenAmount } from '../../utils/math'
+import { getWhitelistedProducts } from '../../utils/graph'
+import SectionTitle from '../../components/SectionHeader'
+
+import TokenAddress from '../../components/TokenAddress'
 
 export default function CreateOption() {
 
   const { networkId, web3, user } = useContext(walletContext)
-
-  const USDC = useTokenBySymbol('USDC', networkId)
-  const WETH = useTokenBySymbol('WETH', networkId)
-
-  const [underlying, setUnderlying] = useState<Token|null>(WETH)
-  const [strike, setStrike] = useState<Token|null>(USDC)
-  const [collateral, setCollateral] = useState<Token|null>(USDC)
+  const toast = useToast()
+  const [selectedProductIndex, setSelectedProductIndex] = useState(-1)
+  
   const [strikePriceReadable, setStrikePriceReadable] = useState<BigNumber>(new BigNumber(250))
   const [expiryTimestamp, setExpiryTimestamp] = useState<BigNumber>(new BigNumber(1606809600))
-  const [isPut, setIsPut] = useState(true)
-
   const [hasExpiryWarning, setHasWarning] = useState<boolean>(false)
   const [warning, setWarning] = useState<string>('')
+
+  const allProducts = useAsyncMemo(async () => {
+    const products = await getWhitelistedProducts(networkId, toast)
+    if (products === null) return []
+
+    return products.map(product => {
+      const type = product.isPut ? 'Put' : 'Call'
+      const optionName = `${product.underlying.symbol}-${product.strike.symbol} ${type} ${product.collateral.symbol} Collateral`
+      return {
+        label: optionName,
+        ...product
+      }
+    })
+  }, [], [])
 
   // make sure expiry to be UTC 0800
   useEffect(() => {
@@ -39,51 +47,59 @@ export default function CreateOption() {
     }
   }, [expiryTimestamp])
 
-  useEffect(() => {
-    if (isPut) {
-      setCollateral(strike)
-    } else {
-      setCollateral(underlying)
-    }
-    return () => { }
-  }, [isPut, underlying, strike])
-
   const strikePrice = useMemo(() => fromTokenAmount(new BigNumber(strikePriceReadable), 8), [strikePriceReadable])
 
   async function createOToken() {
     const factory = new OTokenFactory(web3, networkId, user)
-    if (!underlying || !strike || !collateral) return 
-    await factory.createOToken(underlying.address, strike.address, collateral.address, strikePrice, expiryTimestamp, isPut)
+    if (selectedProductIndex === -1) {
+      toast('Please select a product')
+      return
+    }
+    const underlying = allProducts[selectedProductIndex].underlying
+    const strike = allProducts[selectedProductIndex].strike
+    const collateral = allProducts[selectedProductIndex].collateral
+    const isPut = allProducts[selectedProductIndex].isPut
+    
+    await factory.createOToken(underlying.id, strike.id, collateral.id, strikePrice, expiryTimestamp, isPut)
   }
 
   return (
     <>
       <Header primary="Create new oToken" />
+      <SectionTitle title="Choose a product" />
+      <DropDown
+        items={allProducts ? allProducts.map(p => p.label) : []}
+        selected={selectedProductIndex}
+        onChange={setSelectedProductIndex}
+      />
+      <br/><br/>
       <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '3%' }}>
 
-        <div style={{ width: '30%', marginRight: '5%' }}>
+        <div style={{ width: '20%', marginRight: '5%' }}>
           <LabelText label='Underlying' />
-          <TextInput type="text" onChange={setUnderlying} readOnly value={underlying ?  underlying.address : ZERO_ADDR } wide />
+          <TokenAddress token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].underlying : null} />
         </div>
 
-        <div style={{ width: '30%' }}>
+        <div style={{ width: '20%', marginRight: '5%' }}>
           <LabelText label='Strike' />
-          <TextInput type="text" onChange={setStrike} readOnly value={strike ? strike.address : ZERO_ADDR} wide />
+          <TokenAddress token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].strike : null} />
         </div>
 
-        <div style={{ width: '30%', marginLeft: '5%' }}>
+        <div style={{ width: '20%', marginRight: '5%' }}>
           <LabelText label='Collateral' />
-          <TextInput type="text" onChange={setCollateral} readOnly value={collateral ? collateral.address : ZERO_ADDR} wide />
+          <TokenAddress token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].collateral : null} />
+        </div>
+
+        <div style={{ width: '20%', marginRight: '5%' }}>
+          <LabelText label="Type" />
+          {allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].isPut ? "Put" : "Call": 'Put'}
         </div>
 
       </div>
+      <SectionTitle title="Details" />
+
 
       <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '1%' }}>
-
-        <div style={{ width: '30%', marginRight: '5%' }}>
-          <LabelText label="IsPut" />
-          <Switch checked={isPut} onChange={setIsPut} />
-        </div>
 
         <div style={{ width: '30%' }}>
           <LabelText label='Strike Price' />
@@ -96,10 +112,11 @@ export default function CreateOption() {
           <Warning text={warning} show={hasExpiryWarning} />
         </div>
 
-      </div>
+        <div style={{ width: '30%', marginLeft: '5%' }}>
+          <LabelText label='Create' />
+          <Button label="Create" wide onClick={createOToken} />
+        </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', paddingTop: '2%' }}>
-        <Button label="Create" wide onClick={createOToken} />
       </div>
 
     </>
