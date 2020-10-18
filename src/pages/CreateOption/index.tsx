@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react'
 import BigNumber from 'bignumber.js'
-import { Header, TextInput, Button, DropDown, useToast } from '@aragon/ui'
+import { Header, TextInput, Button, DropDown, useToast, Layout } from '@aragon/ui'
 import LabelText from '../../components/LabelText'
 import Warning from '../../components/Warning'
 import { walletContext } from '../../contexts/wallet'
@@ -64,7 +64,7 @@ export default function CreateOption() {
   }
 
   return (
-    <>
+    <Layout>
       <Header primary="Create new oToken" />
       <SectionTitle title="Choose a product" />
       <DropDown
@@ -119,6 +119,6 @@ export default function CreateOption() {
 
       </div>
 
-    </>
+    </Layout>
   )
 }

@@ -2,7 +2,7 @@ import React, { useContext, useMemo, useState, useCallback } from 'react'
 import BigNumber from 'bignumber.js'
 import { useParams } from 'react-router-dom';
 
-import { TextInput, Button, DataView, useToast, Tag, Header, IconCirclePlus, IconCircleMinus, DropDown } from '@aragon/ui'
+import { TextInput, Button, DataView, useToast, Tag, Header, IconCirclePlus, IconCircleMinus, DropDown, Layout } from '@aragon/ui'
 import History from './history'
 
 import { walletContext } from '../../contexts/wallet'
@@ -38,8 +38,6 @@ export default function VaultDetail() {
     setIsLoading(false)
     return result
   }, null, [networkId, owner, toast, vaultId])
-
-  console.log(`vaultDetail`, vaultDetail)
 
   const allOtokens = useAsyncMemo(async () => {
     const result = await getOTokens(networkId, toast)
@@ -112,7 +110,7 @@ export default function VaultDetail() {
   }, [])
 
   return (
-    <>
+    <Layout>
       <Header primary="Vault Detail" secondary={isAuthorized && <Tag mode="new">My vault</Tag>} />
       <DataView
         mode="table"
@@ -174,6 +172,6 @@ export default function VaultDetail() {
       <br /><br />
       <History/>
 
-    </>
+    </Layout>
   )
 }

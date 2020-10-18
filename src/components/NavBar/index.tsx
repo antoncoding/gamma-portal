@@ -17,6 +17,7 @@ function MyBar() {
 
   return (
     <Bar
+      style={{margin: 0}}
       primary={
         <>
           <MaxHeightDiv>
