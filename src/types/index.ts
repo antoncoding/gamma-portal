@@ -39,11 +39,11 @@ export type actionArg = {
 
 export type SubgraphVault = {
   collateralAmount: string | null;
-  collateralAsset: { id: string; symbol: string } | null;
+  collateralAsset: SubgraphToken | null;
   longAmount: string | null;
-  longOToken: { id: string; symbol: string } | null;
+  longOToken: SubgraphOToken | null;
   shortAmount: string | null;
-  shortOToken: { id: string; symbol: string } | null;
+  shortOToken: SubgraphOToken | null;
 };
 
 export type SubgraphVaultAction = {
@@ -60,4 +60,8 @@ export type SubgraphToken = {
   symbol: string
   name: string
   decimals: number
+}
+
+export type SubgraphOToken = SubgraphToken & {
+  underlyingAsset: SubgraphToken
 }

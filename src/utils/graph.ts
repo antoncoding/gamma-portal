@@ -25,16 +25,25 @@ export async function getAccount(
         collateralAsset {
           id
           symbol
+          decimals
         }
         collateralAmount
         shortOToken{
           id
           symbol
+          decimals
+          underlyingAsset {
+            symbol
+          }
         }
         shortAmount
         longOToken {
           id
           symbol
+          decimals
+          underlyingAsset {
+            symbol
+          }
         }
         longAmount
       }
@@ -69,14 +78,17 @@ export async function getWhitelistedProducts(networkId: SupportedNetworks, error
       strike {
         symbol
         id
+        decimals
       }
       underlying {
         symbol
         id
+        decimals
       }
       collateral {
         symbol
         id
+        decimals
       }
       isPut
     }
@@ -123,6 +135,7 @@ export async function getVault(
       shortOToken {
         id
         symbol
+        decimals
       }
       shortAmount
       collateralAsset {
@@ -134,6 +147,7 @@ export async function getVault(
       longOToken {
         id
         symbol
+        decimals
       }
       longAmount 
     }
