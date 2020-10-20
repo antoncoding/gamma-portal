@@ -5,13 +5,15 @@ import {
   Header, Box, LinkBase, Tag, IconSwap, IconUser, IconSettings, Layout
 } from '@aragon/ui';
 
+import Comment from '../../components/Comment'
+
 function HomePage() {
   const history = useHistory();
 
   return (
     <Layout>
       <Header primary="Welcome to Opyn V2" />
-      <div style={{ padding: 5, opacity: 0.5 }}> Tools for DeFi Risk Management. </div>
+      <Comment text="Tools for DeFi Risk Management."/>
       <div style={{ padding: 5, display: 'flex', alignItems: 'center' }}>
         <div style={{ width: '30%', marginRight: '3%' }}>
 

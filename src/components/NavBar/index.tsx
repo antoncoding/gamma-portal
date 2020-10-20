@@ -1,30 +1,26 @@
-import React, { useCallback, useContext } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components'
 import { walletContext } from '../../contexts/wallet'
 import { useHistory } from 'react-router-dom';
 
-import { Bar, BackButton, LinkBase, useToast } from '@aragon/ui';
+import { Bar, LinkBase } from '@aragon/ui';
 import ConnectButton from './ConnectButton';
 
 function MyBar() {
   const history = useHistory();
-  const toast = useToast()
   const { user } = useContext(walletContext)
-
-  const goBack = useCallback(() => {
-    history.goBack();
-  }, [history])
 
   return (
     <Bar
-      style={{margin: 0}}
+      style={{ margin: 0 }}
       primary={
         <>
-          <MaxHeightDiv>
-            <BackButton
-              onClick={goBack}
-            />
-          </MaxHeightDiv>
+          <LinkButton
+            title="Home"
+            onClick={() => {
+              history.push('/');
+            }}
+          />
           <LinkButton
             title="Create Options"
             onClick={() => {
@@ -34,12 +30,7 @@ function MyBar() {
           <LinkButton
             title="My Account"
             onClick={() => {
-              if (user === '') {
-                toast('Please connect wallet')
-              } else {
-                history.push(`/account/${user}`);
-              }
-
+              history.push(`/account/${user}`);
             }}
           />
         </>
@@ -72,10 +63,6 @@ function LinkButton({ title, onClick, isSelected = false }: linkButtonProps) {
     </div>
   );
 }
-
-const MaxHeightDiv = styled.div`
-  height: 100%;
-`
 
 const Link = styled.div`
   padding: '1%';
