@@ -2,7 +2,7 @@ import React, { useContext, useMemo, useState, useCallback } from 'react'
 import BigNumber from 'bignumber.js'
 import { useParams } from 'react-router-dom';
 
-import { TextInput, Button, DataView, useToast, Tag, Header, IconCirclePlus, IconCircleMinus, DropDown, Layout } from '@aragon/ui'
+import { TextInput, Button, DataView, useToast, Tag, Header, IconCirclePlus, IconCircleMinus, DropDown } from '@aragon/ui'
 import History from './history'
 
 import { walletContext } from '../../contexts/wallet'
@@ -110,7 +110,7 @@ export default function VaultDetail() {
   }, [])
 
   return (
-    <Layout>
+    <>
       <Header primary="Vault Detail" secondary={isAuthorized && <Tag mode="new">My vault</Tag>} />
       <DataView
         mode="table"
@@ -125,7 +125,7 @@ export default function VaultDetail() {
             asset: vaultDetail?.collateralAsset?.id,
             amount: vaultDetail?.collateralAmount,
             inputValue: changeCollateralAmount,
-            onInputChange: (e) => (e.target.value ? setChangeCollateralAmount(new BigNumber(e.target.value)) 
+            onInputChange: (e) => (e.target.value ? setChangeCollateralAmount(new BigNumber(e.target.value))
               : setChangeCollateralAmount(new BigNumber(0))
             ),
             onClickAdd: simpleAddCollateral,
@@ -141,7 +141,7 @@ export default function VaultDetail() {
             asset: vaultDetail?.longOToken?.id,
             amount: vaultDetail?.longAmount,
             inputValue: changeLongAmount,
-            onInputChange: (e) => ( e.target.value ? setChangeLongAmount(new BigNumber(e.target.value))
+            onInputChange: (e) => (e.target.value ? setChangeLongAmount(new BigNumber(e.target.value))
               : setChangeLongAmount(new BigNumber(0))
             ),
             onClickAdd: simpleAddLong,
@@ -157,9 +157,9 @@ export default function VaultDetail() {
             asset: vaultDetail?.shortOToken?.id,
             amount: vaultDetail?.shortAmount,
             inputValue: changeShortAmount,
-            onInputChange: (e) => ( e.target.value ? setChangeShortAmount(new BigNumber(e.target.value))
-            : setChangeShortAmount(new BigNumber(0))
-          ),
+            onInputChange: (e) => (e.target.value ? setChangeShortAmount(new BigNumber(e.target.value))
+              : setChangeShortAmount(new BigNumber(0))
+            ),
             onClickAdd: simpleMint,
             onClickMinus: simpleBurn,
             dropdownSelected: selectedShortIndex,
@@ -170,8 +170,8 @@ export default function VaultDetail() {
         renderEntry={renderRow}
       />
       <br /><br />
-      <History/>
+      <History />
 
-    </Layout>
+    </>
   )
 }

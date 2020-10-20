@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import {useHistory} from 'react-router-dom'
 import {
-  TextInput, DataView, Button, LinkBase, EthIdenticon, useToast, Layout, Header
+  TextInput, DataView, Button, LinkBase, EthIdenticon, useToast, Header
 } from '@aragon/ui';
 import { getPreference, checkAddressAndAddToStorage } from '../../utils/storage';
 
@@ -35,7 +35,7 @@ function Login() {
   }, [])
 
   return (
-    <Layout>
+    <>
       <Header primary="Account"/> 
       <p style={{ fontSize: 20 }}> Connect Wallet </p>
       <Comment text="Please connect wallet to proceed or enter an address to use Watch Mode." />
@@ -97,7 +97,7 @@ function Login() {
           />
         </div>
       </div>
-    </Layout>
+    </>
   );
 }
 

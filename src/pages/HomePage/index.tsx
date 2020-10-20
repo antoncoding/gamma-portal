@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import {
-  Header, Box, LinkBase, Tag, IconSwap, IconUser, IconSettings, Layout
+  Header, Box, LinkBase, Tag, IconSwap, IconUser, IconSettings
 } from '@aragon/ui';
 
 import Comment from '../../components/Comment'
@@ -11,7 +11,7 @@ function HomePage() {
   const history = useHistory();
 
   return (
-    <Layout>
+    <>
       <Header primary="Welcome to Opyn V2" />
       <Comment text="Tools for DeFi Risk Management."/>
       <div style={{ padding: 5, display: 'flex', alignItems: 'center' }}>
@@ -49,7 +49,7 @@ function HomePage() {
           />
         </div>
       </div>
-    </Layout>
+    </>
   );
 }
 
