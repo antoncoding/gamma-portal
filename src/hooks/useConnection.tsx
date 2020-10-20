@@ -78,7 +78,7 @@ export const initOnboard = (addressChangeCallback, walletChangeCallback) => {
       wallet: walletChangeCallback,
     },
     walletSelect: {
-      description: 'Please select a wallet to connect to Opyn Monitor',
+      description: 'Please select a wallet to connect to the blockchain',
       wallets: [
         { walletName: 'metamask' },
         {

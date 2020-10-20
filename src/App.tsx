@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 // import Moment from 'react-moment';
 import 'moment-timezone';
 
@@ -13,16 +13,22 @@ import ConnectWallet from './pages/ConnectWallet'
 import Vault from './pages/Vault'
 import Operators from './pages/Operators'
 import HomePage from './pages/HomePage'
+import Settings from './pages/Settings'
 import { useConnection } from './hooks/useConnection'
+
+import { getPreference } from './utils/storage'
 
 import { HashRouter as Router, Switch, Route } from 'react-router-dom';
 function App() {
 
   const wallet = useConnection()
 
+  const defaultTheme = getPreference('theme', 'light')
+  const [theme, setTheme] = useState(defaultTheme)
+
   return (
     <Router>
-      <Main layout={false}>
+      <Main layout={false} theme={theme}>
         <walletContext.Provider value={wallet}>
           <NavBar />
           <div style={{ display: 'flex', height: '100%' }}>
@@ -47,6 +53,9 @@ function App() {
                   </Route>
                   <Route path="/vault/:owner/:vaultId">
                     <Vault />
+                  </Route>
+                  <Route path="/settings/">
+                    <Settings setTheme={setTheme}/>
                   </Route>
                   <Route path="/">
                     <HomePage />

@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Bar } from '@aragon/ui';
 import ConnectButton from './ConnectButton';
+import Settings from './SettingsButton'
 
 function MyBar() {
 
@@ -11,6 +12,7 @@ function MyBar() {
       secondary={
         <>
           <ConnectButton />
+          <Settings />
         </>
       }
     />

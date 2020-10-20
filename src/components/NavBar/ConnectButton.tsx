@@ -31,7 +31,7 @@ function ConnectButton() {
 
     </>
   ) : (
-      <Button icon={<IconConnect />} label="Connect" onClick={connectWeb3} />
+      <Button mode="normal" icon={<IconConnect />} label="Connect" onClick={connectWeb3} />
     );
 }
 
