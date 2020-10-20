@@ -8,7 +8,7 @@ const BLOCKNATIVE_KEY = process.env.REACT_APP_BLOCKNATIVE_KEY;
 const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY;
 
 export const useConnection = () => {
-  const [user, setUser] = useState<string>('')
+  const [user, setUser] = useState<string>('')  
   const [web3, setWeb3] = useState<Web3|null>(null)
 
   const networkId = 4

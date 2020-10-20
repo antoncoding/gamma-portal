@@ -19,6 +19,7 @@ export default function Account() {
   const toast = useToast()
 
   const accountData = useAsyncMemo(async () => {
+    if (!account) return
     const result = await getAccount(networkId, account, toast)
     setIsLoading(false)
     return result
@@ -27,20 +28,15 @@ export default function Account() {
   const operatorRelations = useMemo(() => accountData && accountData.operators ? accountData.operators : [], [accountData])
 
   return (
-    <>
-
-      <Layout>
-        <Header primary="Account Overview" />
-        <OperatorSection account={account} operatorRelations={operatorRelations} isLoading={isLoading} />
-        <br /> <br />
-        <VaultSection
-          account={account}
-          vaults={accountData && accountData.vaults ? accountData.vaults : []}
-          isLoading={isLoading}
-        />
-      </Layout>
+    <Layout>
+      <Header primary="Account Overview" />
+      <OperatorSection account={account} operatorRelations={operatorRelations} isLoading={isLoading} />
+      <br /> <br />
+      <VaultSection
+        account={account}
+        vaults={accountData && accountData.vaults ? accountData.vaults : []}
+        isLoading={isLoading}
       />
-
-    </>
+    </Layout>
   )
 }

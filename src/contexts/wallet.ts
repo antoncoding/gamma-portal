@@ -4,7 +4,7 @@ import Web3 from 'web3'
 export interface Wallet {
   web3: Web3 | null,
   user: string,
-  setUser: (user: string) => void;
+  setUser: (user: string) => void,
   networkId: number,
   connect: () => Promise<string | false>,
   disconnect: Function
@@ -16,7 +16,7 @@ export const DEFAULT : Wallet = {
   user: '',
   setUser: (user: string):void => {},
   connect: async () => '',
-  disconnect: () => {}
+  disconnect: () => {},
 }
 
 export const walletContext = createContext(DEFAULT);

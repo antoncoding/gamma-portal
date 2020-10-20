@@ -15,6 +15,7 @@
     "bignumber.js": "^9.0.1",
     "bnc-notify": "^1.4.0",
     "bnc-onboard": "^1.14.0",
+    "ethereum-ens": "^0.8.0",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.31",
     "react": "^16.13.1",
