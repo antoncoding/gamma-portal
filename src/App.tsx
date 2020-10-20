@@ -7,7 +7,7 @@ import { walletContext } from './contexts/wallet'
 import NavBar from "./components/NavBar"
 import SideBar from "./components/SideBar"
 
-import System from './pages/Create'
+import Create from './pages/Create'
 import Account from './pages/Account'
 import ConnectWallet from './pages/ConnectWallet'
 import Vault from './pages/Vault'
@@ -33,8 +33,8 @@ function App() {
               <Layout >
                 <Switch>
 
-                  <Route path="/system/:page">
-                    <System />
+                  <Route path="/create/">
+                    <Create />
                   </Route>
                   <Route path="/account/:account/operators">
                     <Operators />

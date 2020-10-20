@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Header, useToast } from '@aragon/ui'
 import { useParams } from 'react-router-dom';
 import { walletContext } from '../../contexts/wallet'

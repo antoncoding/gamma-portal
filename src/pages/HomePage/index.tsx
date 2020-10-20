@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import {
-  Header, Box, LinkBase, Tag, IconSwap, IconUser, IconSettings
+  Header, Box, LinkBase, Tag, IconSwap, IconUser, IconCirclePlus
 } from '@aragon/ui';
 
 import Comment from '../../components/Comment'
@@ -40,11 +40,11 @@ function HomePage() {
         </div>
         <div style={{ width: '30%', marginLeft: '3%' }}>
           <MainButton
-            title="System Overview"
-            description="Create options, push prices"
-            icon={<IconSettings size="large"/>}
+            title="Create"
+            description="Create new options"
+            icon={<IconCirclePlus size="large"/>}
             onClick={() => {
-              history.push('/system/');
+              history.push('/create/');
             }}
           />
         </div>

@@ -8,6 +8,8 @@ export interface Wallet {
   networkId: number,
   connect: () => Promise<string | false>,
   disconnect: Function
+  readOnlyUser: string
+  setReadOnlyUser: any
 }
 
 export const DEFAULT : Wallet = {
@@ -17,6 +19,8 @@ export const DEFAULT : Wallet = {
   setUser: (user: string):void => {},
   connect: async () => '',
   disconnect: () => {},
+  readOnlyUser: '',
+  setReadOnlyUser: ()=>{}
 }
 
 export const walletContext = createContext(DEFAULT);
