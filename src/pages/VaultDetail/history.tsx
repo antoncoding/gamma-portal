@@ -49,8 +49,9 @@ export default function VaultHistory() {
 
   return (
     <>
-      <SectionTitle title={'History'} />
+      <SectionTitle title='History' />
       <DataView
+        entriesPerPage={5}
         entries={history}
         mode="table"
         status={isLoading ? 'loading' : 'default'}

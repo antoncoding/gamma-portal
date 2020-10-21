@@ -12,7 +12,7 @@ import { resolveENS } from '../../utils/others';
 
 function Login() {
 
-  const { user } = useContext(walletContext)
+  const { user, networkId } = useContext(walletContext)
   const history = useHistory()
   const toast = useToast();
   const [InAddress, setAddress] = useState('');
@@ -86,7 +86,7 @@ function Login() {
                 goToAccount(InAddress)
               } else {
                 try {
-                  const address = await resolveENS(InAddress);
+                  const address = await resolveENS(InAddress, networkId);
                   checkAddressAndAddToStorage(address);
                   goToAccount(address)
                 } catch (error) {

@@ -1,5 +1,5 @@
 import React, { useContext, useMemo, useState } from 'react'
-import { Button, DataView, TextInput, Header, useToast } from '@aragon/ui'
+import { Button, DataView, TextInput, Header, useToast, Tag } from '@aragon/ui'
 import { useParams } from 'react-router-dom';
 
 import { walletContext } from '../../contexts/wallet'
@@ -12,6 +12,8 @@ import SectionTitle from '../../components/SectionHeader'
 import CustomIdentityBadge from '../../components/CustomIdentityBadge'
 import Status from '../../components/DataViewStatusEmpty'
 
+import { isEOA } from '../../utils/others'
+
 export default function OperatorSection() {
 
   const { account } = useParams()
@@ -21,14 +23,22 @@ export default function OperatorSection() {
 
   const toast = useToast()
 
-  const accountData = useAsyncMemo(async () => {
-    if (!account) return
-    const result = await getAccount(networkId, account, toast)
+  // fetch account data, check if each operator is EOA
+  const operators = useAsyncMemo(async () => {
+    if (!account) return []
+    const accountData = await getAccount(networkId, account, toast)
+    const operatorsRelations = accountData ? accountData.operators : []
+    const operatorsWithExtraInfo = await Promise.all(operatorsRelations.map(async(relation) => {
+      const isEOAAddress = await isEOA(relation.operator.id, networkId)
+      return {
+        address: relation.operator.id,
+        isEOA: isEOAAddress
+      }
+    }))
     setIsLoading(false)
-    return result
-  }, null, [networkId, account])
+    return operatorsWithExtraInfo
+  }, [], [networkId, account])
 
-  const operatorRelations = useMemo(() => accountData && accountData.operators ? accountData.operators : [], [accountData])
 
   const [newOperatorAddr, setNewOperatorAddr] = useState('')
 
@@ -56,15 +66,17 @@ export default function OperatorSection() {
       <SectionTitle title="Authorized Operators" />
       <DataView
         status={isLoading ? 'loading' : 'default'}
-        fields={['address', 'action']}
+        fields={['address', 'tag', 'action']}
         statusEmpty={<Status label={"No operator set"} />}
-        entries={operatorRelations.map(relation => relation.operator)}
-        renderEntry={(operator) => {
+        entries={operators}
+        renderEntry={({address, isEOA}) => {
+          const tag = isEOA ? <Tag> EOA </Tag> : <> </>
           return [
-            <CustomIdentityBadge shorten={false} entity={operator.id} />,
+            <CustomIdentityBadge shorten={false} entity={address} />,
+            tag,
             <Button
               label="revoke"
-              onClick={() => revokeOperator(operator.id)}
+              onClick={() => revokeOperator(address)}
             />]
         }}
       />
