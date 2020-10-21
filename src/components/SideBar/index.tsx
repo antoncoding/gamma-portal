@@ -50,11 +50,18 @@ export default function SideBar() {
         />
         <SubButton
           title="Operators"
-          icon={<IconUser />}
           onClick={() => {
             history.push(`/account/${user ? user : readOnlyUser}/operators/`)
           }}
           isSelected={selectedTab === 2 &&  subSelected === 'operators'}
+          shown={selectedTab === 2}
+        />
+        <SubButton
+          title="Vaults"
+          onClick={() => {
+            history.push(`/account/${user ? user : readOnlyUser}/vaults/`)
+          }}
+          isSelected={selectedTab === 2 &&  subSelected === 'vaults'}
           shown={selectedTab === 2}
         />
         <SidebarTitle
@@ -79,5 +86,6 @@ function locationToTabId (location) {
 }
 
 function locationToSubButtomId(location) {
-  return location.pathname.includes('/operators/') ? 'operators' : ''
+  return  location.pathname.includes('/operators/') ? 'operators' : 
+    location.pathname.includes('/vaults/') ? 'vaults' : ''
 }

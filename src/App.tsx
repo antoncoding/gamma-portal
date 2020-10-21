@@ -9,8 +9,9 @@ import SideBar from "./components/SideBar"
 
 import Create from './pages/Create'
 import Account from './pages/Account'
+import AccountVault from './pages/AccountVaults'
 import ConnectWallet from './pages/ConnectWallet'
-import Vault from './pages/Vault'
+import Vault from './pages/VaultDetail'
 import Operators from './pages/Operators'
 import HomePage from './pages/HomePage'
 import Settings from './pages/Settings'
@@ -44,6 +45,9 @@ function App() {
                   </Route>
                   <Route path="/account/:account/operators">
                     <Operators />
+                  </Route>
+                  <Route path="/account/:account/vaults/">
+                    <AccountVault />
                   </Route>
                   <Route path="/account/:account">
                     <Account />

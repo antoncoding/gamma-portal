@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTheme, LinkBase } from '@aragon/ui'
 
-function SubButton({ title, onClick, isSelected, shown }: { title: any, icon: any, isSelected: boolean, onClick: any, shown: boolean }) {
+function SubButton({ title, onClick, isSelected, shown }: { title: any, isSelected: boolean, onClick: any, shown: boolean }) {
   const theme = useTheme()
   
   const backGroundColor = isSelected ? theme.background : theme.surface

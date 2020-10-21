@@ -51,9 +51,12 @@ export default function OperatorSection() {
   return (
     <>
       <Header primary="Operators" />
+      Operators are addresses which can manipulate your vaults on your behave.
+
+      <SectionTitle title="Authorized Operators" />
       <DataView
         status={isLoading ? 'loading' : 'default'}
-        fields={['Authorized Operators', 'action']}
+        fields={['address', 'action']}
         statusEmpty={<Status label={"No operator set"} />}
         entries={operatorRelations.map(relation => relation.operator)}
         renderEntry={(operator) => {

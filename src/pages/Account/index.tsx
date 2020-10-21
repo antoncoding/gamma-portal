@@ -5,7 +5,7 @@ import { walletContext } from '../../contexts/wallet'
 
 import { getAccount } from '../../utils/graph'
 
-import VaultSection from './Vaults'
+import VaultSection from '../AccountVaults'
 import useAsyncMemo from '../../hooks/useAsyncMemo';
 
 export default function Account() {
@@ -27,11 +27,7 @@ export default function Account() {
   return (
     <>
       <Header primary="Account Overview" />
-      <VaultSection
-        account={account}
-        vaults={accountData && accountData.vaults ? accountData.vaults : []}
-        isLoading={isLoading}
-      />
+      
     </>
   )
 }

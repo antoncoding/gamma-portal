@@ -1,6 +1,8 @@
-import React, { useContext, useMemo, useCallback } from 'react'
-import { useHistory } from 'react-router-dom';
-import { Button, DataView } from '@aragon/ui'
+import React, { useContext, useMemo, useCallback, useState } from 'react'
+import { useHistory, useParams } from 'react-router-dom';
+import { Button, DataView, useToast, Header } from '@aragon/ui'
+import useAsyncMemo from '../../hooks/useAsyncMemo'
+import { getAccount } from '../../utils/graph'
 
 import { walletContext } from '../../contexts/wallet'
 import { Controller } from '../../utils/contracts/controller'
@@ -8,12 +10,23 @@ import { SubgraphVault } from '../../types'
 import SectionTitle from '../../components/SectionHeader'
 import Status from '../../components/DataViewStatusEmpty'
 import { OpynTokenAmount } from '../../components/OpynTokenAmount'
+import CustomIdentityBadge from '../../components/CustomIdentityBadge';
 
 
-type VaultSectionProps = { account: string, isLoading: boolean, vaults: SubgraphVault[] }
-
-export default function VaultSection({ account, vaults, isLoading }: VaultSectionProps ) {
+export default function AccountVaults( ) {
   const { web3, networkId, user } = useContext(walletContext)
+  const { account } = useParams()
+
+  const [isLoading, setIsLoading] = useState(true)
+
+  const toast = useToast()
+
+  const vaults = useAsyncMemo(async () => {
+    if (!account) return
+    const result = await getAccount(networkId, account, toast)
+    setIsLoading(false)
+    return result ? result.vaults : []
+  }, [], [networkId, account])
 
   const controller = useMemo(() => new Controller(web3, networkId, user), [networkId, user, web3])
   const history =  useHistory()
@@ -47,9 +60,10 @@ export default function VaultSection({ account, vaults, isLoading }: VaultSectio
 
   return (
     <>
-      <SectionTitle title="Vaults" />
-      <Button label={"Open new Vault"} onClick={() => openVault()} />
-      <br/><br/>
+      <Header primary="Vaults" />
+      <>  <span style={{paddingRight: 20}}> Mange Vaults for </span> <CustomIdentityBadge entity={account} shorten={false} /> </>
+      
+      <SectionTitle title="Existing Vaults"/>
       <DataView
         status={isLoading ? 'loading' : 'default'}
         fields={['Collateral', 'Long', 'Short', '']}
@@ -57,6 +71,9 @@ export default function VaultSection({ account, vaults, isLoading }: VaultSectio
         entries={vaults}
         renderEntry={renderRow}
       />
+      <br />
+      <SectionTitle title="Open New"/>
+      <Button label={"Open Empty Vault"} onClick={() => openVault()} /> 
       
     </>
   )
