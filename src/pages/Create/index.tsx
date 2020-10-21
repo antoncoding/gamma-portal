@@ -23,6 +23,15 @@ export default function CreateOption() {
   const [hasExpiryWarning, setHasWarning] = useState<boolean>(false)
   const [warning, setWarning] = useState<string>('')
 
+  const expiryDate = useMemo(() => {
+    try {
+      const date = new Date(expiryTimestamp.times(1000).toNumber()).toISOString().split('T')[0]
+      return date
+    } catch(error) {
+      return ''
+    }
+  }, [expiryTimestamp])
+
   const allProducts = useAsyncMemo(async () => {
     const products = await getWhitelistedProducts(networkId, toast)
     if (products === null) return []
@@ -107,13 +116,21 @@ export default function CreateOption() {
         </div>
 
         <div style={{ width: '30%', marginLeft: '5%' }}>
-          <LabelText label='Expiry Timestamp' />
-          <TextInput type="number" value={expiryTimestamp} onChange={(e) => setExpiryTimestamp(new BigNumber(e.target.value))} wide />
+          <LabelText label='Expiry Date (08:00 UTC)' />
+          <TextInput 
+            type="date" 
+            value={expiryDate} 
+            onChange={(e) => {
+              const dateSelected = new Date(e.target.value)
+              const dateUTC = Date.UTC(dateSelected.getFullYear(), dateSelected.getMonth(), dateSelected.getDate(), 8)
+              setExpiryTimestamp(new BigNumber(dateUTC / 1000))
+            }} 
+            wide />
           <Warning text={warning} show={hasExpiryWarning} />
         </div>
 
         <div style={{ width: '30%', marginLeft: '5%' }}>
-          <LabelText label='Create' />
+          <LabelText label='Done!' />
           <Button label="Create" wide onClick={createOToken} />
         </div>
 
