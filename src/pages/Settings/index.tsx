@@ -3,6 +3,7 @@ import { Header } from '@aragon/ui'
 
 import ThemeSwitch from './Theme'
 import ClearCache from './ClearCache'
+import Network from './Network'
 
 function Settings({ setTheme }: { setTheme: any }) {
 
@@ -10,8 +11,10 @@ function Settings({ setTheme }: { setTheme: any }) {
     <>
       <Header primary="Settings" />
       <ThemeSwitch setTheme={setTheme} />
-      <br></br>
+      <br/>
       <ClearCache />
+      <br/><br/>
+      <Network />
     </>
   );
 }

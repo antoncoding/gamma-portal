@@ -8,11 +8,12 @@ const BLOCKNATIVE_KEY = process.env.REACT_APP_BLOCKNATIVE_KEY;
 const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY;
 
 export const useConnection = () => {
-  const [user, setUser] = useState<string>('')  
+  const [user, setUser] = useState<string>('')
   const [readOnlyUser, setReadOnlyUser] = useState<string>('')
-  const [web3, setWeb3] = useState<Web3|null>(null)
+  const [web3, setWeb3] = useState<Web3 | null>(null)
 
-  const networkId = 4
+  const storedNetwork = Number(getPreference('networkId', '4'))
+  const [networkId, setNetworkId] = useState<number>(storedNetwork)
 
   // function for block native sdk when address is updated
   const setAddressCallback = useCallback((address: string | undefined) => {
@@ -30,7 +31,10 @@ export const useConnection = () => {
     setWeb3(web3Instance)
   }, [])
 
-  const onboard = useMemo(() => initOnboard(setAddressCallback, setWalletCallback), [setAddressCallback, setWalletCallback])
+  const onboard = useMemo(() => {
+    return initOnboard(setAddressCallback, setWalletCallback, networkId)
+  }, [setAddressCallback, setWalletCallback, networkId]
+  )
 
   // get last connection info and try to set default user to previous connected account.
   useEffect(() => {
@@ -65,14 +69,14 @@ export const useConnection = () => {
     setUser('')
   }, [onboard]);
 
-  return { networkId, user, setUser, web3, connect, disconnect, readOnlyUser, setReadOnlyUser }
+  return { networkId, setNetworkId, user, setUser, web3, connect, disconnect, readOnlyUser, setReadOnlyUser }
 }
 
-export const initOnboard = (addressChangeCallback, walletChangeCallback) => {
+export const initOnboard = (addressChangeCallback, walletChangeCallback, networkId) => {
   const onboard = Onboard({
     darkMode: getPreference('theme', 'light') === 'dark',
     dappId: BLOCKNATIVE_KEY, // [String] The API key created by step one above
-    networkId: 4, // [Integer] The Ethereum network ID your Dapp uses.
+    networkId: networkId, // [Integer] The Ethereum network ID your Dapp uses.
     subscriptions: {
       address: addressChangeCallback,
       wallet: walletChangeCallback,

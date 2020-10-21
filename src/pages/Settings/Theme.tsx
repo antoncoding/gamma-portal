@@ -16,7 +16,7 @@ function ThemeSwitch({ setTheme }: { setTheme: any }) {
     <>
       <SectionTitle title="Theme" />
       <div style={{display: 'flex'}}>
-        <div style={{ paddingBottom: 10, paddingRight: 20 }}> Dark Mode </div>
+        <div style={{ paddingRight: 20 }}> Dark Mode </div>
         <div style={{ paddingTop: 3 }}> <Switch checked={isDarkMode} onChange={(checked) => {
           setDarkMode(checked)
           const newMode = checked ? 'dark' : 'light'
