@@ -6,6 +6,7 @@ import { EmptyToken } from '../TokenDisplay'
 import {TokenAmount} from '@aragon/ui'
 
 import ETH from '../../imgs/ETH.png'
+import WBTC from '../../imgs/WBTC.png'
 import oETH from '../../imgs/oETH.svg'
 import USDC from '../../imgs/USDC.png'
 
@@ -21,6 +22,7 @@ export function OpynTokenAmount({token, amount, chainId} : TokenAmountProps ) {
 
   if(token.symbol === 'USDC') imgUrl = USDC
   if(token.symbol === 'WETH' ) imgUrl = ETH;
+  if(token.symbol === 'WBTC' ) imgUrl = WBTC;
 
   if((token as SubgraphOToken).underlyingAsset) {
     const symbol = (token as SubgraphOToken).underlyingAsset.symbol

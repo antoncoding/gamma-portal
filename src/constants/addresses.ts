@@ -37,6 +37,12 @@ export const tokens: TokensTyps = {
       address: '0xc778417e063141139fce010982780140aa0cd5ab',
       symbol: 'WETH',
       decimals: 18
+    },
+    {
+      name: 'Wrapped BTC',
+      address: '0x577d296678535e4903d59a4c929b718e1d575e0a',
+      symbol: 'WBTC',
+      decimals: 8
     }
   ]
 }
