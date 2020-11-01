@@ -98,6 +98,12 @@ export const initOnboard = (addressChangeCallback, walletChangeCallback, network
         { walletName: 'status' },
       ],
     },
+    walletCheck: [
+      { checkName: 'derivationPath' },
+      { checkName: 'connect' },
+      { checkName: 'accounts' },
+      { checkName: 'network' },
+    ],
   });
   return onboard
 
