@@ -136,6 +136,7 @@ export async function getVault(
         id
         symbol
         decimals
+        expiryTimestamp
       }
       shortAmount
       collateralAsset {
@@ -148,6 +149,7 @@ export async function getVault(
         id
         symbol
         decimals
+        expiryTimestamp
       }
       longAmount 
     }

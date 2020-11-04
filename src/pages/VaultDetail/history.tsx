@@ -24,8 +24,20 @@ export default function VaultHistory() {
   const toast = useToast()
 
   const history = useAsyncMemo(async () => {
-    const { burnShortActions, depositCollateralActions, depositLongActions, mintShortActions, withdrawCollateralActions, withdrawLongActions } = await getVaultHistory(networkId, owner, vaultId, toast)
-    const allEntry = [...burnShortActions, ...depositCollateralActions, ...depositLongActions, ...mintShortActions, ...withdrawCollateralActions, ...withdrawLongActions]
+    const historyData = await getVaultHistory(networkId, owner, vaultId, toast)
+    if (historyData === null) {
+      setIsLoading(false)
+      return []
+    }
+      
+    const allEntry = [
+        ...historyData.burnShortActions, 
+        ...historyData.depositCollateralActions,
+        ...historyData.depositLongActions,
+        ...historyData.mintShortActions,
+        ...historyData.withdrawCollateralActions, 
+        ...historyData.withdrawLongActions
+      ]
       .sort((a, b) => a.timestamp >= b.timestamp ? -1 : 1)
     setIsLoading(false)
     return allEntry

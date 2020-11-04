@@ -64,4 +64,5 @@ export type SubgraphToken = {
 
 export type SubgraphOToken = SubgraphToken & {
   underlyingAsset: SubgraphToken
+  expiryTimestamp: number
 }

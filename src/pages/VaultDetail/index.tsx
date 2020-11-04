@@ -13,7 +13,7 @@ import Status from '../../components/DataViewStatusEmpty'
 import { ZERO_ADDR, tokens } from '../../constants/addresses'
 import { useTokenByAddress } from '../../hooks/useToken'
 import { toTokenAmount, fromTokenAmount } from '../../utils/math'
-
+import { SubgraphOToken } from '../../types'
 import useAsyncMemo from '../../hooks/useAsyncMemo';
 
 export default function VaultDetail() {
@@ -88,6 +88,14 @@ export default function VaultDetail() {
     setChangeCollateralAmount(new BigNumber(0))
   }, [vaultDetail, allOtokens, selectedShortIndex, controller, user, vaultId, changeShortAmount])
 
+  const canSettle = useMemo(()=>{
+    return vaultDetail && vaultDetail.shortOToken && (vaultDetail.shortOToken as SubgraphOToken).expiryTimestamp < Date.now() / 1000
+  }, [vaultDetail])
+
+  const simpleSettle = useCallback(async () => {
+    await controller.simpleSettle(user, vaultId, user)
+  }, [controller, user, vaultId])
+
   const renderRow = useCallback(({ label, symbol, asset, amount, decimals, onInputChange, inputValue, onClickAdd, onClickMinus, dropdownSelected, dropdownOnChange, dropdownItems }) => {
     return [
       <div style={{ opacity: 0.8 }}> {label} </div>,
@@ -111,7 +119,13 @@ export default function VaultDetail() {
 
   return (
     <>
-      <Header primary="Vault Detail" secondary={isAuthorized && <Tag mode="new">My vault</Tag>} />
+      <Header 
+      primary={
+        <div style={{fontSize: 26}}> 
+          Vault Detail {isAuthorized && <span style={{paddingBottom: 10}}><Tag mode="new">My vault</Tag></span> } 
+        </div> 
+      } 
+      secondary={canSettle && <Button label="Settle" onClick={simpleSettle} />} />
       <DataView
         mode="table"
         status={isLoading ? 'loading' : 'default'}

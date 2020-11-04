@@ -71,6 +71,12 @@ export class Controller extends SmartContract {
     await this.operate([arg])
   }
 
+  async simpleSettle(account: string, vaultId: BigNumber, to: string) {
+    if (this.web3 === null) return
+    const arg = createSettleArg(account, to, vaultId)
+    await this.operate([arg])
+  }
+
   async operate (args: actionArg[]) {
     await this.contract.methods
       .operate(args)
@@ -174,6 +180,19 @@ function createWithdrawLongArg(account: string, to: string, vaultId: BigNumber, 
     asset: oToken,
     vaultId: vaultId.toString(),
     amount: amount.toString(),
+    index: '0',
+    data: ZERO_ADDR,
+  }
+}
+
+function createSettleArg(account: string, to: string, vaultId: BigNumber) : actionArg {
+  return {
+    actionType: ActionType.SettleVault,
+    owner: account,
+    secondAddress: to,
+    asset: ZERO_ADDR,
+    vaultId: vaultId.toString(),
+    amount: '0',
     index: '0',
     data: ZERO_ADDR,
   }
