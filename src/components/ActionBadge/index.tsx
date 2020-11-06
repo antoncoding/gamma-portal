@@ -47,7 +47,7 @@ export function BurnShortBadge() {
 }
 
 export function SettleBadge() {
-  return <Tag size="normal"> Settle Vault </Tag> 
+  return <Tag color="#FFC300" background="#FFF8BC" size="normal"> Settle Vault </Tag> 
 }
 
 export function OtherBadge() {

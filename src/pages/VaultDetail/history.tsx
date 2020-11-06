@@ -36,7 +36,8 @@ export default function VaultHistory() {
         ...historyData.depositLongActions,
         ...historyData.mintShortActions,
         ...historyData.withdrawCollateralActions, 
-        ...historyData.withdrawLongActions
+        ...historyData.withdrawLongActions,
+        ...historyData.settleActions
       ]
       .sort((a, b) => a.timestamp >= b.timestamp ? -1 : 1)
     setIsLoading(false)
@@ -44,17 +45,18 @@ export default function VaultHistory() {
   }, [], [])
 
   const renderRow = useCallback((entry: SubgraphVaultAction) => {
+    console.log(`entry`, entry)
     const hash = entry.transactionHash
     const badge = <ActionBadgeFromId id={entry.id} />
-    const assetToken = entry.oToken ? entry.oToken : entry.asset
-    const assetDecimals = assetToken.decimals ? assetToken.decimals : 8
+    const assetToken = entry.oToken ? entry.oToken : entry.asset ? entry.asset : null
+    const assetDecimals = assetToken ? assetToken.decimals ? assetToken.decimals : 8 : 8
     const amount = toTokenAmount(new BigNumber(entry.amount ? entry.amount : 0), assetDecimals).toString()
     const timestamp = new BigNumber(entry.timestamp).times(1000).toNumber()
     return [
       <TransactionBadge transaction={hash} networkType={networkId === 1 ? 'main' : 'rinkeby'} />,
       badge,
-      amount,
-      <TokenAddress token={assetToken}/>,
+      amount === '0' ? '' : amount,
+      assetToken ? <TokenAddress token={assetToken}/> : '',
       timeSince(timestamp)
     ]
   }, [networkId])

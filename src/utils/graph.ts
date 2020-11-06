@@ -292,6 +292,11 @@ export const getVaultHistory = async (networkId: SupportedNetworks,
       timestamp
       transactionHash
     }
+    settleActions (where: {vault_contains: "${owner}-${vaultId}"}) {
+      id
+      timestamp
+      transactionHash
+    }
   }
   `
   try {
