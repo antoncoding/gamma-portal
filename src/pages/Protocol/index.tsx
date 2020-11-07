@@ -2,51 +2,44 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import {
-  Header, Box, LinkBase, Tag, IconSwap, IconUser, IconConfiguration
+  Header, Box, LinkBase, Tag, IconCoin, IconCirclePlus
 } from '@aragon/ui';
 
 import Comment from '../../components/Comment'
 
-function HomePage() {
+function ProtocolPage() {
   const history = useHistory();
 
   return (
     <>
-      <Header primary="Welcome to Opyn V2" />
-      <Comment text="Tools for DeFi Risk Management."/>
+      <Header primary="Protocol" />
+      <Comment text="Advance Settings of opyn v2"/>
       <div style={{ padding: 5, display: 'flex', alignItems: 'center' }}>
         <div style={{ width: '30%', marginRight: '3%' }}>
 
           <MainButton
-            title="Account"
-            description="Manage vaults, open / close positions"
-            icon={<IconUser size="large"/>}
+            title="Oracle"
+            description="Submit Price / See oracl config"
+            icon={<IconCoin size="large"/>}
             onClick={() => {
-              history.push('/account/');
+              history.push('/system/oracle/');
             }}
           />
         </div>
 
         <div style={{ width: '30%' }}>
           <MainButton
-            title="Trade"
-            description="Coming Soon"
-            icon={<IconSwap size="large"/>}
+            title="Create"
+            description="Create new options"
+            icon={<IconCirclePlus size="large"/>}
             onClick={() => {
-              history.push('/trade/');
+              history.push('/system/create/');
             }}
           />
 
         </div>
         <div style={{ width: '30%', marginLeft: '3%' }}>
-          <MainButton
-            title="Protocol"
-            description="Protocol configs"
-            icon={<IconConfiguration size="large"/>}
-            onClick={() => {
-              history.push('/system/');
-            }}
-          />
+          
         </div>
       </div>
     </>
@@ -83,4 +76,4 @@ function MainButton({
   );
 }
 
-export default HomePage;
+export default ProtocolPage;

@@ -66,3 +66,24 @@ export type SubgraphOToken = SubgraphToken & {
   underlyingAsset: SubgraphToken
   expiryTimestamp: number
 }
+
+export type SubgraphPriceEntry = {
+  // id: string
+  expiry: string
+  reportedTimestamp: string
+  isDisputed: boolean
+  price: string
+}
+
+export type SubgraphOracleAsset = {
+  id: string
+  asset: SubgraphToken
+  pricer: SubgraphPricer
+  prices: SubgraphPriceEntry[]
+}
+
+export type SubgraphPricer = {
+  id: string
+  lockingPeriod: string
+  disputePeriod: string
+}

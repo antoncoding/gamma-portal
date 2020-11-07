@@ -37,5 +37,9 @@ export function timeSince(timeStamp) {
   return timeStamp;
 }
 
+export function expiryToDate(timestamp: number | string) {
+  const timestampNum = Number(timestamp)
+  return new Date(timestampNum * 1000).toDateString()
+}
 
 export const isAddress = web3.utils.isAddress;
