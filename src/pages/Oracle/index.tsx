@@ -87,10 +87,10 @@ export default function Oracle() {
       }
       if (pricerMap[selectedAsset.symbol] === PricerTypes.CTokenPricer) {
         const contract = new CTokenPricer(web3, pricer , networkId, user)
-        contract.setPrice(unsetExpiries[expiryIdxToSubmit].toString())
+        return contract.setPrice(unsetExpiries[expiryIdxToSubmit].toString())
       } else if (pricerMap[selectedAsset.symbol] === PricerTypes.USDCPricer) {
         const contract = new USDCPricer(web3, pricer, networkId, user)
-        contract.setPrice(unsetExpiries[expiryIdxToSubmit].toString())
+        return contract.setPrice(unsetExpiries[expiryIdxToSubmit].toString())
       } 
     },
     [allOracleAssets, selectedAssetIndex, expiryIdxToSubmit, networkId, user, web3, unsetExpiries, toast],

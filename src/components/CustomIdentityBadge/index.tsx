@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import styled from 'styled-components'
 import { Modal, TextInput, Button, IdentityBadge, Header, textStyle, useTheme, IconLabel } from '@aragon/ui'
 import { getPreference, storePreference } from '../../utils/storage'
 
 import { ZERO_ADDR } from '../../constants/addresses'
-import { useConnection } from '../../hooks/useConnection'
+import { walletContext } from '../../contexts/wallet'
 
 type CustomIdentityBadgeProps = {
   shorten?: boolean
@@ -14,7 +14,7 @@ type CustomIdentityBadgeProps = {
 }
 
 function CustomIdentityBadge({ entity, connectedAccount, label, shorten }: CustomIdentityBadgeProps) {
-  const { networkId } = useConnection()
+  const { networkId } = useContext(walletContext)
   const theme = useTheme()
 
   const [storedLabels, setAllLabels] = useState<{address: string, label: string}[]>(JSON.parse(getPreference('labels', '[]')))
