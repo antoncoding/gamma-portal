@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react'
-import { Header, DataView, DropDown, useToast, Tag, Help, Button } from '@aragon/ui'
+import { Header, DataView, DropDown, useToast, Tag, Help, Button, LoadingRing } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
 import Status from '../../components/DataViewStatusEmpty'
 import LabelText from '../../components/LabelText'
@@ -11,7 +11,7 @@ import { getOracleAssetsAndPricers, getOTokens } from '../../utils/graph'
 import SectionTitle from '../../components/SectionHeader'
 
 import { SubgraphPriceEntry } from '../../types'
-import { CTokenPricer, USDCPricer } from '../../utils/contracts/pricers'
+import { CTokenPricer, USDCPricer, CLPricer } from '../../utils/contracts/pricers'
 import { pricerMap, PricerTypes } from './config'
 import { ZERO_ADDR } from '../../constants/addresses'
 
@@ -22,7 +22,7 @@ export default function Oracle() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(true)
   const [selectedAssetIndex, setSelectedAssetIndex] = useState(-1)
   const [assetHistory, setAssetHistory] = useState<SubgraphPriceEntry[]>([])
-  const [isReadyToSetPrice, setIsReadyToSetPrice] = useState(true)
+  const [isSearchingID, setIsSearching] = useState(false)
 
   const [expiryIdxToSubmit, setExpiryIdxToSubmit] = useState(-1)
 
@@ -50,24 +50,6 @@ export default function Oracle() {
 
   const haveValidSelection = useMemo(()=>allOracleAssets.length > 0 && selectedAssetIndex !== -1, 
   [allOracleAssets, selectedAssetIndex]) 
-
-  // check is ready to set price
-  useEffect(() => {
-    if(!haveValidSelection) return
-    // if no expiry selected, return 
-    if (expiryIdxToSubmit === -1) return
-
-    // if it's USDC or cUSDC pricer, return true
-    const selectedAsset = allOracleAssets[selectedAssetIndex].asset
-    if (pricerMap[selectedAsset.symbol] === PricerTypes.CTokenPricer || pricerMap[selectedAsset.symbol] === PricerTypes.USDCPricer) {
-      setIsReadyToSetPrice(true)
-      return
-    }
-
-    // if it's chainlink pricer, search for the the valid roundId.
-
-  }, [allOracleAssets, selectedAssetIndex, haveValidSelection, expiryIdxToSubmit])
-
   
   // update ths history array
   useEffect(() => {
@@ -91,7 +73,11 @@ export default function Oracle() {
       } else if (pricerMap[selectedAsset.symbol] === PricerTypes.USDCPricer) {
         const contract = new USDCPricer(web3, pricer, networkId, user)
         return contract.setPrice(unsetExpiries[expiryIdxToSubmit].toString())
-      } 
+      } else {
+        const contract = new CLPricer(web3, pricer, networkId, user)
+        toast('Fetching Data from Chainlink Oracle, this could take a while...')
+        return contract.setPrice(unsetExpiries[expiryIdxToSubmit].toString(), toast, setIsSearching)
+      }
     },
     [allOracleAssets, selectedAssetIndex, expiryIdxToSubmit, networkId, user, web3, unsetExpiries, toast],
   )
@@ -154,9 +140,10 @@ export default function Oracle() {
         <div style={{ width: '30%' }}>
           <LabelText label=' ' /> 
           <Button 
-            disabled={!isReadyToSetPrice || !haveValidSelection || expiryIdxToSubmit === -1}
-            label={'Set Price'}
+            disabled={!haveValidSelection || expiryIdxToSubmit === -1}
+            label={isSearchingID ? 'Checking Oracle...' : 'Set Price'}
             onClick={setPrice}
+            icon={isSearchingID ? <LoadingRing /> : null}
           />
         </div>
 
