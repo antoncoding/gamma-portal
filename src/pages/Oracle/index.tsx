@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react'
-import { Header, DataView, DropDown, useToast, Tag, Help } from '@aragon/ui'
+import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react'
+import { Header, DataView, DropDown, useToast, Tag, Help, Button } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
 import Status from '../../components/DataViewStatusEmpty'
 import LabelText from '../../components/LabelText'
@@ -7,40 +7,93 @@ import CustomIdentityBadge from '../../components/CustomIdentityBadge'
 import { walletContext } from '../../contexts/wallet'
 import { useAsyncMemo } from '../../hooks/useAsyncMemo'
 import { expiryToDate, toTokenAmount } from '../../utils/math'
-import { getOracleAssetsAndPricers } from '../../utils/graph'
+import { getOracleAssetsAndPricers, getOTokens } from '../../utils/graph'
 import SectionTitle from '../../components/SectionHeader'
 
 import { SubgraphPriceEntry } from '../../types'
-
-import { pricerMap } from './config'
+import { CTokenPricer, USDCPricer } from '../../utils/contracts/pricers'
+import { pricerMap, PricerTypes } from './config'
 import { ZERO_ADDR } from '../../constants/addresses'
 
 export default function Oracle() {
 
-  const { networkId } = useContext(walletContext)
+  const { networkId, user, web3 } = useContext(walletContext)
   const toast = useToast()
   const [isLoadingHistory, setIsLoadingHistory] = useState(true)
   const [selectedAssetIndex, setSelectedAssetIndex] = useState(-1)
   const [assetHistory, setAssetHistory] = useState<SubgraphPriceEntry[]>([])
+  const [isReadyToSetPrice, setIsReadyToSetPrice] = useState(true)
 
-  // const [hasExpiryWarning, setHasWarning] = useState<Boolean>(false)
-  // const [warning, setWarning] = useState<string>('')
+  const [expiryIdxToSubmit, setExpiryIdxToSubmit] = useState(-1)
 
   const allOracleAssets = useAsyncMemo(async () => {
     const assets = await getOracleAssetsAndPricers(networkId, toast)
     setIsLoadingHistory(false)
+    if(assets && assets.length > 0) setSelectedAssetIndex(0)
     return assets === null ? [] : assets
   }, [], [])
+
+  const allOTokens = useAsyncMemo(async () => {
+    const oTokens = await getOTokens(networkId, toast)
+    return oTokens === null ? [] : oTokens
+  }, [], [])
+
+  const unsetExpiries = useMemo(() => {
+    const alreadySet = assetHistory.map(entry => Number(entry.expiry))
+    const unique = new Set(allOTokens
+      .map(o => Number(o.expiryTimestamp))
+      .filter(expiry => expiry < Date.now() / 1000)
+      .filter(expiry => !alreadySet.includes(expiry)))
+    return Array.from(unique)
+    
+  }, [assetHistory, allOTokens])
 
   const haveValidSelection = useMemo(()=>allOracleAssets.length > 0 && selectedAssetIndex !== -1, 
   [allOracleAssets, selectedAssetIndex]) 
 
+  // check is ready to set price
+  useEffect(() => {
+    if(!haveValidSelection) return
+    // if no expiry selected, return 
+    if (expiryIdxToSubmit === -1) return
+
+    // if it's USDC or cUSDC pricer, return true
+    const selectedAsset = allOracleAssets[selectedAssetIndex].asset
+    if (pricerMap[selectedAsset.symbol] === PricerTypes.CTokenPricer || pricerMap[selectedAsset.symbol] === PricerTypes.USDCPricer) {
+      setIsReadyToSetPrice(true)
+      return
+    }
+
+    // if it's chainlink pricer, search for the the valid roundId.
+
+  }, [allOracleAssets, selectedAssetIndex, haveValidSelection, expiryIdxToSubmit])
+
+  
   // update ths history array
   useEffect(() => {
     if (!haveValidSelection) return
     setAssetHistory(allOracleAssets[selectedAssetIndex].prices)
   },
   [selectedAssetIndex, allOracleAssets, haveValidSelection]
+  )
+
+  const setPrice = useCallback(
+    () => {
+      const selectedAsset = allOracleAssets[selectedAssetIndex].asset
+      const pricer = allOracleAssets[selectedAssetIndex].pricer.id
+      if(web3 === null) {
+        toast('Please connect wallet first')
+        return
+      }
+      if (pricerMap[selectedAsset.symbol] === PricerTypes.CTokenPricer) {
+        const contract = new CTokenPricer(web3, pricer , networkId, user)
+        contract.setPrice(unsetExpiries[expiryIdxToSubmit].toString())
+      } else if (pricerMap[selectedAsset.symbol] === PricerTypes.USDCPricer) {
+        const contract = new USDCPricer(web3, pricer, networkId, user)
+        contract.setPrice(unsetExpiries[expiryIdxToSubmit].toString())
+      } 
+    },
+    [allOracleAssets, selectedAssetIndex, expiryIdxToSubmit, networkId, user, web3, unsetExpiries, toast],
   )
 
   return (
@@ -85,6 +138,32 @@ export default function Oracle() {
           </div>
         </div>
       </div>
+      
+      <SectionTitle title="Submit Price" />
+
+      <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '3%' }}>
+        <div style={{ width: '30%' }}>
+          <DropDown 
+            placeholder={'Choose Expiry'}
+            items={unsetExpiries ? unsetExpiries.map(expiry => expiryToDate(expiry)) : []}
+            selected={expiryIdxToSubmit}
+            onChange={setExpiryIdxToSubmit}
+          />
+        </div>
+
+        <div style={{ width: '30%' }}>
+          <LabelText label=' ' /> 
+          <Button 
+            disabled={!isReadyToSetPrice || !haveValidSelection || expiryIdxToSubmit === -1}
+            label={'Set Price'}
+            onClick={setPrice}
+          />
+        </div>
+
+      
+      </div>
+
+      <br></br>
       <SectionTitle title="Price Submissions" />
       <DataView
         status={isLoadingHistory ? 'loading' : 'default'}
