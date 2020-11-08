@@ -1,7 +1,7 @@
 export enum PricerTypes {
-  USDCPricer,
-  CTokenPricer,
-  ChainlinkPricer
+  USDCPricer = 'USD Pricer',
+  CTokenPricer = 'cToken Pricer',
+  ChainlinkPricer = 'Chainlink Pricer'
 }
 
 export const pricerMap = {

@@ -4,6 +4,7 @@ import { Modal, TextInput, Button, IdentityBadge, Header, textStyle, useTheme, I
 import { getPreference, storePreference } from '../../utils/storage'
 
 import { ZERO_ADDR } from '../../constants/addresses'
+import { useConnection } from '../../hooks/useConnection'
 
 type CustomIdentityBadgeProps = {
   shorten?: boolean
@@ -13,6 +14,7 @@ type CustomIdentityBadgeProps = {
 }
 
 function CustomIdentityBadge({ entity, connectedAccount, label, shorten }: CustomIdentityBadgeProps) {
+  const { networkId } = useConnection()
   const theme = useTheme()
 
   const [storedLabels, setAllLabels] = useState<{address: string, label: string}[]>(JSON.parse(getPreference('labels', '[]')))
@@ -59,6 +61,7 @@ function CustomIdentityBadge({ entity, connectedAccount, label, shorten }: Custo
   return (
     <>
       <IdentityBadge
+        networkType={networkId === 1 ? 'main' : 'rinkeby'}
         entity={entity}
         connectedAccount={connectedAccount}
         label={displayLabel}

@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react'
-import { Header, DataView, DropDown, useToast, Tag } from '@aragon/ui'
+import React, { useState, useEffect, useContext, useMemo } from 'react'
+import { Header, DataView, DropDown, useToast, Tag, Help } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
 import Status from '../../components/DataViewStatusEmpty'
+import LabelText from '../../components/LabelText'
+import CustomIdentityBadge from '../../components/CustomIdentityBadge'
 import { walletContext } from '../../contexts/wallet'
 import { useAsyncMemo } from '../../hooks/useAsyncMemo'
 import { expiryToDate, toTokenAmount } from '../../utils/math'
@@ -9,6 +11,9 @@ import { getOracleAssetsAndPricers } from '../../utils/graph'
 import SectionTitle from '../../components/SectionHeader'
 
 import { SubgraphPriceEntry } from '../../types'
+
+import { pricerMap } from './config'
+import { ZERO_ADDR } from '../../constants/addresses'
 
 export default function Oracle() {
 
@@ -27,12 +32,15 @@ export default function Oracle() {
     return assets === null ? [] : assets
   }, [], [])
 
+  const haveValidSelection = useMemo(()=>allOracleAssets.length > 0 && selectedAssetIndex !== -1, 
+  [allOracleAssets, selectedAssetIndex]) 
+
   // update ths history array
   useEffect(() => {
-    if (allOracleAssets.length === 0 || selectedAssetIndex === -1) return
+    if (!haveValidSelection) return
     setAssetHistory(allOracleAssets[selectedAssetIndex].prices)
   },
-  [selectedAssetIndex, allOracleAssets]
+  [selectedAssetIndex, allOracleAssets, haveValidSelection]
   )
 
   return (
@@ -46,8 +54,36 @@ export default function Oracle() {
         onChange={setSelectedAssetIndex}
       />
       <br/><br/>
+      <SectionTitle title="Asset Detail" />
       <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '3%' }}>
+        <div style={{ width: '30%' }}>
+          <LabelText label='Pricer' />
+          <CustomIdentityBadge 
+            label={haveValidSelection ? pricerMap[allOracleAssets[selectedAssetIndex].asset.symbol] : 'Unkown'}  
+            entity={haveValidSelection ? allOracleAssets[selectedAssetIndex].pricer.id : ZERO_ADDR}
+          />
+        </div>
 
+        <div style={{ width: '30%' }}>
+        <div style={{display:'flex'}}>
+          <LabelText label='Locking Period' /> 
+          <Help hint={"What is locking period"} > 
+            Period of time after expiry that price submission will not be accepted.
+          </Help>
+        </div>
+          <div style={{paddingTop: '3%'}}>
+          { haveValidSelection ? Number(allOracleAssets[selectedAssetIndex].pricer.lockingPeriod) / 60 : 0 } Minutes
+          </div>
+        </div>
+
+        <div style={{ width: '30%' }}>
+          <div style={{display:'flex'}}> <LabelText label='Dispute Period' /> <Help hint={"What is dispute period"} > 
+            Period of time after price submission that the price can be overrided by the disputer.
+          </Help> </div>
+          <div style={{paddingTop: '3%'}}>
+          { haveValidSelection ? Number(allOracleAssets[selectedAssetIndex].pricer.disputePeriod) / 60 : 0 } Minutes
+          </div>
+        </div>
       </div>
       <SectionTitle title="Price Submissions" />
       <DataView
