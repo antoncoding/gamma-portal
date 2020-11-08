@@ -92,7 +92,6 @@ export default function Oracle() {
         selected={selectedAssetIndex}
         onChange={setSelectedAssetIndex}
       />
-      <br/><br/>
       <SectionTitle title="Asset Detail" />
       <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '3%' }}>
         <div style={{ width: '30%' }}>
@@ -130,7 +129,8 @@ export default function Oracle() {
       <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '3%' }}>
         <div style={{ width: '30%' }}>
           <DropDown 
-            placeholder={'Choose Expiry'}
+            placeholder={unsetExpiries.length > 0 ? 'Choose Expiry' : 'No unset expiry'}
+            disabled={unsetExpiries.length===0}
             items={unsetExpiries ? unsetExpiries.map(expiry => expiryToDate(expiry)) : []}
             selected={expiryIdxToSubmit}
             onChange={setExpiryIdxToSubmit}
@@ -146,16 +146,14 @@ export default function Oracle() {
             icon={isSearchingID ? <LoadingRing /> : null}
           />
         </div>
-
-      
       </div>
 
-      <br></br>
       <SectionTitle title="Price Submissions" />
       <DataView
         status={isLoadingHistory ? 'loading' : 'default'}
         fields={['Expiry', 'Price', 'Submitted Timestamp', 'Submitted By']}
         statusEmpty={<Status label={"No submissions"} />}
+        entriesPerPage={8}
         entries={assetHistory.sort((a,b) => Number(a.expiry) > Number(b.expiry) ? -1 : 1)}
         renderEntry={({expiry, reportedTimestamp, price, isDisputed}: SubgraphPriceEntry) => {
           const tag = isDisputed ? <Tag mode="new"> Disputer </Tag> : <Tag> Pricer </Tag>
