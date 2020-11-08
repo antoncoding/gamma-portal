@@ -8,10 +8,12 @@ import NavBar from "./components/NavBar"
 import SideBar from "./components/SideBar"
 
 import Create from './pages/Create'
+import ProtocolHome from './pages/Protocol'
 import Account from './pages/Account'
 import AccountVault from './pages/AccountVaults'
 import ConnectWallet from './pages/ConnectWallet'
 import Vault from './pages/VaultDetail'
+import Oracle from './pages/Oracle'
 import Operators from './pages/Operators'
 import HomePage from './pages/HomePage'
 import Settings from './pages/Settings'
@@ -23,7 +25,6 @@ import { HashRouter as Router, Switch, Route } from 'react-router-dom';
 function App() {
 
   const wallet = useConnection()
-
   const defaultTheme = getPreference('theme', 'light')
   const [theme, setTheme] = useState(defaultTheme)
 
@@ -39,10 +40,6 @@ function App() {
             <div style={{ width: '80%', marginRight: '2%' }}>
               <Layout >
                 <Switch>
-
-                  <Route path="/create/">
-                    <Create />
-                  </Route>
                   <Route path="/account/:account/operators">
                     <Operators />
                   </Route>
@@ -57,6 +54,15 @@ function App() {
                   </Route>
                   <Route path="/vault/:owner/:vaultId">
                     <Vault />
+                  </Route>
+                  <Route path="/system/oracle">
+                    <Oracle />
+                  </Route>
+                  <Route path="/system/create/">
+                    <Create />
+                  </Route>
+                  <Route path="/system/">
+                    <ProtocolHome />
                   </Route>
                   <Route path="/settings/">
                     <Settings setTheme={setTheme}/>

@@ -1,7 +1,7 @@
 import { subgraph as endpoints } from '../constants/endpoints';
 import { blacklistOTokens } from '../constants/addresses'
 import { SupportedNetworks } from '../constants/networks';
-import { SubgraphVault, SubgraphToken } from '../types';
+import { SubgraphVault, SubgraphToken, SubgraphOracleAsset } from '../types';
 
 /**
  * Get all oTokens
@@ -302,6 +302,38 @@ export const getVaultHistory = async (networkId: SupportedNetworks,
   try {
     const response = await postQuery(endpoints[networkId], query);
     return response.data;
+  } catch (error) {
+    errorCallback(error.toString());
+    return null;
+  }
+}
+
+export const getOracleAssetsAndPricers = async(networkId: SupportedNetworks, errorCallback: Function): Promise<
+  SubgraphOracleAsset[] | null
+> => {
+  const query = `{
+    oracleAssets {
+     asset {
+       id
+       symbol
+       decimals
+     }
+     pricer {
+       id
+       lockingPeriod
+       disputePeriod
+     }
+     prices {
+      expiry
+      reportedTimestamp
+      isDisputed
+      price
+     }
+   }
+   }`
+   try {
+    const response = await postQuery(endpoints[networkId], query);
+    return response.data.oracleAssets;
   } catch (error) {
     errorCallback(error.toString());
     return null;

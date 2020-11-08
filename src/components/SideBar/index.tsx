@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react'
 import { useHistory } from 'react-router-dom'
-import { useTheme, IconHome, IconUser, IconCirclePlus } from '@aragon/ui'
+import { useTheme, IconHome, IconUser, IconConfiguration } from '@aragon/ui'
 import SidebarTitle from './SidebarTitle'
 import SubButton from './SubButton'
 
@@ -65,13 +65,29 @@ export default function SideBar() {
           shown={selectedTab === 2}
         />
         <SidebarTitle
-          title="Create Option"
-          icon={<IconCirclePlus />}
+          title="Protocol"
+          icon={<IconConfiguration />}
           onClick={() => {
-            history.push('/create/')
+            history.push('/system/')
           }
           }
           isSelected={selectedTab === 3}
+        />
+        <SubButton
+          title="Create oTokens"
+          onClick={() => {
+            history.push(`/system/create/`)
+          }}
+          isSelected={selectedTab === 3 &&  subSelected === 'create'}
+          shown={selectedTab === 3}
+        />
+        <SubButton
+          title="Oracle"
+          onClick={() => {
+            history.push(`/system/oracle/`)
+          }}
+          isSelected={selectedTab === 3 &&  subSelected === 'oracle'}
+          shown={selectedTab === 3}
         />
       </div>
     </div>
@@ -81,11 +97,13 @@ export default function SideBar() {
 function locationToTabId (location) {
   return  location.pathname === '/' ? 1 :
   location.pathname.includes('/account/') ? 2 :
-  location.pathname === '/create/' ? 3 :
+  location.pathname.includes('/system/') ? 3 :
     -1
 }
 
 function locationToSubButtomId(location) {
   return  location.pathname.includes('/operators/') ? 'operators' : 
-    location.pathname.includes('/vaults/') ? 'vaults' : ''
+    location.pathname.includes('/vaults/') ? 'vaults' : 
+    location.pathname.includes('/create/') ? 'create' :
+    location.pathname.includes('/oracle/') ? 'oracle' : ''
 }
