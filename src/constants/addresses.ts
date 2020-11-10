@@ -44,6 +44,21 @@ export const tokens: TokensTyps = {
       symbol: 'WBTC',
       decimals: 8
     }
+  ],
+  '42' : [
+    emptyToken,
+    {
+      name: 'USDC',
+      address: '0xb7a4f3e9097c08da09517b5ab877f7a917224ede',
+      symbol: 'USDC',
+      decimals: 6
+    },
+    {
+      name: 'Wrapped Ether',
+      address: '0xd0a1e359811322d97991e03f863a0c30c2cf029c',
+      symbol: 'WETH',
+      decimals: 18
+    },
   ]
 }
 
@@ -63,10 +78,17 @@ export const addressese: GammaAddress = {
     factory: '0x17fFbe9476dDcC79f4574E0c89CE537fD65A8cAe',
     addressBook: '0x7630e7dE53E3d1f298f653d27fcF3710c602331C',
     pool: '0x228D386D950984D1F4A2425683e620558A1430d9'
+  },
+  '42' : {
+    controller: '0x162114ca77be3234e459c816be93c3a32c3ad5a7',
+    factory: '0x7EaEbc642Af4E92245105De1958B87BF8ee89757',
+    addressBook: '0xD37752Fd2976335fddb2e6A2cF5FfbfA88bf5F05',
+    pool: '0x48ab3c5ff91cce46cd96d0d31e935ca53b885b2e'
   }
 }
 
 export const blacklistOTokens = {
   '1': [ZERO_ADDR],
-  '4': ["0x080022f16f3ad1d29c42a64ab2449fda25ffafc0", "0x1b3e291570f1c35013a252b8c52fef9f3dc46783", "0x4824cb60348702718db00ebbfb78a364b71094ef", "0xcbdbbbca5cc390d3a2a0f71177d2ea3d0e7d6e1c", "0xff7094938a547b96cdfc9582644e1413421f9efc"]
+  '4': ["0x080022f16f3ad1d29c42a64ab2449fda25ffafc0", "0x1b3e291570f1c35013a252b8c52fef9f3dc46783", "0x4824cb60348702718db00ebbfb78a364b71094ef", "0xcbdbbbca5cc390d3a2a0f71177d2ea3d0e7d6e1c", "0xff7094938a547b96cdfc9582644e1413421f9efc"],
+  '42': [ZERO_ADDR]
 }

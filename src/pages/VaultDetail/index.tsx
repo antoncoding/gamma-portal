@@ -41,6 +41,7 @@ export default function VaultDetail() {
 
   const allOtokens = useAsyncMemo(async () => {
     const result = await getOTokens(networkId, toast)
+    console.log(`result`, result)
     return result
   }, [networkId, toast])
 

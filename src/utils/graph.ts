@@ -216,7 +216,6 @@ export async function getOTokens(
   }`;
   try {
     const response = await postQuery(endpoints[networkId], query);
-    
     const oTokens = response.data.otokens.filter((otoken: {id: string}) => !blacklistOTokens[networkId].includes(otoken.id));
     return oTokens
   } catch (error) {
