@@ -2,29 +2,62 @@ import React, { useState } from 'react';
 
 import SectionTitle from '../../components/SectionHeader'
 
-import { Switch } from '@aragon/ui'
+import { RadioList, useToast } from '@aragon/ui'
 import { storePreference } from '../../utils/storage'
-
+import { subgraph } from '../../constants/endpoints'
 import { useConnection } from '../../hooks/useConnection'
+import { SupportedNetworks } from '../../constants/networks'
+
+const items = [
+  {
+    title: 'Mainnet', 
+    description: `Subgraph endpoint: ${subgraph[SupportedNetworks.Mainnet]}`
+  },
+  {
+    title: 'Rinkeby', 
+    description: `Subgraph endpoint: ${subgraph[SupportedNetworks.Rinkeby]}`
+  },
+  {
+    title: 'Kovan', 
+    description: `Subgraph endpoint: ${subgraph[SupportedNetworks.Kovan]}`
+  }
+]
+
+const idxToNetworkId = [1, 4, 42]
+const networkIdToIdx = {
+  1: 0,
+  4: 1,
+  42: 2,
+}
 
 function Network() {
-
+  const toast = useToast()
   const { networkId, setNetworkId } = useConnection()
 
-  const [isTestnet, setIsTestnet] = useState(networkId === 4)
+  const [selectedIdx, setSelectedIdx] = useState(networkIdToIdx[networkId]) 
 
   return (
     <>
       <SectionTitle title="Network" />
       <div style={{display: 'flex'}}>
-        <div style={{ paddingBottom: 10, paddingRight: 45 }}> Testnet </div>
-        <div style={{ paddingTop: 3 }}> <Switch disabled checked={isTestnet} onChange={(checked) => {
-          setIsTestnet(checked)
-          const newNetworkId = checked ? 4 : 1
-          setNetworkId(newNetworkId)
-          storePreference('networkId', newNetworkId.toString())
-          window.location.reload()
-        }} /> </div>
+        <RadioList 
+          title={'Switch between networks'}
+          items={items}
+          selected={selectedIdx}
+          onChange={(selectedIdx: number) => {
+            
+            const newNetworkId = idxToNetworkId[selectedIdx]
+            if (newNetworkId === 1) {
+              toast('Mainnet not ready yet!')
+              return
+            }
+            setSelectedIdx(selectedIdx)
+            // const newNetworkId = checked ? 4 : 1
+            setNetworkId(newNetworkId)
+            storePreference('networkId', newNetworkId.toString())
+            window.location.reload()
+          }}
+        />
       </div>
     </>
   );

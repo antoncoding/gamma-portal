@@ -44,6 +44,21 @@ export const tokens: TokensTyps = {
       symbol: 'WBTC',
       decimals: 8
     }
+  ],
+  '42' : [
+    emptyToken,
+    {
+      name: 'USDC',
+      address: '0xb7a4f3e9097c08da09517b5ab877f7a917224ede',
+      symbol: 'USDC',
+      decimals: 6
+    },
+    {
+      name: 'Wrapped Ether',
+      address: '0xd0a1e359811322d97991e03f863a0c30c2cf029c',
+      symbol: 'WETH',
+      decimals: 18
+    },
   ]
 }
 
@@ -63,6 +78,12 @@ export const addressese: GammaAddress = {
     factory: '0x17fFbe9476dDcC79f4574E0c89CE537fD65A8cAe',
     addressBook: '0x7630e7dE53E3d1f298f653d27fcF3710c602331C',
     pool: '0x228D386D950984D1F4A2425683e620558A1430d9'
+  },
+  '42' : {
+    controller: '',
+    factory: '',
+    addressBook: '',
+    pool: ''
   }
 }
 
