@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
 import SectionTitle from '../../components/SectionHeader'
 
 import { RadioList, useToast } from '@aragon/ui'
 import { storePreference } from '../../utils/storage'
 import { subgraph } from '../../constants/endpoints'
-import { useConnection } from '../../hooks/useConnection'
+import { walletContext } from '../../contexts/wallet'
 import { SupportedNetworks } from '../../constants/networks'
 
 const items = [
@@ -32,7 +32,7 @@ const networkIdToIdx = {
 
 function Network() {
   const toast = useToast()
-  const { networkId, setNetworkId } = useConnection()
+  const { networkId, setNetworkId } = useContext(walletContext)
 
   const [selectedIdx, setSelectedIdx] = useState(networkIdToIdx[networkId]) 
 

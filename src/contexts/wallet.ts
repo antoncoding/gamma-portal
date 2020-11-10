@@ -7,6 +7,7 @@ export interface Wallet {
   setUser: (user: string) => void,
   networkId: number,
   connect: () => Promise<string | false>,
+  setNetworkId: (networkId: number) => void,
   disconnect: Function
   readOnlyUser: string
   setReadOnlyUser: any
@@ -16,6 +17,7 @@ export const DEFAULT : Wallet = {
   networkId: 4,
   web3: null,
   user: '',
+  setNetworkId: (networkId: number) =>{},
   setUser: (user: string):void => {},
   connect: async () => '',
   disconnect: () => {},
