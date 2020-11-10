@@ -74,9 +74,10 @@ export default function CreateOption() {
 
   return (
     <>
-      <Header primary="Create new oToken" />
-      <SectionTitle title="Choose a product" />
+      <Header primary="oToken Factory" />
+      <SectionTitle title="Create new oToken" />
       <DropDown
+        placeholder="Select product"
         items={allProducts ? allProducts.map(p => p.label) : []}
         selected={selectedProductIndex}
         onChange={setSelectedProductIndex}

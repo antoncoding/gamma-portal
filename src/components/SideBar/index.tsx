@@ -74,11 +74,11 @@ export default function SideBar() {
           isSelected={selectedTab === 3}
         />
         <SubButton
-          title="Create oTokens"
+          title="Factory"
           onClick={() => {
-            history.push(`/system/create/`)
+            history.push(`/system/factory/`)
           }}
-          isSelected={selectedTab === 3 &&  subSelected === 'create'}
+          isSelected={selectedTab === 3 &&  subSelected === 'factory'}
           shown={selectedTab === 3}
         />
         <SubButton
@@ -104,6 +104,6 @@ function locationToTabId (location) {
 function locationToSubButtomId(location) {
   return  location.pathname.includes('/operators/') ? 'operators' : 
     location.pathname.includes('/vaults/') ? 'vaults' : 
-    location.pathname.includes('/create/') ? 'create' :
+    location.pathname.includes('/factory/') ? 'factory' :
     location.pathname.includes('/oracle/') ? 'oracle' : ''
 }

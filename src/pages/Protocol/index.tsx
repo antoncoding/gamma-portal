@@ -29,11 +29,11 @@ function ProtocolPage() {
 
         <div style={{ width: '30%' }}>
           <MainButton
-            title="Create"
+            title="Factory"
             description="Create new options"
             icon={<IconCirclePlus size="large"/>}
             onClick={() => {
-              history.push('/system/create/');
+              history.push('/system/factory/');
             }}
           />
 

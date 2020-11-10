@@ -7,7 +7,7 @@ import { walletContext } from './contexts/wallet'
 import NavBar from "./components/NavBar"
 import SideBar from "./components/SideBar"
 
-import Create from './pages/Create'
+import Factory from './pages/Factory'
 import ProtocolHome from './pages/Protocol'
 import Account from './pages/Account'
 import AccountVault from './pages/AccountVaults'
@@ -58,8 +58,8 @@ function App() {
                   <Route path="/system/oracle">
                     <Oracle />
                   </Route>
-                  <Route path="/system/create/">
-                    <Create />
+                  <Route path="/system/factory/">
+                    <Factory />
                   </Route>
                   <Route path="/system/">
                     <ProtocolHome />
