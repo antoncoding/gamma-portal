@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react'
+import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react'
 import BigNumber from 'bignumber.js'
-import { Header, TextInput, Button, DropDown, useToast } from '@aragon/ui'
+import { Header, TextInput, Button, DropDown, useToast, LoadingRing, AddressField, Help } from '@aragon/ui'
 import LabelText from '../../components/LabelText'
 import Warning from '../../components/Warning'
 import { walletContext } from '../../contexts/wallet'
@@ -10,6 +10,8 @@ import { fromTokenAmount } from '../../utils/math'
 import { getWhitelistedProducts } from '../../utils/graph'
 import SectionTitle from '../../components/SectionHeader'
 import TokenAddress from '../../components/TokenAddress'
+import { ZERO_ADDR } from '../../constants/addresses'
+import WarningText from '../../components/Warning'
 
 export default function CreateOption() {
 
@@ -20,7 +22,11 @@ export default function CreateOption() {
   const [strikePriceReadable, setStrikePriceReadable] = useState<BigNumber>(new BigNumber(250))
   const [expiryTimestamp, setExpiryTimestamp] = useState<BigNumber>(new BigNumber(1606809600))
   const [hasExpiryWarning, setHasWarning] = useState<boolean>(false)
-  const [warning, setWarning] = useState<string>('')
+  const [expiryWarning, setExpiryWarning] = useState<string>('')
+
+  const [isDuplicated, setIsDuplicated] = useState(false)
+  const [isCreating, setIsCreating] = useState(Boolean)
+  const [targetAddress, setTargetAddress] = useState(ZERO_ADDR)
 
   const expiryDate = useMemo(() => {
     try {
@@ -49,7 +55,7 @@ export default function CreateOption() {
   useEffect(() => {
     if ((expiryTimestamp.minus(28800)).mod(86400).isGreaterThan(0)) {
       setHasWarning(true)
-      setWarning('Expiry time need to be 08:00 AM UTC')
+      setExpiryWarning('Expiry time need to be 08:00 AM UTC')
     } else {
       setHasWarning(false)
     }
@@ -67,9 +73,37 @@ export default function CreateOption() {
     const strike = allProducts[selectedProductIndex].strike
     const collateral = allProducts[selectedProductIndex].collateral
     const isPut = allProducts[selectedProductIndex].isPut
-    
-    await factory.createOToken(underlying.id, strike.id, collateral.id, strikePrice, expiryTimestamp, isPut)
+    setIsCreating(true)
+    // check if the option has been created.
+    try {
+      await factory.createOToken(underlying.id, strike.id, collateral.id, strikePrice, expiryTimestamp, isPut)
+    } catch(error) {}
+    finally {
+      setIsCreating(false)
+    }
   }
+
+  const computeAddress = useCallback(async (idx, strikePrice, expiry)=> {
+    const factory = new OTokenFactory(web3, networkId, user)
+    if (idx === -1) {
+      return
+    }
+    const underlying = allProducts[idx].underlying
+    const strike = allProducts[idx].strike
+    const collateral = allProducts[idx].collateral
+    const isPut = allProducts[idx].isPut
+    // check if the option has been created.
+    const targetAddress = await factory.getTargetOtokenAddress(underlying.id, strike.id, collateral.id, strikePrice, expiry, isPut)
+    setTargetAddress(targetAddress)
+    const isCreated = await factory.isCreated(underlying.id, strike.id, collateral.id, strikePrice, expiry, isPut)
+    setIsDuplicated(isCreated)
+  }, [allProducts, networkId, user, web3])
+
+  // recompute address when input changes
+  useEffect(() => {
+    computeAddress(selectedProductIndex, strikePrice, expiryTimestamp)
+  }, [computeAddress, selectedProductIndex, strikePrice, expiryTimestamp])
+
 
   return (
     <>
@@ -110,12 +144,12 @@ export default function CreateOption() {
 
       <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '1%' }}>
 
-        <div style={{ width: '30%' }}>
+        <div style={{ width: '20%' }}>
           <LabelText label='Strike Price' />
           <TextInput type="number" value={strikePriceReadable} onChange={(e) => setStrikePriceReadable(new BigNumber(e.target.value))} wide />
         </div>
 
-        <div style={{ width: '30%', marginLeft: '5%' }}>
+        <div style={{ width: '20%', marginLeft: '5%' }}>
           <LabelText label='Expiry Date (08:00 UTC)' />
           <TextInput 
             type="date" 
@@ -123,17 +157,28 @@ export default function CreateOption() {
             onChange={(e) => {
               const dateSelected = new Date(e.target.value)
               const dateUTC = Date.UTC(dateSelected.getFullYear(), dateSelected.getMonth(), dateSelected.getDate(), 8)
-              setExpiryTimestamp(new BigNumber(dateUTC / 1000))
+              const expiry = new BigNumber(dateUTC / 1000)
+              setExpiryTimestamp(expiry)
             }} 
             wide />
-          <Warning text={warning} show={hasExpiryWarning} />
+          <Warning text={expiryWarning} show={hasExpiryWarning} />
         </div>
 
-        <div style={{ width: '30%', marginLeft: '5%' }}>
-          <LabelText label='Done!' />
-          <Button label="Create" wide onClick={createOToken} />
+        <div style={{ width: '20%', marginLeft: '5%' }}>
+          <div style={{display: 'flex'}}> <LabelText label='Create!' /> <WarningText text="This option has been created" show={isDuplicated} /> </div>
+          <Button wide disabled={isDuplicated || isCreating} onClick={createOToken}> {isCreating ? <> <LoadingRing /> <span style={{paddingLeft: '5px'}}>Createing </span>  </> : "Create"}  </Button>
         </div>
 
+        <div style={{ width: '20%', marginLeft: '5%' }}>
+          <div style={{display: 'flex'}}> 
+            <LabelText label='Output' /> 
+            <Help hint={"What is this output address"}>
+              The address the new oToken will be created at.
+              In Opyn V2, we use CREATE2 opcode to create new oToken contract, so we can predict the contract address before actual deployment 
+            </Help>
+          </div>
+          <AddressField address={targetAddress}/>
+        </div>
       </div>
 
     </>
