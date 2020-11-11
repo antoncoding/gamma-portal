@@ -174,7 +174,7 @@ export default function CreateOption() {
             <LabelText label='Output' /> 
             <Help hint={"What is this output address"}>
               The address the new oToken will be created at.
-              In Opyn V2, we use CREATE2 opcode to create new oToken contract, so we can predict the contract address before actual deployment 
+              In Opyn V2, we use CREATE2 opcode to create new oToken contracts, so we can predict a contract address before actual deployments.
             </Help>
           </div>
           <AddressField address={targetAddress}/>
