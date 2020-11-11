@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import Web3 from 'web3' 
 import {SmartContract} from './base'
-import {addressese} from '../../constants/addresses'
+import {addressese, ZERO_ADDR} from '../../constants/addresses'
 const abi = require('../../constants/abis/factory.json')
 
 export class OTokenFactory extends SmartContract {
@@ -25,5 +25,34 @@ export class OTokenFactory extends SmartContract {
       .createOtoken(underlying, strike, collateral, strikePrice.toString(), expiry.toString(), isPut)
       .send({from: this.account})
       .on('transactionHash', this.getCallback());
+  }
+
+  async isCreated(
+    underlying: string, 
+    strike: string, 
+    collateral: string, 
+    strikePrice: BigNumber, 
+    expiry: BigNumber, 
+    isPut: boolean
+  ) : Promise<boolean> {
+    const deployedAddress = await this.contract.methods
+      .getOtoken(underlying, strike, collateral, strikePrice.toString(), expiry.toString(), isPut)
+      .call()
+
+    return deployedAddress !== ZERO_ADDR
+  }
+
+  async getTargetOtokenAddress(
+    underlying: string, 
+    strike: string, 
+    collateral: string, 
+    strikePrice: BigNumber, 
+    expiry: BigNumber, 
+    isPut: boolean
+  ) : Promise<string> {
+    const targetAddress = await this.contract.methods
+      .getTargetOtokenAddress(underlying, strike, collateral, strikePrice.toString(), expiry.toString(), isPut)
+      .call()
+    return targetAddress
   }
 }

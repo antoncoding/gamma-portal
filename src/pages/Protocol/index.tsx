@@ -2,12 +2,15 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import {
-  Header, Box, LinkBase, Tag, IconCoin, IconCirclePlus
+  Header, Box, LinkBase, Tag, IconCoin, useTheme
 } from '@aragon/ui';
 
 import Comment from '../../components/Comment'
+import factoryBlack from '../../imgs/icons/factory-black.png'
+import factoryWhite from '../../imgs/icons/factory-white.png'
 
 function ProtocolPage() {
+  const theme = useTheme()
   const history = useHistory();
 
   return (
@@ -29,11 +32,11 @@ function ProtocolPage() {
 
         <div style={{ width: '30%' }}>
           <MainButton
-            title="Create"
+            title="Factory"
             description="Create new options"
-            icon={<IconCirclePlus size="large"/>}
+            icon={<img style={{height: 55}} src={theme._name === 'dark' ? factoryWhite : factoryBlack} alt="factory" />}
             onClick={() => {
-              history.push('/system/create/');
+              history.push('/system/factory/');
             }}
           />
 
