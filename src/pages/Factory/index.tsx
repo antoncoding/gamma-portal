@@ -9,7 +9,6 @@ import { OTokenFactory } from '../../utils/contracts/factory'
 import { fromTokenAmount } from '../../utils/math'
 import { getWhitelistedProducts } from '../../utils/graph'
 import SectionTitle from '../../components/SectionHeader'
-
 import TokenAddress from '../../components/TokenAddress'
 
 export default function CreateOption() {
