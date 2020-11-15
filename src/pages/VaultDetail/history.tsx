@@ -45,7 +45,6 @@ export default function VaultHistory() {
   }, [], [])
 
   const renderRow = useCallback((entry: SubgraphVaultAction) => {
-    console.log(`entry`, entry)
     const hash = entry.transactionHash
     const badge = <ActionBadgeFromId id={entry.id} />
     const assetToken = entry.oToken ? entry.oToken : entry.asset ? entry.asset : null
@@ -53,7 +52,7 @@ export default function VaultHistory() {
     const amount = toTokenAmount(new BigNumber(entry.amount ? entry.amount : 0), assetDecimals).toString()
     const timestamp = new BigNumber(entry.timestamp).times(1000).toNumber()
     return [
-      <TransactionBadge transaction={hash} networkType={networkId === 1 ? 'main' : 'rinkeby'} />,
+      <TransactionBadge transaction={hash} networkType={networkId === 1 ? 'main' : networkId === 42 ? 'kovan' :'rinkeby'} />,
       badge,
       amount === '0' ? '' : amount,
       assetToken ? <TokenAddress token={assetToken}/> : '',

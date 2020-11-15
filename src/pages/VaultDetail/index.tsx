@@ -7,13 +7,12 @@ import History from './history'
 
 import { walletContext } from '../../contexts/wallet'
 import { Controller } from '../../utils/contracts/controller'
-import { getVault, getOTokens } from '../../utils/graph'
+import { getVault, getLiveOTokens } from '../../utils/graph'
 import CustomIdentityBadge from '../../components/CustomIdentityBadge'
 import Status from '../../components/DataViewStatusEmpty'
 import { ZERO_ADDR, tokens } from '../../constants/addresses'
 import { useTokenByAddress } from '../../hooks/useToken'
 import { toTokenAmount, fromTokenAmount } from '../../utils/math'
-import { SubgraphOToken } from '../../types'
 import useAsyncMemo from '../../hooks/useAsyncMemo';
 
 export default function VaultDetail() {
@@ -40,8 +39,7 @@ export default function VaultDetail() {
   }, null, [networkId, owner, toast, vaultId])
 
   const allOtokens = useAsyncMemo(async () => {
-    const result = await getOTokens(networkId, toast)
-    console.log(`result`, result)
+    const result = await getLiveOTokens(networkId, toast)
     return result
   }, [networkId, toast])
 
@@ -89,8 +87,16 @@ export default function VaultDetail() {
     setChangeCollateralAmount(new BigNumber(0))
   }, [vaultDetail, allOtokens, selectedShortIndex, controller, user, vaultId, changeShortAmount])
 
-  const canSettle = useMemo(()=>{
-    return vaultDetail && vaultDetail.shortOToken && (vaultDetail.shortOToken as SubgraphOToken).expiryTimestamp < Date.now() / 1000
+  const isExpired = useMemo(() => {
+    if (!vaultDetail) return false
+
+    if (vaultDetail.shortOToken && Number(vaultDetail.shortOToken.expiryTimestamp) < Date.now() / 1000 ) 
+      return true
+    
+    if (vaultDetail.longOToken && Number (vaultDetail.longOToken.expiryTimestamp) < Date.now() / 1000)
+      return true;
+    
+    return false
   }, [vaultDetail])
 
   const simpleSettle = useCallback(async () => {
@@ -111,22 +117,22 @@ export default function VaultDetail() {
         ? toTokenAmount(new BigNumber(amount), decimals).toString()
         : 0,
       <>
-        <TextInput type="number" onChange={onInputChange} value={inputValue} />
-        <Button label="Add" display="icon" icon={<IconCirclePlus />} onClick={onClickAdd} />
-        <Button label="Remove" display="icon" icon={<IconCircleMinus />} onClick={onClickMinus} />
+        <TextInput type="number" disabled={isExpired} onChange={onInputChange} value={inputValue} />
+        <Button label="Add" disabled={isExpired} display="icon" icon={<IconCirclePlus />} onClick={onClickAdd} />
+        <Button label="Remove" disabled={isExpired} display="icon" icon={<IconCircleMinus />} onClick={onClickMinus} />
       </>
     ]
-  }, [])
+  }, [isExpired])
 
   return (
     <>
-      <Header 
-      primary={
-        <div style={{fontSize: 26}}> 
-          Vault Detail {isAuthorized && <span style={{paddingBottom: 10}}><Tag mode="new">My vault</Tag></span> } 
-        </div> 
-      } 
-      secondary={canSettle && <Button label="Settle" onClick={simpleSettle} />} />
+      <Header
+        primary={
+          <div style={{ fontSize: 26 }}>
+            Vault Detail {isAuthorized && <span style={{ paddingBottom: 10 }}><Tag mode="new">My vault</Tag></span>}
+          </div>
+        }
+        secondary={isExpired && <Button label="Settle" onClick={simpleSettle} />} />
       <DataView
         mode="table"
         status={isLoading ? 'loading' : 'default'}
@@ -163,7 +169,7 @@ export default function VaultDetail() {
             onClickMinus: simpleRemoveLong,
             dropdownSelected: selectedLongIndex,
             dropdownOnChange: setSelectedLongIndex,
-            dropdownItems: allOtokens?.map(o => o.symbol)
+            dropdownItems: allOtokens? allOtokens.map(o => o.symbol) : []
           },
           {
             label: 'Short',
@@ -179,7 +185,7 @@ export default function VaultDetail() {
             onClickMinus: simpleBurn,
             dropdownSelected: selectedShortIndex,
             dropdownOnChange: setSelectedShortIndex,
-            dropdownItems: allOtokens?.map(o => o.symbol)
+            dropdownItems: allOtokens? allOtokens.map(o => o.symbol) : []
           }
         ]}
         renderEntry={renderRow}

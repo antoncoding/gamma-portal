@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { subgraph as endpoints } from '../constants/endpoints';
 import { blacklistOTokens } from '../constants/addresses'
 import { SupportedNetworks } from '../constants/networks';
@@ -111,7 +112,7 @@ export async function getVault(
   collateralAmount: string | null;
   collateralAsset: null | { id: string, symbol: string };
   longAmount: string | null;
-  longOToken: null | { id: string, symbol: string };
+  longOToken: null | { id: string, symbol: string, decimals: number, expiryTimestamp: string };
   owner: {
     operators: {
       operator: {
@@ -120,7 +121,7 @@ export async function getVault(
     }[];
   };
   shortAmount: null | string;
-  shortOToken: null | { id: string, symbol: string };
+  shortOToken: null | { id: string, symbol: string, decimals: number, expiryTimestamp: string };
 }> {
   const query = `{
     vault(id: "${accountOwner}-${vaultId}")
@@ -189,6 +190,67 @@ export async function getOTokens(
   const query = `
   {
     otokens {
+      id
+      symbol
+      name
+      strikeAsset {
+        id
+        symbol
+        decimals
+      }
+      underlyingAsset {
+        id
+        symbol
+        decimals
+      }
+      collateralAsset {
+        id
+        symbol
+        decimals
+      }
+      strikePrice
+      isPut
+      expiryTimestamp
+      createdAt
+      createdTx
+    }
+  }`;
+  try {
+    const response = await postQuery(endpoints[networkId], query);
+    const oTokens = response.data.otokens.filter((otoken: {id: string}) => !blacklistOTokens[networkId].includes(otoken.id));
+    return oTokens
+  } catch (error) {
+    errorCallback(error.toString());
+    return null;
+  }
+}
+
+/**
+ * Get all oTokens
+ */
+export async function getLiveOTokens(
+  networkId: SupportedNetworks,
+  errorCallback: Function
+): Promise<
+  | {
+      id: string;
+      symbol: string,
+      name: string;
+      strikeAsset: {id:string, symbol:string};
+      strikePrice: string
+      underlyingAsset: {id:string, symbol:string};
+      collateralAsset: {id:string, symbol:string};
+      isPut: boolean;
+      expiryTimestamp: string;
+      createdAt: string;
+      createdTx: string;
+    }[]
+  | null
+> {
+  const current = new BigNumber(Date.now()).div(1000).integerValue().toString()
+  const query = `
+  {
+    otokens (where: {expiryTimestamp_gt: ${current}}) {
       id
       symbol
       name

@@ -94,7 +94,7 @@ export class Controller extends SmartContract {
 
 // util functions for action library
 
-function createOpenVaultArg(account: string, vaultId: BigNumber) : actionArg {
+export function createOpenVaultArg(account: string, vaultId: BigNumber) : actionArg {
   return {
     actionType: ActionType.OpenVault,
     owner: account,
@@ -107,7 +107,7 @@ function createOpenVaultArg(account: string, vaultId: BigNumber) : actionArg {
   }
 }
 
-function createDepositCollateralArg(account: string, from:string, vaultId: BigNumber, asset: string, amount: BigNumber) : actionArg {
+export function createDepositCollateralArg(account: string, from:string, vaultId: BigNumber, asset: string, amount: BigNumber) : actionArg {
   return {
     actionType: ActionType.DepositCollateral,
     owner: account,
@@ -120,7 +120,7 @@ function createDepositCollateralArg(account: string, from:string, vaultId: BigNu
   }
 }
 
-function createWithdrawCollateralArg(account: string, to: string, vaultId: BigNumber, asset: string, amount: BigNumber) : actionArg {
+export function createWithdrawCollateralArg(account: string, to: string, vaultId: BigNumber, asset: string, amount: BigNumber) : actionArg {
   return {
     actionType: ActionType.WithdrawCollateral,
     owner: account,
@@ -133,7 +133,7 @@ function createWithdrawCollateralArg(account: string, to: string, vaultId: BigNu
   }
 }
 
-function createMintShortArg(account: string, to:string, vaultId: BigNumber, oToken: string, amount: BigNumber) : actionArg {
+export function createMintShortArg(account: string, to:string, vaultId: BigNumber, oToken: string, amount: BigNumber) : actionArg {
   return {
     actionType: ActionType.MintShortOption,
     owner: account,
@@ -146,7 +146,7 @@ function createMintShortArg(account: string, to:string, vaultId: BigNumber, oTok
   }
 }
 
-function createBurnShortArg(account: string, from: string, vaultId: BigNumber, oToken: string, amount: BigNumber) : actionArg {
+export function createBurnShortArg(account: string, from: string, vaultId: BigNumber, oToken: string, amount: BigNumber) : actionArg {
   return {
     actionType: ActionType.BurnShortOption,
     owner: account,
@@ -159,7 +159,7 @@ function createBurnShortArg(account: string, from: string, vaultId: BigNumber, o
   }
 }
 
-function createDepositLongArg(account: string, from:string, vaultId: BigNumber, oToken: string, amount: BigNumber) : actionArg {
+export function createDepositLongArg(account: string, from:string, vaultId: BigNumber, oToken: string, amount: BigNumber) : actionArg {
   return {
     actionType: ActionType.DepositLongOption,
     owner: account,
@@ -172,7 +172,7 @@ function createDepositLongArg(account: string, from:string, vaultId: BigNumber, 
   }
 }
 
-function createWithdrawLongArg(account: string, to: string, vaultId: BigNumber, oToken: string, amount: BigNumber) : actionArg {
+export function createWithdrawLongArg(account: string, to: string, vaultId: BigNumber, oToken: string, amount: BigNumber) : actionArg {
   return {
     actionType: ActionType.WithdrawLongOption,
     owner: account,
@@ -185,7 +185,7 @@ function createWithdrawLongArg(account: string, to: string, vaultId: BigNumber, 
   }
 }
 
-function createSettleArg(account: string, to: string, vaultId: BigNumber) : actionArg {
+export function createSettleArg(account: string, to: string, vaultId: BigNumber) : actionArg {
   return {
     actionType: ActionType.SettleVault,
     owner: account,
