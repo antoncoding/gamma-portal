@@ -3,6 +3,8 @@ import Web3 from 'web3'
 import {SmartContract} from './base'
 import {addressese, ZERO_ADDR} from '../../constants/addresses'
 import {actionArg, ActionType} from '../../types'
+import {getPreference} from '../../utils/storage'
+import {MAX_UINT} from '../../constants/others'
 
 const abi = require('../../constants/abis/controller.json')
 const erc20Abi = require('../../constants/abis/erc20.json')
@@ -29,7 +31,8 @@ export class Controller extends SmartContract {
     const pool = addressese[this.networkId].pool;
     const allowance = await collateral.methods.allowance(from, pool).call()
     if (new BigNumber(allowance).lt(amount)) {
-      await collateral.methods.approve(pool, amount.toString()).send({from: this.account}).on('transactionHash', this.getCallback())
+      const approveAmount = getPreference('approval', 'normal') === 'normal' ? amount.toString() : MAX_UINT
+      await collateral.methods.approve(pool, approveAmount).send({from: this.account}).on('transactionHash', this.getCallback())
     }
     const arg = createDepositCollateralArg(account, from, vaultId, asset, amount)
     await this.operate([arg])
@@ -47,7 +50,8 @@ export class Controller extends SmartContract {
     const pool = addressese[this.networkId].pool;
     const allowance = await oToken.methods.allowance(from, pool).call()
     if (new BigNumber(allowance).lt(amount)) {
-      await oToken.methods.approve(pool, amount.toString()).send({from: this.account}).on('transactionHash', this.getCallback())
+      const approveAmount = getPreference('approval', 'normal') === 'normal' ? amount.toString() : MAX_UINT
+      await oToken.methods.approve(pool, approveAmount).send({from: this.account}).on('transactionHash', this.getCallback())
     }
     const arg = createDepositLongArg(account, from, vaultId, asset, amount)
     await this.operate([arg])
