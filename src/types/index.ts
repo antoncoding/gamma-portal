@@ -64,7 +64,11 @@ export type SubgraphToken = {
 
 export type SubgraphOToken = SubgraphToken & {
   underlyingAsset: SubgraphToken
-  expiryTimestamp: number
+  strikeAsset: SubgraphToken,
+  collateralAsset: SubgraphToken
+  strikePrice: string
+  expiryTimestamp: string
+  isPut: boolean
 }
 
 export type SubgraphPriceEntry = {
