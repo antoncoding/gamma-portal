@@ -27,8 +27,8 @@ export default function VaultDetail() {
 
   // for dropdown options
   const [selectedCollateralIndex, setSelectedCollateralIndex] = useState(0)
-  const [longOtoken, setLongOToken] = useState<SubgraphOToken | null>(null)
-  const [shortOtoken, setShortOToken] = useState<SubgraphOToken | null>(null)
+  const [selectedLong, setLongOToken] = useState<SubgraphOToken | null>(null)
+  const [selectedShort, setShortOToken] = useState<SubgraphOToken | null>(null)
 
   const { web3, networkId, user } = useContext(walletContext)
   const { owner, vaultId } = useParams()
@@ -54,6 +54,12 @@ export default function VaultDetail() {
   }, [vaultDetail, owner, user])
 
   const collateralToken = useTokenByAddress(vaultDetail && vaultDetail.collateralAsset ? vaultDetail.collateralAsset.id : tokens[networkId][selectedCollateralIndex].address, networkId)
+
+  const shortOtoken = useMemo( () => (vaultDetail && vaultDetail.shortOToken) || selectedShort || null 
+  , [vaultDetail, selectedShort])
+  
+  const longOtoken = useMemo(() => (vaultDetail && vaultDetail.longOToken) || selectedLong || null
+  , [vaultDetail, selectedLong])
 
   useEffect(() => {
     if (shortOtoken) {

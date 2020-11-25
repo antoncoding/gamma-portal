@@ -112,7 +112,7 @@ export async function getVault(
   collateralAmount: string | null;
   collateralAsset: null | { id: string, symbol: string };
   longAmount: string | null;
-  longOToken: null | { id: string, symbol: string, decimals: number, expiryTimestamp: string };
+  longOToken: null | SubgraphOToken;
   owner: {
     operators: {
       operator: {
@@ -121,7 +121,7 @@ export async function getVault(
     }[];
   };
   shortAmount: null | string;
-  shortOToken: null | { id: string, symbol: string, decimals: number, expiryTimestamp: string };
+  shortOToken: null | SubgraphOToken;
 }> {
   const query = `{
     vault(id: "${accountOwner}-${vaultId}")
@@ -138,6 +138,11 @@ export async function getVault(
         symbol
         decimals
         expiryTimestamp
+        collateralAsset {
+          id
+          symbol
+          decimals
+        }
       }
       shortAmount
       collateralAsset {
@@ -151,6 +156,11 @@ export async function getVault(
         symbol
         decimals
         expiryTimestamp
+        collateralAsset {
+          id
+          symbol
+          decimals
+        }
       }
       longAmount 
     }
