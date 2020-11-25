@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { subgraph as endpoints } from '../constants/endpoints';
 import { blacklistOTokens } from '../constants/addresses'
 import { SupportedNetworks } from '../constants/networks';
-import { SubgraphVault, SubgraphToken, SubgraphOracleAsset } from '../types';
+import { SubgraphVault, SubgraphToken, SubgraphOracleAsset, SubgraphOToken } from '../types';
 
 /**
  * Get all oTokens
@@ -232,19 +232,7 @@ export async function getLiveOTokens(
   networkId: SupportedNetworks,
   errorCallback: Function
 ): Promise<
-  | {
-      id: string;
-      symbol: string,
-      name: string;
-      strikeAsset: {id:string, symbol:string};
-      strikePrice: string
-      underlyingAsset: {id:string, symbol:string};
-      collateralAsset: {id:string, symbol:string};
-      isPut: boolean;
-      expiryTimestamp: string;
-      createdAt: string;
-      createdTx: string;
-    }[]
+  | SubgraphOToken[]
   | null
 > {
   const current = new BigNumber(Date.now()).div(1000).integerValue().toString()
@@ -254,6 +242,7 @@ export async function getLiveOTokens(
       id
       symbol
       name
+      decimals
       strikeAsset {
         id
         symbol
@@ -272,8 +261,6 @@ export async function getLiveOTokens(
       strikePrice
       isPut
       expiryTimestamp
-      createdAt
-      createdTx
     }
   }`;
   try {
