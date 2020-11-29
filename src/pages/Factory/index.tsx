@@ -6,7 +6,7 @@ import Warning from '../../components/Warning'
 import { walletContext } from '../../contexts/wallet'
 import { useAsyncMemo } from '../../hooks/useAsyncMemo'
 import { OTokenFactory } from '../../utils/contracts/factory'
-import { fromTokenAmount } from '../../utils/math'
+import { getNextFriday, fromTokenAmount } from '../../utils/math'
 import { getWhitelistedProducts } from '../../utils/graph'
 import SectionTitle from '../../components/SectionHeader'
 import TokenAddress from '../../components/TokenAddress'
@@ -19,8 +19,8 @@ export default function CreateOption() {
   const toast = useToast()
   const [selectedProductIndex, setSelectedProductIndex] = useState(-1)
 
-  const [strikePriceReadable, setStrikePriceReadable] = useState<BigNumber>(new BigNumber(250))
-  const [expiryTimestamp, setExpiryTimestamp] = useState<BigNumber>(new BigNumber(1606809600))
+  const [strikePriceReadable, setStrikePriceReadable] = useState<BigNumber>(new BigNumber(500))
+  const [expiryTimestamp, setExpiryTimestamp] = useState<BigNumber>(new BigNumber(getNextFriday()))
   const [hasExpiryWarning, setHasWarning] = useState<boolean>(false)
   const [expiryWarning, setExpiryWarning] = useState<string>('')
 
