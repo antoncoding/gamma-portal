@@ -43,3 +43,16 @@ export function expiryToDate(timestamp: number | string) {
 }
 
 export const isAddress = web3.utils.isAddress;
+
+/**
+ * @returns {number} timestamp (in s)
+ */
+export function getNextFriday(): number {
+  const date = new Date()
+  date.setDate(date.getDate() + (7 + 5 - date.getDay()) % 7);
+  date.setMinutes(0)
+  date.setSeconds(0)
+  date.setMilliseconds(0)
+  date.setUTCHours(8)
+  return (date.getTime() / 1000);
+}
