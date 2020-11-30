@@ -49,7 +49,7 @@ export const isAddress = web3.utils.isAddress;
  */
 export function getNextFriday(): number {
   const date = new Date()
-  date.setDate(date.getDate() + (7 + 5 - date.getDay()) % 7);
+  date.setUTCDate(date.getUTCDate() + (7 + 5 - date.getUTCDay()) % 7);
   date.setMinutes(0)
   date.setSeconds(0)
   date.setMilliseconds(0)
