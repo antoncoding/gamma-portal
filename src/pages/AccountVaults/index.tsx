@@ -25,7 +25,7 @@ export default function AccountVaults( ) {
     if (!account) return
     const result = await getAccount(networkId, account, toast)
     setIsLoading(false)
-    return result ? result.vaults : []
+    return result ? result.vaults.sort((v1, v2) => Number(v1.vaultId) > Number(v2.vaultId) ? 1: -1) : []
   }, [], [networkId, account])
 
   const controller = useMemo(() => new Controller(web3, networkId, user), [networkId, user, web3])
@@ -54,7 +54,7 @@ export default function AccountVaults( ) {
         amount={shortAmount}
         chainId={networkId}
       />,
-      <Button label={"Detail"} onClick={()=>{ history.push(`/vault/${account}/${index + 1}`);}} />
+      <Button label={"Detail"} onClick={()=>{ history.push(`/vault/${account}/${vault.vaultId}`);}} />
     ]
   }, [account, history, networkId])
 

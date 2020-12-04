@@ -14,7 +14,7 @@ export const resolveENS = async (ensName: string, networkId: number) => {
 };
 
 export const isEOA = async(address: string, networkId: number) : Promise<Boolean>  => {
-  const network =  networkId === 1 ? 'mainnet' : 'rinkeby'
+  const network =  networkId === 1 ? 'mainnet' : networkId === 42 ? 'kovan' : 'rinkeby'
   const web3 = new Web3(`https://${network}.infura.io/v3/${INFURA_KEY}`);
   return (await web3.eth.getCode(address)) === '0x'
 }
