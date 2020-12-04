@@ -38,6 +38,7 @@ export type actionArg = {
 };
 
 export type SubgraphVault = {
+  vaultId: string
   collateralAmount: string | null;
   collateralAsset: SubgraphToken | null;
   longAmount: string | null;

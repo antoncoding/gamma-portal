@@ -22,7 +22,7 @@ export async function getAccount(
     account(id: "${account}") {
       vaultCount
       vaults {
-        id
+        vaultId
         collateralAsset {
           id
           symbol
