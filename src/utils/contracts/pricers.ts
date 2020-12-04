@@ -66,7 +66,7 @@ export class CLPricer extends SmartContract {
     }
     // latest id has timestamp > expiry!
     
-    let id = new BigNumber(latestId)
+    let id = new BigNumber(latestId.toString())
     while(true) {
       if(typeof searchingCallback === 'function') searchingCallback(true)
       const prevTimestamp = new BigNumber(await aggregator.methods.getTimestamp(id.minus(1)).call())

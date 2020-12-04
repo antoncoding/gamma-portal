@@ -81,6 +81,17 @@ export class Controller extends SmartContract {
     await this.operate([arg])
   }
 
+  async refreshConfig() {
+    if (this.web3 === null) {
+      console.log(`no web3`)
+      return
+    }
+    await this.contract.methods
+      .refreshConfiguration()
+      .send({from: this.account})
+      .on('transactionHash', this.getCallback());
+  }
+
   async operate (args: actionArg[]) {
     await this.contract.methods
       .operate(args)
