@@ -64,13 +64,7 @@ export class Controller extends SmartContract {
 
   async simpleAddCollateral(account: string, vaultId: BigNumber, from: string, asset:string, amount: BigNumber) {
     if (this.web3 === null) return
-    const collateral = new this.web3.eth.Contract(erc20Abi, asset)
-    const pool = addressese[this.networkId].pool;
-    const allowance = await collateral.methods.allowance(from, pool).call()
-    if (new BigNumber(allowance).lt(amount)) {
-      const approveAmount = getPreference('approval', 'normal') === 'normal' ? amount.toString() : MAX_UINT
-      await collateral.methods.approve(pool, approveAmount).send({from: this.account}).on('transactionHash', this.getCallback())
-    }
+    await this.checkAndIncreaseAllowance(asset, from, amount.toString())
     const arg = createDepositCollateralArg(account, from, vaultId, asset, amount)
     await this.operate([arg])
   }
@@ -83,13 +77,7 @@ export class Controller extends SmartContract {
 
   async simpleAddLong(account: string, vaultId: BigNumber, from: string, asset:string, amount: BigNumber) {
     if (this.web3 === null) return
-    const oToken = new this.web3.eth.Contract(erc20Abi, asset)
-    const pool = addressese[this.networkId].pool;
-    const allowance = await oToken.methods.allowance(from, pool).call()
-    if (new BigNumber(allowance).lt(amount)) {
-      const approveAmount = getPreference('approval', 'normal') === 'normal' ? amount.toString() : MAX_UINT
-      await oToken.methods.approve(pool, approveAmount).send({from: this.account}).on('transactionHash', this.getCallback())
-    }
+    await this.checkAndIncreaseAllowance(asset, from, amount.toString())
     const arg = createDepositLongArg(account, from, vaultId, asset, amount)
     await this.operate([arg])
   }
@@ -126,7 +114,6 @@ export class Controller extends SmartContract {
 
   async refreshConfig() {
     if (this.web3 === null) {
-      console.log(`no web3`)
       return
     }
     await this.contract.methods
@@ -143,13 +130,35 @@ export class Controller extends SmartContract {
   }
 
   async operateCache(callback: Function) {
+    // check allowance to add long
+    const addLongAction = this.actions.find(action => action.actionType === ActionType.DepositLongOption)
+    if (addLongAction !== undefined) {
+      await this.checkAndIncreaseAllowance(addLongAction.asset, this.account, addLongAction.amount) 
+    }
+
+    // check allowance to add collateral
+    const addCollateralAction = this.actions.find(action => action.actionType === ActionType.DepositCollateral)
+    if (addCollateralAction !== undefined) {
+      await this.checkAndIncreaseAllowance(addCollateralAction.asset, this.account, addCollateralAction.amount)
+    }
+
     await this.contract.methods
       .operate(this.actions)
       .send({from: this.account})
       .on('transactionHash', this.getCallback())
       .on('receipt', callback);
-    this.actions = []
-    
+    this.actions = [] 
+  }
+
+  async checkAndIncreaseAllowance(erc20: string, from: string, amount: string) {
+    if (!this.web3) return
+    const pool = addressese[this.networkId].pool;
+    const token = new this.web3.eth.Contract(erc20Abi, erc20)
+    const allowance = await token.methods.allowance(from, pool).call()
+    if (new BigNumber(allowance).lt(new BigNumber(amount))) {
+      const approveAmount = getPreference('approval', 'normal') === 'normal' ? amount : MAX_UINT
+      await token.methods.approve(pool, approveAmount).send({from: this.account}).on('transactionHash', this.getCallback())
+    }
   }
 
   async updateOperator(operator: string, isOperator: boolean) {
