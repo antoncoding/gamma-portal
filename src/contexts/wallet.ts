@@ -1,11 +1,11 @@
 import { createContext } from 'react';
 import Web3 from 'web3'
-
+import { SupportedNetworks } from '../constants/networks'
 export interface Wallet {
   web3: Web3 | null,
   user: string,
   setUser: (user: string) => void,
-  networkId: number,
+  networkId: SupportedNetworks,
   connect: () => Promise<string | false>,
   setNetworkId: (networkId: number) => void,
   disconnect: Function
