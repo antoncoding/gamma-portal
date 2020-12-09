@@ -73,7 +73,7 @@ export class CLPricer extends SmartContract {
       if (prevTimestamp.lt(new BigNumber(expiry))) {
         if(typeof searchingCallback === 'function') searchingCallback(false)
         await this.contract.methods
-          .setExpiryPriceInOracle(expiry, id)
+          .setExpiryPriceInOracle(expiry, id.toString())
           .send({from: this.account})
           .on('transactionHash', this.getCallback());
         break

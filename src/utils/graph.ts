@@ -352,6 +352,16 @@ export const getVaultHistory = async (networkId: SupportedNetworks,
     }
     settleActions (where: {vault_contains: "${owner}-${vaultId}"}) {
       id
+      oToken {
+        symbol
+        id
+        collateralAsset {
+          id
+          symbol
+          decimals
+        }
+      }
+      amount
       timestamp
       transactionHash
     }

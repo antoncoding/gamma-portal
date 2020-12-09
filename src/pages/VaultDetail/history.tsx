@@ -47,7 +47,10 @@ export default function VaultHistory() {
   const renderRow = useCallback((entry: SubgraphVaultAction) => {
     const hash = entry.transactionHash
     const badge = <ActionBadgeFromId id={entry.id} />
-    const assetToken = entry.oToken ? entry.oToken : entry.asset ? entry.asset : null
+    const assetToken = entry.oToken 
+      ? entry.id.includes('SETTLE') 
+        ? entry.oToken.collateralAsset // if it's a settle action, show payout in collateral asset
+        : entry.oToken : entry.asset ? entry.asset : null
     const assetDecimals = assetToken ? assetToken.decimals ? assetToken.decimals : 8 : 8
     const amount = toTokenAmount(new BigNumber(entry.amount ? entry.amount : 0), assetDecimals).toString()
     const timestamp = new BigNumber(entry.timestamp).times(1000).toNumber()

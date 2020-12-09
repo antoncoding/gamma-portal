@@ -51,7 +51,7 @@ export type SubgraphVaultAction = {
   id: string
   transactionHash: string;
   timestamp: string;
-  oToken: null | { id: string; symbol: string; decimals: number };
+  oToken: null | { id: string; symbol: string; decimals: number, collateralAsset: SubgraphToken };
   asset: { id: string; symbol: string; decimals: number };
   amount: null| string;
 };
