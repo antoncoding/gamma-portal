@@ -27,6 +27,10 @@ export default function VaultDetail() {
   const [changeLongAmount, setChangeLongAmount] = useState(new BigNumber(0))
   const [changeShortAmount, setChangeShortAmount] = useState(new BigNumber(0))
 
+  const [pendingCollateralAmount, setPendingCollateralAmount] = useState('')
+  const [pendingLongAmount, setPendingLongAmount] = useState('')
+  const [pendingShortAmount, setPendingShortAmount] = useState('')
+
   // for dropdown options
   const [selectedCollateralIndex, setSelectedCollateralIndex] = useState(0)
   const [selectedLong, setLongOToken] = useState<SubgraphOToken | null>(null)
@@ -92,14 +96,24 @@ export default function VaultDetail() {
   }, [allOtokens, collateralToken, vaultExpiry])
 
   const pushAddCollateral = useCallback(() => {
+    if(collateralToken.address === ZERO_ADDR) {
+      toast('Select collateral asset first')
+      return
+    }
     controller.pushAddCollateralArg(user, vaultId, user, collateralToken.address, fromTokenAmount(changeCollateralAmount, collateralToken.decimals))
     setChangeCollateralAmount(new BigNumber(0))
-  }, [collateralToken, controller, user, vaultId, changeCollateralAmount])
+    setPendingCollateralAmount(` + ${changeCollateralAmount.toString()}`)
+  }, [collateralToken, controller, user, vaultId, changeCollateralAmount, toast])
 
   const pushRemoveCollateral = useCallback(() => {
+    if(collateralToken.address === ZERO_ADDR) {
+      toast('Select collateral asset first')
+      return
+    }
     controller.pushRemoveCollateralArg(user, vaultId, user, collateralToken.address, fromTokenAmount(changeCollateralAmount, collateralToken.decimals))
     setChangeCollateralAmount(new BigNumber(0))
-  }, [controller, user, vaultId, collateralToken.address, collateralToken.decimals, changeCollateralAmount])
+    setPendingCollateralAmount(` - ${changeCollateralAmount.toString()}`)
+  }, [controller, user, vaultId, collateralToken.address, collateralToken.decimals, changeCollateralAmount, toast])
 
   const pushAddLong = useCallback(() => {
     if (!longOtoken) {
@@ -109,6 +123,7 @@ export default function VaultDetail() {
     const oToken = vaultDetail && vaultDetail.longOToken ? vaultDetail.longOToken.id : longOtoken.id
     controller.pushAddLongArg(user, vaultId, user, oToken, fromTokenAmount(changeLongAmount, 8))
     setChangeLongAmount(new BigNumber(0))
+    setPendingLongAmount(` + ${changeLongAmount.toString()}`)
   }, [toast, vaultDetail, longOtoken, controller, user, vaultId, changeLongAmount])
 
   const pushRemoveLong = useCallback(() => {
@@ -119,6 +134,7 @@ export default function VaultDetail() {
     const oToken = vaultDetail && vaultDetail.longOToken ? vaultDetail.longOToken.id : longOtoken.id
     controller.pushRemoveLongArg(user, vaultId, user, oToken, fromTokenAmount(changeLongAmount, 8))
     setChangeLongAmount(new BigNumber(0))
+    setPendingLongAmount(` - ${changeLongAmount.toString()}`)
   }, [toast, vaultDetail, longOtoken, controller, user, vaultId, changeLongAmount])
 
   const pushMint = useCallback(() => {
@@ -129,6 +145,7 @@ export default function VaultDetail() {
     const oToken = vaultDetail && vaultDetail.shortOToken ? vaultDetail.shortOToken.id : shortOtoken.id
     controller.pushMintArg(user, vaultId, user, oToken, fromTokenAmount(changeShortAmount, 8))
     setChangeShortAmount(new BigNumber(0))
+    setPendingShortAmount(` + ${changeShortAmount.toString()}`)
   }, [toast, vaultDetail, shortOtoken, controller, user, vaultId, changeShortAmount])
 
   const pushBurn = useCallback(async () => {
@@ -139,6 +156,7 @@ export default function VaultDetail() {
     const oToken = vaultDetail && vaultDetail.shortOToken ? vaultDetail.shortOToken.id : shortOtoken.id
     controller.pushBurnArg(user, vaultId, user, oToken, fromTokenAmount(changeShortAmount, 8))
     setChangeShortAmount(new BigNumber(0))
+    setPendingShortAmount(` - ${changeShortAmount.toString()}`)
   }, [toast, vaultDetail, shortOtoken, controller, user, vaultId, changeShortAmount])
 
   const isExpired = useMemo(() => {
@@ -157,7 +175,7 @@ export default function VaultDetail() {
     await controller.simpleSettle(user, vaultId, user)
   }, [controller, user, vaultId])
 
-  const renderRow = useCallback(({ label, symbol, asset, amount, decimals, onInputChange, inputValue, onClickAdd, onClickMinus, dropdownSelected, dropdownOnChange, dropdownItems }) => {
+  const renderRow = useCallback(({ label, symbol, asset, amount, decimals, onInputChange, inputValue, onClickAdd, onClickMinus, dropdownSelected, dropdownOnChange, dropdownItems, pendingAmount }) => {
     return [
       <div style={{ opacity: 0.8 }}> {label} </div>,
       asset
@@ -168,8 +186,8 @@ export default function VaultDetail() {
           onChange={dropdownOnChange}
         />,
       amount
-        ? toTokenAmount(new BigNumber(amount), decimals).toString()
-        : 0,
+        ? <div> {toTokenAmount(new BigNumber(amount), decimals).toString()} <span style={{opacity: 0.5}}> {pendingAmount} </span> </div>   
+        : <div> 0 <span style={{opacity: 0.5}}> {pendingAmount} </span> </div>,
       <>
         <TextInput type="number" disabled={isExpired} onChange={onInputChange} value={inputValue} />
         <Button label="Add" disabled={isExpired} display="icon" icon={<IconCirclePlus />} onClick={onClickAdd} />
@@ -211,6 +229,7 @@ export default function VaultDetail() {
             symbol: collateralToken.symbol,
             asset: vaultDetail?.collateralAsset?.id,
             amount: vaultDetail?.collateralAmount,
+            pendingAmount: pendingCollateralAmount,
             inputValue: changeCollateralAmount,
             onInputChange: (e) => (e.target.value ? setChangeCollateralAmount(new BigNumber(e.target.value))
               : setChangeCollateralAmount(new BigNumber(0))
@@ -227,6 +246,7 @@ export default function VaultDetail() {
             symbol: vaultDetail?.longOToken?.symbol,
             asset: vaultDetail?.longOToken?.id,
             amount: vaultDetail?.longAmount,
+            pendingAmount: pendingLongAmount,
             inputValue: changeLongAmount,
             onInputChange: (e) => (e.target.value ? setChangeLongAmount(new BigNumber(e.target.value))
               : setChangeLongAmount(new BigNumber(0))
@@ -246,6 +266,7 @@ export default function VaultDetail() {
             symbol: vaultDetail?.shortOToken?.symbol,
             asset: vaultDetail?.shortOToken?.id,
             amount: vaultDetail?.shortAmount,
+            pendingAmount: pendingShortAmount,
             inputValue: changeShortAmount,
             onInputChange: (e) => (e.target.value ? setChangeShortAmount(new BigNumber(e.target.value))
               : setChangeShortAmount(new BigNumber(0))
