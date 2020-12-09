@@ -81,6 +81,14 @@ export class Controller extends SmartContract {
     await this.operate([arg])
   }
 
+  async settleBatch(account: string, vaultIds: number[], to: string) {
+    console.log(`vaultIds`, vaultIds)
+    if (this.web3 === null) return
+    const args = vaultIds.map(id => createSettleArg(account, to, new BigNumber(id)))
+    console.log(`args`, args)
+    await this.operate(args)
+  }
+
   async refreshConfig() {
     if (this.web3 === null) {
       console.log(`no web3`)

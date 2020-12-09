@@ -1,6 +1,6 @@
 import React, { useContext, useMemo, useCallback, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom';
-import { Button, DataView, useToast, Header } from '@aragon/ui'
+import { Button, DataView, useToast, Header, Tag } from '@aragon/ui'
 import useAsyncMemo from '../../hooks/useAsyncMemo'
 import { getAccount } from '../../utils/graph'
 
@@ -11,7 +11,6 @@ import SectionTitle from '../../components/SectionHeader'
 import Status from '../../components/DataViewStatusEmpty'
 import { OpynTokenAmount } from '../../components/OpynTokenAmount'
 import CustomIdentityBadge from '../../components/CustomIdentityBadge';
-
 
 export default function AccountVaults( ) {
   const { web3, networkId, user } = useContext(walletContext)
@@ -28,7 +27,25 @@ export default function AccountVaults( ) {
     return result ? result.vaults.sort((v1, v2) => Number(v1.vaultId) > Number(v2.vaultId) ? 1: -1) : []
   }, [], [networkId, account])
 
+  // for batch settle
+  const vaultsToSettle = useMemo(() => {
+    if(!vaults) return []
+    return vaults.filter(vault => {
+      return vault.shortOToken 
+        ? Number(vault.shortOToken.expiryTimestamp) * 1000 < Date.now()
+        : vault.longOToken 
+          ? Number(vault.longOToken.expiryTimestamp) * 1000 < Date.now()
+          : false
+    })
+  }, [vaults])
+
   const controller = useMemo(() => new Controller(web3, networkId, user), [networkId, user, web3])
+
+  const batchSettle = useCallback(async () => {
+    const vaultIds = vaultsToSettle.map(vault => Number(vault.vaultId))
+    await controller.settleBatch(user, vaultIds, user)
+  }, [controller, user, vaultsToSettle])
+
   const history =  useHistory()
   const openVault = useCallback(async() => {
     await controller.openVault(account)
@@ -60,7 +77,17 @@ export default function AccountVaults( ) {
 
   return (
     <>
-      <Header primary="Vaults" />
+      <Header 
+        primary="Vaults"
+        secondary={vaultsToSettle.length > 0 
+          ? <Button
+              onClick={batchSettle}  
+            > 
+              Settle Vaults <Tag> {vaultsToSettle.length}  </Tag>  
+            </Button> 
+          : null
+        }
+      />
       <>  <span style={{paddingRight: 20}}> Mange Vaults for </span> <CustomIdentityBadge entity={account} shorten={false} /> </>
       
       <SectionTitle title="Existing Vaults"/>

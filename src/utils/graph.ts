@@ -33,6 +33,7 @@ export async function getAccount(
           id
           symbol
           decimals
+          expiryTimestamp
           underlyingAsset {
             symbol
           }
@@ -42,6 +43,7 @@ export async function getAccount(
           id
           symbol
           decimals
+          expiryTimestamp
           underlyingAsset {
             symbol
           }
