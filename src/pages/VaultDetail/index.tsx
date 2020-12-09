@@ -2,7 +2,7 @@ import React, { useContext, useMemo, useState, useCallback, useEffect } from 're
 import BigNumber from 'bignumber.js'
 import { useParams } from 'react-router-dom';
 
-import { TextInput, Button, DataView, useToast, Tag, Header, IconCirclePlus, IconCircleMinus, DropDown } from '@aragon/ui'
+import { TextInput, Button, DataView, useToast, Tag, Header, IconCirclePlus, IconCircleMinus, DropDown, LoadingRing } from '@aragon/ui'
 import History from './history'
 
 import { walletContext } from '../../contexts/wallet'
@@ -20,6 +20,8 @@ export default function VaultDetail() {
 
   const [vaultExpiry, setVaultExpiry] = useState<string>('0')
   const [isLoading, setIsLoading] = useState(true)
+
+  const [isSendingTx, setIsSendingTx] = useState(false)
 
   const [changeCollateralAmount, setChangeCollateralAmount] = useState(new BigNumber(0))
   const [changeLongAmount, setChangeLongAmount] = useState(new BigNumber(0))
@@ -45,7 +47,10 @@ export default function VaultDetail() {
     return result
   }, [], [networkId, toast])
 
-  const controller = useMemo(() => new Controller(web3, networkId, user), [networkId, user, web3])
+  /**
+   * Use asyncMemo to trigger a rerender when isSendingTx changes.
+   */
+  const controller = useAsyncMemo(async() => new Controller(web3, networkId, user), new Controller(null, 42, ''),  [networkId, user, web3, isSendingTx])
 
   const isAuthorized = useMemo(() => {
     if (vaultDetail === null) return false
@@ -55,18 +60,18 @@ export default function VaultDetail() {
 
   const collateralToken = useTokenByAddress(vaultDetail && vaultDetail.collateralAsset ? vaultDetail.collateralAsset.id : tokens[networkId][selectedCollateralIndex].address, networkId)
 
-  const shortOtoken = useMemo( () => (vaultDetail && vaultDetail.shortOToken) || selectedShort || null 
-  , [vaultDetail, selectedShort])
-  
+  const shortOtoken = useMemo(() => (vaultDetail && vaultDetail.shortOToken) || selectedShort || null
+    , [vaultDetail, selectedShort])
+
   const longOtoken = useMemo(() => (vaultDetail && vaultDetail.longOToken) || selectedLong || null
-  , [vaultDetail, selectedLong])
+    , [vaultDetail, selectedLong])
 
   useEffect(() => {
     if (shortOtoken) {
       setVaultExpiry(shortOtoken.expiryTimestamp)
       const collateralIdx = tokens[networkId].findIndex(token => token.address === shortOtoken.collateralAsset.id)
       setSelectedCollateralIndex(collateralIdx)
-    } else if (longOtoken){
+    } else if (longOtoken) {
       setVaultExpiry(longOtoken.expiryTimestamp)
       const collateralIdx = tokens[networkId].findIndex(token => token.address === longOtoken.collateralAsset.id)
       setSelectedCollateralIndex(collateralIdx)
@@ -86,65 +91,65 @@ export default function VaultDetail() {
     return sameExpiry
   }, [allOtokens, collateralToken, vaultExpiry])
 
-  const simpleAddCollateral = useCallback(async () => {
-    await controller.simpleAddCollateral(user, vaultId, user, collateralToken.address, fromTokenAmount(changeCollateralAmount, collateralToken.decimals))
+  const pushAddCollateral = useCallback(() => {
+    controller.pushAddCollateralArg(user, vaultId, user, collateralToken.address, fromTokenAmount(changeCollateralAmount, collateralToken.decimals))
     setChangeCollateralAmount(new BigNumber(0))
   }, [collateralToken, controller, user, vaultId, changeCollateralAmount])
 
-  const simpleRemoveCollateral = useCallback(async () => {
-    await controller.simpleRemoveCollateral(user, vaultId, user, collateralToken.address, fromTokenAmount(changeCollateralAmount, collateralToken.decimals))
+  const pushRemoveCollateral = useCallback(() => {
+    controller.pushRemoveCollateralArg(user, vaultId, user, collateralToken.address, fromTokenAmount(changeCollateralAmount, collateralToken.decimals))
     setChangeCollateralAmount(new BigNumber(0))
   }, [controller, user, vaultId, collateralToken.address, collateralToken.decimals, changeCollateralAmount])
 
-  const simpleAddLong = useCallback(async () => {
+  const pushAddLong = useCallback(() => {
     if (!longOtoken) {
       toast('No long token selected')
       return
     }
     const oToken = vaultDetail && vaultDetail.longOToken ? vaultDetail.longOToken.id : longOtoken.id
-    await controller.simpleAddLong(user, vaultId, user, oToken, fromTokenAmount(changeLongAmount, 8))
-    setChangeCollateralAmount(new BigNumber(0))
+    controller.pushAddLongArg(user, vaultId, user, oToken, fromTokenAmount(changeLongAmount, 8))
+    setChangeLongAmount(new BigNumber(0))
   }, [toast, vaultDetail, longOtoken, controller, user, vaultId, changeLongAmount])
 
-  const simpleRemoveLong = useCallback(async () => {
+  const pushRemoveLong = useCallback(() => {
     if (!longOtoken) {
       toast('No long token selected')
       return
     }
     const oToken = vaultDetail && vaultDetail.longOToken ? vaultDetail.longOToken.id : longOtoken.id
-    await controller.simpleRemoveLong(user, vaultId, user, oToken, fromTokenAmount(changeLongAmount, 8))
-    setChangeCollateralAmount(new BigNumber(0))
+    controller.pushRemoveLongArg(user, vaultId, user, oToken, fromTokenAmount(changeLongAmount, 8))
+    setChangeLongAmount(new BigNumber(0))
   }, [toast, vaultDetail, longOtoken, controller, user, vaultId, changeLongAmount])
 
-  const simpleMint = useCallback(async () => {
+  const pushMint = useCallback(() => {
     if (!shortOtoken) {
       toast('No short token selected')
       return
     }
     const oToken = vaultDetail && vaultDetail.shortOToken ? vaultDetail.shortOToken.id : shortOtoken.id
-    await controller.simpleMint(user, vaultId, user, oToken, fromTokenAmount(changeShortAmount, 8))
-    setChangeCollateralAmount(new BigNumber(0))
+    controller.pushMintArg(user, vaultId, user, oToken, fromTokenAmount(changeShortAmount, 8))
+    setChangeShortAmount(new BigNumber(0))
   }, [toast, vaultDetail, shortOtoken, controller, user, vaultId, changeShortAmount])
 
-  const simpleBurn = useCallback(async () => {
+  const pushBurn = useCallback(async () => {
     if (!shortOtoken) {
       toast('No short token selected')
       return
     }
     const oToken = vaultDetail && vaultDetail.shortOToken ? vaultDetail.shortOToken.id : shortOtoken.id
-    await controller.simpleBurn(user, vaultId, user, oToken, fromTokenAmount(changeShortAmount, 8))
-    setChangeCollateralAmount(new BigNumber(0))
+    controller.pushBurnArg(user, vaultId, user, oToken, fromTokenAmount(changeShortAmount, 8))
+    setChangeShortAmount(new BigNumber(0))
   }, [toast, vaultDetail, shortOtoken, controller, user, vaultId, changeShortAmount])
 
   const isExpired = useMemo(() => {
     if (!vaultDetail) return false
 
-    if (vaultDetail.shortOToken && Number(vaultDetail.shortOToken.expiryTimestamp) < Date.now() / 1000 ) 
+    if (vaultDetail.shortOToken && Number(vaultDetail.shortOToken.expiryTimestamp) < Date.now() / 1000)
       return true
-    
-    if (vaultDetail.longOToken && Number (vaultDetail.longOToken.expiryTimestamp) < Date.now() / 1000)
+
+    if (vaultDetail.longOToken && Number(vaultDetail.longOToken.expiryTimestamp) < Date.now() / 1000)
       return true;
-    
+
     return false
   }, [vaultDetail])
 
@@ -181,7 +186,19 @@ export default function VaultDetail() {
             Vault Detail {isAuthorized && <span style={{ paddingBottom: 10 }}><Tag mode="new">My vault</Tag></span>}
           </div>
         }
-        secondary={isExpired && <Button label="Settle" onClick={simpleSettle} />} />
+        secondary={
+          isExpired
+            ? <Button label="Settle" onClick={simpleSettle} />
+            : <Button
+              disabled={controller.actions.length === 0 || isSendingTx }
+              onClick={() => {
+                setIsSendingTx(true)
+                controller.operateCache(() => { 
+                  setIsSendingTx(false)
+                })
+              }}
+            > Operate {isSendingTx ? <LoadingRing /> : <Tag> {controller.actions.length} </Tag>}  </Button>
+        } />
       <DataView
         mode="table"
         status={isLoading ? 'loading' : 'default'}
@@ -198,8 +215,8 @@ export default function VaultDetail() {
             onInputChange: (e) => (e.target.value ? setChangeCollateralAmount(new BigNumber(e.target.value))
               : setChangeCollateralAmount(new BigNumber(0))
             ),
-            onClickAdd: simpleAddCollateral,
-            onClickMinus: simpleRemoveCollateral,
+            onClickAdd: pushAddCollateral,
+            onClickMinus: pushRemoveCollateral,
             dropdownSelected: selectedCollateralIndex,
             dropdownOnChange: setSelectedCollateralIndex,
             dropdownItems: tokens[networkId]?.map(o => o.symbol)
@@ -214,8 +231,8 @@ export default function VaultDetail() {
             onInputChange: (e) => (e.target.value ? setChangeLongAmount(new BigNumber(e.target.value))
               : setChangeLongAmount(new BigNumber(0))
             ),
-            onClickAdd: simpleAddLong,
-            onClickMinus: simpleRemoveLong,
+            onClickAdd: pushAddLong,
+            onClickMinus: pushRemoveLong,
             dropdownSelected: longOtoken ? tokensInSelection.findIndex(o => o.id === longOtoken.id) : -1,
             dropdownOnChange: (idx: number) => {
               if (idx === -1 || !tokensInSelection[idx]) setLongOToken(null)
@@ -233,8 +250,8 @@ export default function VaultDetail() {
             onInputChange: (e) => (e.target.value ? setChangeShortAmount(new BigNumber(e.target.value))
               : setChangeShortAmount(new BigNumber(0))
             ),
-            onClickAdd: simpleMint,
-            onClickMinus: simpleBurn,
+            onClickAdd: pushMint,
+            onClickMinus: pushBurn,
             dropdownSelected: shortOtoken ? tokensInSelection.findIndex(o => o.id === shortOtoken.id) : -1,
             dropdownOnChange: (idx: number) => {
               if (idx === -1 || !tokensInSelection[idx]) setShortOToken(null)

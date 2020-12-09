@@ -11,9 +11,11 @@ const erc20Abi = require('../../constants/abis/erc20.json')
 
 export class Controller extends SmartContract {
   public contract: any
+  public actions: actionArg[]
   constructor (_web3: Web3|null, networkId: number, account: string) {
     super(_web3, networkId, account)
     const address = addressese[networkId].controller;
+    this.actions = []
     if (this.web3 !== null)
       this.contract = new this.web3.eth.Contract(abi, address)
   }
@@ -24,6 +26,41 @@ export class Controller extends SmartContract {
     const openArg = createOpenVaultArg(account, newVulatId)
     await this.operate([openArg])
   }
+
+  pushAddCollateralArg(account: string, vaultId: BigNumber, from: string, asset: string, amount: BigNumber) {
+    const arg = createDepositCollateralArg(account, from, vaultId, asset, amount)
+    this.actions.push(arg)
+  }
+
+  pushRemoveCollateralArg(account: string, vaultId: BigNumber, to: string, asset: string, amount: BigNumber) {
+    const arg = createWithdrawCollateralArg(account, to, vaultId, asset, amount)
+    this.actions.push(arg)
+  }
+
+  pushAddLongArg(account: string, vaultId: BigNumber, from: string, asset:string, amount: BigNumber) {
+    const arg = createDepositLongArg(account, from, vaultId, asset, amount)
+    this.actions.push(arg)
+  }
+
+  pushRemoveLongArg(account: string, vaultId: BigNumber, to: string, asset:string, amount: BigNumber) {
+    const arg = createWithdrawLongArg(account, to, vaultId, asset, amount)
+    this.actions.push(arg)
+  }
+
+  pushMintArg(account: string, vaultId: BigNumber, to: string, asset:string, amount: BigNumber) {
+    const arg = createMintShortArg(account, to, vaultId, asset, amount)
+    this.actions.push(arg)
+  }
+
+  pushBurnArg(account: string, vaultId: BigNumber, from: string, asset:string, amount: BigNumber) {
+    if (this.web3 === null) return
+    const arg = createBurnShortArg(account, from, vaultId, asset, amount)
+    this.actions.push(arg)
+  }
+
+  /**
+   * Simple methods: each action as individual tx.
+   */
 
   async simpleAddCollateral(account: string, vaultId: BigNumber, from: string, asset:string, amount: BigNumber) {
     if (this.web3 === null) return
@@ -82,10 +119,8 @@ export class Controller extends SmartContract {
   }
 
   async settleBatch(account: string, vaultIds: number[], to: string) {
-    console.log(`vaultIds`, vaultIds)
     if (this.web3 === null) return
     const args = vaultIds.map(id => createSettleArg(account, to, new BigNumber(id)))
-    console.log(`args`, args)
     await this.operate(args)
   }
 
@@ -97,7 +132,7 @@ export class Controller extends SmartContract {
     await this.contract.methods
       .refreshConfiguration()
       .send({from: this.account})
-      .on('transactionHash', this.getCallback());
+      .on('transactionHash', this.getCallback())
   }
 
   async operate (args: actionArg[]) {
@@ -105,6 +140,16 @@ export class Controller extends SmartContract {
       .operate(args)
       .send({from: this.account})
       .on('transactionHash', this.getCallback());
+  }
+
+  async operateCache(callback: Function) {
+    await this.contract.methods
+      .operate(this.actions)
+      .send({from: this.account})
+      .on('transactionHash', this.getCallback())
+      .on('receipt', callback);
+    this.actions = []
+    
   }
 
   async updateOperator(operator: string, isOperator: boolean) {
