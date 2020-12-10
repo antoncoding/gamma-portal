@@ -53,7 +53,6 @@ export default function VaultDetail() {
   }, [], [networkId, toast])
 
   const { balances } = useOTokenBalances(user, networkId)
-  console.log(`balances`, balances)
 
   /**
    * Use asyncMemo to trigger a rerender when isSendingTx changes.
@@ -74,6 +73,20 @@ export default function VaultDetail() {
   const longOtoken = useMemo(() => (vaultDetail && vaultDetail.longOToken) || selectedLong || null
     , [vaultDetail, selectedLong])
 
+
+  const longBalance = useMemo(() => {
+    if (!balances) return new BigNumber(0)
+    const target = balances?.find(balanceObj => balanceObj.token.id === longOtoken?.id)
+    return target? target.balance : new BigNumber(0)
+  }, [balances, longOtoken])
+
+  const shortBalance = useMemo(() => {
+    if (!balances) return new BigNumber(0)
+    const target = balances?.find(balanceObj => balanceObj.token.id === shortOtoken?.id)
+    return target? target.balance : new BigNumber(0)
+  }, [balances, shortOtoken])
+
+
   useEffect(() => {
     if (shortOtoken) {
       setVaultExpiry(shortOtoken.expiryTimestamp)
@@ -88,8 +101,6 @@ export default function VaultDetail() {
 
     }
   }, [networkId, shortOtoken, longOtoken, setVaultExpiry])
-
-
 
   // short tokens to be shown in dropdown
   const allShorts = useMemo(() => {
@@ -107,11 +118,12 @@ export default function VaultDetail() {
     if (!allOtokens) return []
     if (!balances) return allShorts;
     // which user has balance
-    const hasBalance = allShorts.filter(short => balances.find(b => b.token.id === short.id) !== undefined);
+    const hasBalance = allShorts.filter(short => {
+      const target = balances.find(b => b.token.id === short.id) 
+      return target !== undefined && target.balance.gt(new BigNumber(0))
+    });
     return hasBalance
   }, [allOtokens, balances, allShorts])
-
-  console.log(`allLongs`, allLongs)
 
   const pushAddCollateral = useCallback(() => {
     if (collateralToken.address === ZERO_ADDR) {
@@ -193,7 +205,11 @@ export default function VaultDetail() {
     await controller.simpleSettle(user, vaultId, user)
   }, [controller, user, vaultId])
 
-  const renderRow = useCallback(({ label, symbol, asset, amount, decimals, onInputChange, inputValue, onClickAdd, onClickMinus, dropdownSelected, dropdownOnChange, dropdownItems, pendingAmount }) => {
+  const renderRow = useCallback(({ label, symbol, asset, amount, balance, decimals, onInputChange, inputValue, onClickAdd, onClickMinus, dropdownSelected, dropdownOnChange, dropdownItems, pendingAmount }) => {
+    const amountToDisplay = amount
+      ? <div> {toTokenAmount(new BigNumber(amount), decimals).toString()} <span style={{ opacity: 0.5 }}> {pendingAmount} </span> </div>
+      : <div> 0 <span style={{ opacity: 0.5 }}> {pendingAmount} </span> </div>
+    
     return [
       <div style={{ opacity: 0.8 }}> {label} </div>,
       asset
@@ -203,16 +219,15 @@ export default function VaultDetail() {
           selected={dropdownSelected}
           onChange={dropdownOnChange}
         />,
-      amount
-        ? <div> {toTokenAmount(new BigNumber(amount), decimals).toString()} <span style={{ opacity: 0.5 }}> {pendingAmount} </span> </div>
-        : <div> 0 <span style={{ opacity: 0.5 }}> {pendingAmount} </span> </div>,
+        toTokenAmount(balance, decimals).toString(),
+      amountToDisplay,
       <>
         <TextInput type="number" disabled={isExpired} onChange={onInputChange} value={inputValue} />
         <Button label="Add" disabled={isExpired} display="icon" icon={<IconCirclePlus />} onClick={onClickAdd} />
         <Button label="Remove" disabled={isExpired} display="icon" icon={<IconCircleMinus />} onClick={onClickMinus} />
       </>
     ]
-  }, [isExpired])
+  }, [isExpired, balances])
 
   return (
     <>
@@ -238,7 +253,7 @@ export default function VaultDetail() {
       <DataView
         mode="table"
         status={isLoading ? 'loading' : 'default'}
-        fields={['type', 'asset', 'amount', '']}
+        fields={['type', 'asset', 'wallet balance', 'vault balance', '']}
         statusEmpty={<Status label={"No vaults"} />}
         entries={[
           {
@@ -256,7 +271,8 @@ export default function VaultDetail() {
             onClickMinus: pushRemoveCollateral,
             dropdownSelected: selectedCollateralIndex,
             dropdownOnChange: setSelectedCollateralIndex,
-            dropdownItems: tokens[networkId]?.map(o => o.symbol)
+            dropdownItems: tokens[networkId]?.map(o => o.symbol),
+            balance: new BigNumber(0)
           },
           {
             label: 'Long',
@@ -276,7 +292,8 @@ export default function VaultDetail() {
               if (idx === -1 || !allLongs[idx]) setLongOToken(null)
               else setLongOToken(allLongs[idx])
             },
-            dropdownItems: allLongs.map(o => o.symbol)
+            dropdownItems: allLongs.map(o => o.symbol),
+            balance: longBalance
           },
           {
             label: 'Short',
@@ -296,7 +313,8 @@ export default function VaultDetail() {
               if (idx === -1 || !allShorts[idx]) setShortOToken(null)
               else setShortOToken(allShorts[idx])
             },
-            dropdownItems: allShorts.map(o => o.symbol)
+            dropdownItems: allShorts.map(o => o.symbol),
+            balance: shortBalance
           }
         ]}
         renderEntry={renderRow}
