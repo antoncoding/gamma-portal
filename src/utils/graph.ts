@@ -1,8 +1,14 @@
-import BigNumber from 'bignumber.js'
+import BigNumber from 'bignumber.js';
 import { subgraph as endpoints } from '../constants/endpoints';
-import { blacklistOTokens } from '../constants/addresses'
+import { blacklistOTokens } from '../constants/addresses';
 import { SupportedNetworks } from '../constants/networks';
-import { SubgraphVault, SubgraphToken, SubgraphOracleAsset, SubgraphOToken } from '../types';
+import {
+  SubgraphVault,
+  SubgraphToken,
+  SubgraphOracleAsset,
+  SubgraphOToken,
+  OTokenBalance,
+} from '../types';
 
 /**
  * Get all oTokens
@@ -67,13 +73,19 @@ export async function getAccount(
   }
 }
 
-export async function getWhitelistedProducts(networkId: SupportedNetworks, errorCallback: Function) : Promise <{
-  id: string,
-  strike: SubgraphToken
-  collateral: SubgraphToken
-  underlying: SubgraphToken
-  isPut: boolean
-}[] | null> {
+export async function getWhitelistedProducts(
+  networkId: SupportedNetworks,
+  errorCallback: Function
+): Promise<
+  | {
+      id: string;
+      strike: SubgraphToken;
+      collateral: SubgraphToken;
+      underlying: SubgraphToken;
+      isPut: boolean;
+    }[]
+  | null
+> {
   const query = `
   {
     whitelistedProducts (where:{isWhitelisted: true}) {
@@ -95,7 +107,7 @@ export async function getWhitelistedProducts(networkId: SupportedNetworks, error
       }
       isPut
     }
-  }`
+  }`;
   try {
     const response = await postQuery(endpoints[networkId], query);
     return response.data.whitelistedProducts;
@@ -103,16 +115,16 @@ export async function getWhitelistedProducts(networkId: SupportedNetworks, error
     errorCallback(error.toString());
     return null;
   }
-} 
+}
 
 export async function getVault(
   networkId: SupportedNetworks,
   accountOwner: string,
   vaultId: number,
   errorCallback: Function
-): Promise< null | {
+): Promise<null | {
   collateralAmount: string | null;
-  collateralAsset: null | { id: string, symbol: string };
+  collateralAsset: null | { id: string; symbol: string };
   longAmount: string | null;
   longOToken: null | SubgraphOToken;
   owner: {
@@ -186,12 +198,12 @@ export async function getOTokens(
 ): Promise<
   | {
       id: string;
-      symbol: string,
+      symbol: string;
       name: string;
-      strikeAsset: {id:string, symbol:string};
-      strikePrice: string
-      underlyingAsset: {id:string, symbol:string};
-      collateralAsset: {id:string, symbol:string};
+      strikeAsset: { id: string; symbol: string };
+      strikePrice: string;
+      underlyingAsset: { id: string; symbol: string };
+      collateralAsset: { id: string; symbol: string };
       isPut: boolean;
       expiryTimestamp: string;
       createdAt: string;
@@ -229,8 +241,10 @@ export async function getOTokens(
   }`;
   try {
     const response = await postQuery(endpoints[networkId], query);
-    const oTokens = response.data.otokens.filter((otoken: {id: string}) => !blacklistOTokens[networkId].includes(otoken.id));
-    return oTokens
+    const oTokens = response.data.otokens.filter(
+      (otoken: { id: string }) => !blacklistOTokens[networkId].includes(otoken.id)
+    );
+    return oTokens;
   } catch (error) {
     errorCallback(error.toString());
     return null;
@@ -243,11 +257,8 @@ export async function getOTokens(
 export async function getLiveOTokens(
   networkId: SupportedNetworks,
   errorCallback: Function
-): Promise<
-  | SubgraphOToken[]
-  | null
-> {
-  const current = new BigNumber(Date.now()).div(1000).integerValue().toString()
+): Promise<SubgraphOToken[] | null> {
+  const current = new BigNumber(Date.now()).div(1000).integerValue().toString();
   const query = `
   {
     otokens (where: {expiryTimestamp_gt: ${current}}) {
@@ -277,18 +288,72 @@ export async function getLiveOTokens(
   }`;
   try {
     const response = await postQuery(endpoints[networkId], query);
-    const oTokens = response.data.otokens.filter((otoken: {id: string}) => !blacklistOTokens[networkId].includes(otoken.id));
-    return oTokens
+    const oTokens = response.data.otokens.filter(
+      (otoken: { id: string }) => !blacklistOTokens[networkId].includes(otoken.id)
+    );
+    return oTokens;
   } catch (error) {
     errorCallback(error.toString());
     return null;
   }
 }
 
-export const getVaultHistory = async (networkId: SupportedNetworks,
+export async function getBalances(
+  networkId: SupportedNetworks,
+  owner: string,
+  errorCallback: Function
+): Promise<OTokenBalance[] | null> {
+  const query = `
+  {
+    accountBalances (where: {account: "${owner}"}) {
+      token {
+        id
+        name
+        symbol
+        decimals
+        underlyingAsset{
+          id
+          symbol
+          decimals
+        }
+        strikeAsset {
+          id
+          symbol
+          decimals
+        }
+        collateralAsset {
+          id
+          symbol
+          decimals
+        }
+        strikePrice
+        expiryTimestamp
+        isPut
+      }
+    balance
+  }
+}`;
+  try {
+    const response = await postQuery(endpoints[networkId], query);
+    const balances = response.data.accountBalances;
+    return balances.map((b: OTokenBalance) => {
+      return {
+        ...b,
+        balance: new BigNumber(b.balance),
+      };
+    });
+  } catch (error) {
+    errorCallback(error.toString());
+    return null;
+  }
+}
+
+export const getVaultHistory = async (
+  networkId: SupportedNetworks,
   owner: string,
   vaultId: number,
-  errorCallback: Function) => {
+  errorCallback: Function
+) => {
   const query = `{
     depositCollateralActions (where: {vault_contains: "${owner}-${vaultId}"}) {
       id
@@ -368,7 +433,7 @@ export const getVaultHistory = async (networkId: SupportedNetworks,
       transactionHash
     }
   }
-  `
+  `;
   try {
     const response = await postQuery(endpoints[networkId], query);
     return response.data;
@@ -376,11 +441,12 @@ export const getVaultHistory = async (networkId: SupportedNetworks,
     errorCallback(error.toString());
     return null;
   }
-}
+};
 
-export const getOracleAssetsAndPricers = async(networkId: SupportedNetworks, errorCallback: Function): Promise<
-  SubgraphOracleAsset[] | null
-> => {
+export const getOracleAssetsAndPricers = async (
+  networkId: SupportedNetworks,
+  errorCallback: Function
+): Promise<SubgraphOracleAsset[] | null> => {
   const query = `{
     oracleAssets {
      asset {
@@ -400,15 +466,15 @@ export const getOracleAssetsAndPricers = async(networkId: SupportedNetworks, err
       price
      }
    }
-   }`
-   try {
+   }`;
+  try {
     const response = await postQuery(endpoints[networkId], query);
     return response.data.oracleAssets;
   } catch (error) {
     errorCallback(error.toString());
     return null;
   }
-}
+};
 
 const postQuery = async (endpoint: string, query: string) => {
   const options = {

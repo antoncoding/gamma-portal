@@ -1,3 +1,5 @@
+import { BigNumber } from 'bignumber.js'
+
 export type Token = {
   address: string;
   name: string;
@@ -92,3 +94,8 @@ export type SubgraphPricer = {
   lockingPeriod: string
   disputePeriod: string
 }
+
+export type OTokenBalance = {
+  token: SubgraphOToken;
+  balance: BigNumber;
+};
