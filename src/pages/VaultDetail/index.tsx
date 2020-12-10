@@ -13,6 +13,7 @@ import Status from '../../components/DataViewStatusEmpty'
 import { ZERO_ADDR, tokens } from '../../constants/addresses'
 import { useTokenByAddress } from '../../hooks/useToken'
 import { useOTokenBalances } from '../../hooks/useOTokenBalances'
+import { useTokenBalance } from '../../hooks/useTokenBalance'
 import { toTokenAmount, fromTokenAmount } from '../../utils/math'
 import useAsyncMemo from '../../hooks/useAsyncMemo';
 import { SubgraphOToken } from '../../types'
@@ -73,17 +74,18 @@ export default function VaultDetail() {
   const longOtoken = useMemo(() => (vaultDetail && vaultDetail.longOToken) || selectedLong || null
     , [vaultDetail, selectedLong])
 
+  const collateralBalance = useTokenBalance(collateralToken.address, user, 20)
 
   const longBalance = useMemo(() => {
     if (!balances) return new BigNumber(0)
     const target = balances?.find(balanceObj => balanceObj.token.id === longOtoken?.id)
-    return target? target.balance : new BigNumber(0)
+    return target ? target.balance : new BigNumber(0)
   }, [balances, longOtoken])
 
   const shortBalance = useMemo(() => {
     if (!balances) return new BigNumber(0)
     const target = balances?.find(balanceObj => balanceObj.token.id === shortOtoken?.id)
-    return target? target.balance : new BigNumber(0)
+    return target ? target.balance : new BigNumber(0)
   }, [balances, shortOtoken])
 
 
@@ -119,7 +121,7 @@ export default function VaultDetail() {
     if (!balances) return allShorts;
     // which user has balance
     const hasBalance = allShorts.filter(short => {
-      const target = balances.find(b => b.token.id === short.id) 
+      const target = balances.find(b => b.token.id === short.id)
       return target !== undefined && target.balance.gt(new BigNumber(0))
     });
     return hasBalance
@@ -209,7 +211,10 @@ export default function VaultDetail() {
     const amountToDisplay = amount
       ? <div> {toTokenAmount(new BigNumber(amount), decimals).toString()} <span style={{ opacity: 0.5 }}> {pendingAmount} </span> </div>
       : <div> 0 <span style={{ opacity: 0.5 }}> {pendingAmount} </span> </div>
-    
+    const pendingBalance = label === 'Short' ? pendingAmount : inversePendingAmountString(pendingAmount)
+    const balanceToDisplay =
+      <div> {toTokenAmount(balance, decimals).toString()} <span style={{ opacity: 0.5 }}> {pendingBalance}  </span> </div>
+
     return [
       <div style={{ opacity: 0.8 }}> {label} </div>,
       asset
@@ -219,7 +224,7 @@ export default function VaultDetail() {
           selected={dropdownSelected}
           onChange={dropdownOnChange}
         />,
-        toTokenAmount(balance, decimals).toString(),
+      balanceToDisplay,
       amountToDisplay,
       <>
         <TextInput type="number" disabled={isExpired} onChange={onInputChange} value={inputValue} />
@@ -227,7 +232,7 @@ export default function VaultDetail() {
         <Button label="Remove" disabled={isExpired} display="icon" icon={<IconCircleMinus />} onClick={onClickMinus} />
       </>
     ]
-  }, [isExpired, balances])
+  }, [isExpired])
 
   return (
     <>
@@ -272,7 +277,7 @@ export default function VaultDetail() {
             dropdownSelected: selectedCollateralIndex,
             dropdownOnChange: setSelectedCollateralIndex,
             dropdownItems: tokens[networkId]?.map(o => o.symbol),
-            balance: new BigNumber(0)
+            balance: collateralBalance,
           },
           {
             label: 'Long',
@@ -324,4 +329,10 @@ export default function VaultDetail() {
 
     </>
   )
+}
+
+function inversePendingAmountString(amount: string): string {
+  if (amount.includes('-')) return amount.replace('-', '+')
+  else if (amount.includes('+')) return amount.replace('+', '-')
+  else return amount
 }

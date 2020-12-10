@@ -4,7 +4,6 @@ import { useToast } from '@aragon/ui'
 import { OTokenBalance } from '../types';
 import { getBalances } from '../utils/graph'
 import useAsyncMemo from './useAsyncMemo';
-import { useConnection } from './useConnection';
 import { SupportedNetworks } from '../constants/networks';
 
 export function useOTokenBalances(account: string, networkId: SupportedNetworks): { balances: OTokenBalance[] | null, refetch: Function } {
