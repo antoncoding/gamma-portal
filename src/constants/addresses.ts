@@ -24,27 +24,27 @@ export const tokens: TokensTyps = {
       decimals: 6
     }
   ],
-  '4' : [
-    emptyToken,
-    {
-      name: 'USDC',
-      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
-      symbol: 'USDC',
-      decimals: 6
-    },
-    {
-      name: 'Wrapped Ether',
-      address: '0xc778417e063141139fce010982780140aa0cd5ab',
-      symbol: 'WETH',
-      decimals: 18
-    },
-    {
-      name: 'Wrapped BTC',
-      address: '0x577d296678535e4903d59a4c929b718e1d575e0a',
-      symbol: 'WBTC',
-      decimals: 8
-    }
-  ],
+  // '4' : [
+  //   emptyToken,
+  //   {
+  //     name: 'USDC',
+  //     address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+  //     symbol: 'USDC',
+  //     decimals: 6
+  //   },
+  //   {
+  //     name: 'Wrapped Ether',
+  //     address: '0xc778417e063141139fce010982780140aa0cd5ab',
+  //     symbol: 'WETH',
+  //     decimals: 18
+  //   },
+  //   {
+  //     name: 'Wrapped BTC',
+  //     address: '0x577d296678535e4903d59a4c929b718e1d575e0a',
+  //     symbol: 'WBTC',
+  //     decimals: 8
+  //   }
+  // ],
   '42' : [
     emptyToken,
     {
@@ -73,17 +73,17 @@ export const addressese: GammaAddress = {
     addressBook: '',
     pool: ''
   },
-  '4': {
-    controller: '0x5ca72b05416f728c877942078454d458e6733421',
-    factory: '0x17fFbe9476dDcC79f4574E0c89CE537fD65A8cAe',
-    addressBook: '0x7630e7dE53E3d1f298f653d27fcF3710c602331C',
-    pool: '0x228D386D950984D1F4A2425683e620558A1430d9'
-  },
+  // '4': {
+  //   controller: '0x5ca72b05416f728c877942078454d458e6733421',
+  //   factory: '0x17fFbe9476dDcC79f4574E0c89CE537fD65A8cAe',
+  //   addressBook: '0x7630e7dE53E3d1f298f653d27fcF3710c602331C',
+  //   pool: '0x228D386D950984D1F4A2425683e620558A1430d9'
+  // },
   '42' : {
-    controller: '0x162114ca77be3234e459c816be93c3a32c3ad5a7',
-    factory: '0x7EaEbc642Af4E92245105De1958B87BF8ee89757',
-    addressBook: '0xD37752Fd2976335fddb2e6A2cF5FfbfA88bf5F05',
-    pool: '0x48ab3c5ff91cce46cd96d0d31e935ca53b885b2e'
+    controller: '0x37adb373e5f986a31a3441a24453bc047f26c46c',
+    factory: '0x6fb1a6809961b0611c4296b16d8F14eF17FfAacF',
+    addressBook: '0x16124C5d58F58Fe3fce36C36C5c5Df67548',
+    pool: '0xe477d1FFC1e5eA6a577846a4699617997315B4ee'
   }
 }
 

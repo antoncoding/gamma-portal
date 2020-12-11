@@ -13,21 +13,21 @@ const items = [
     title: 'Mainnet', 
     description: `Subgraph endpoint: ${subgraph[SupportedNetworks.Mainnet]}`
   },
-  {
-    title: 'Rinkeby', 
-    description: `Subgraph endpoint: ${subgraph[SupportedNetworks.Rinkeby]}`
-  },
+  // {
+  //   title: 'Rinkeby', 
+  //   description: `Subgraph endpoint: ${subgraph[SupportedNetworks.Rinkeby]}`
+  // },
   {
     title: 'Kovan', 
     description: `Subgraph endpoint: ${subgraph[SupportedNetworks.Kovan]}`
   }
 ]
 
-const idxToNetworkId = [1, 4, 42]
+const idxToNetworkId = [1, 42, 4]
 const networkIdToIdx = {
   1: 0,
-  4: 1,
-  42: 2,
+  42: 1,
+  // 4: 2,
 }
 
 function Network() {
