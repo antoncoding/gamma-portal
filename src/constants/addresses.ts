@@ -89,6 +89,6 @@ export const addressese: GammaAddress = {
 
 export const blacklistOTokens = {
   '1': [ZERO_ADDR],
-  '4': ["0x080022f16f3ad1d29c42a64ab2449fda25ffafc0", "0x1b3e291570f1c35013a252b8c52fef9f3dc46783", "0x4824cb60348702718db00ebbfb78a364b71094ef", "0xcbdbbbca5cc390d3a2a0f71177d2ea3d0e7d6e1c", "0xff7094938a547b96cdfc9582644e1413421f9efc"],
+  // '4': ["0x080022f16f3ad1d29c42a64ab2449fda25ffafc0", "0x1b3e291570f1c35013a252b8c52fef9f3dc46783", "0x4824cb60348702718db00ebbfb78a364b71094ef", "0xcbdbbbca5cc390d3a2a0f71177d2ea3d0e7d6e1c", "0xff7094938a547b96cdfc9582644e1413421f9efc"],
   '42': [ZERO_ADDR]
 }
