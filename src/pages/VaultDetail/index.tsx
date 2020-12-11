@@ -246,6 +246,7 @@ export default function VaultDetail() {
           isExpired
             ? <Button label="Settle" onClick={simpleSettle} />
             : <Button
+              mode="strong"
               disabled={controller.actions.length === 0 || isSendingTx}
               onClick={() => {
                 setIsSendingTx(true)
@@ -253,7 +254,11 @@ export default function VaultDetail() {
                   setIsSendingTx(false)
                 })
               }}
-            > Operate {isSendingTx ? <LoadingRing /> : <Tag> {controller.actions.length} </Tag>}  </Button>
+            > Operate {
+                isSendingTx
+                  ? <LoadingRing />
+                  : <span style={{ paddingLeft: '7px' }}><Tag>{controller.actions.length}</Tag></span>}
+            </Button>
         } />
       <DataView
         mode="table"
