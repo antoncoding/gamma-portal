@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react'
-import { Header, DataView, DropDown, useToast, Tag, Help, Button, LoadingRing } from '@aragon/ui'
+import React, { useState, useEffect, useContext, useMemo } from 'react'
+import { Header, DataView, DropDown, useToast, Tag, Help } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
 import Status from '../../components/DataViewStatusEmpty'
 import LabelText from '../../components/LabelText'
@@ -7,24 +7,24 @@ import CustomIdentityBadge from '../../components/CustomIdentityBadge'
 import { walletContext } from '../../contexts/wallet'
 import { useAsyncMemo } from '../../hooks/useAsyncMemo'
 import { expiryToDate, toTokenAmount } from '../../utils/math'
-import { getOracleAssetsAndPricers, getOTokens } from '../../utils/graph'
+import { getOracleAssetsAndPricers } from '../../utils/graph'
 import SectionTitle from '../../components/SectionHeader'
 
 import { SubgraphPriceEntry } from '../../types'
-import { CTokenPricer, USDCPricer, CLPricer } from '../../utils/contracts/pricers'
-import { pricerMap, PricerTypes } from './config'
+// import { CTokenPricer, USDCPricer, CLPricer } from '../../utils/contracts/pricers'
+import { pricerMap } from './config'
 import { ZERO_ADDR } from '../../constants/addresses'
 
 export default function Oracle() {
 
-  const { networkId, user, web3 } = useContext(walletContext)
+  const { networkId } = useContext(walletContext)
   const toast = useToast()
   const [isLoadingHistory, setIsLoadingHistory] = useState(true)
   const [selectedAssetIndex, setSelectedAssetIndex] = useState(-1)
   const [assetHistory, setAssetHistory] = useState<SubgraphPriceEntry[]>([])
-  const [isSearchingID, setIsSearching] = useState(false)
+  // const [isSearchingID, setIsSearching] = useState(false)
 
-  const [expiryIdxToSubmit, setExpiryIdxToSubmit] = useState(-1)
+  // const [expiryIdxToSubmit, setExpiryIdxToSubmit] = useState(-1)
 
   const allOracleAssets = useAsyncMemo(async () => {
     const assets = await getOracleAssetsAndPricers(networkId, toast)
@@ -33,20 +33,20 @@ export default function Oracle() {
     return assets === null ? [] : assets
   }, [], [])
 
-  const allOTokens = useAsyncMemo(async () => {
-    const oTokens = await getOTokens(networkId, toast)
-    return oTokens === null ? [] : oTokens
-  }, [], [])
+  // const allOTokens = useAsyncMemo(async () => {
+  //   const oTokens = await getOTokens(networkId, toast)
+  //   return oTokens === null ? [] : oTokens
+  // }, [], [])
 
-  const unsetExpiries = useMemo(() => {
-    const alreadySet = assetHistory.map(entry => Number(entry.expiry))
-    const unique = new Set(allOTokens
-      .map(o => Number(o.expiryTimestamp))
-      .filter(expiry => expiry < Date.now() / 1000)
-      .filter(expiry => !alreadySet.includes(expiry)))
-    return Array.from(unique)
+  // const unsetExpiries = useMemo(() => {
+  //   const alreadySet = assetHistory.map(entry => Number(entry.expiry))
+  //   const unique = new Set(allOTokens
+  //     .map(o => Number(o.expiryTimestamp))
+  //     .filter(expiry => expiry < Date.now() / 1000)
+  //     .filter(expiry => !alreadySet.includes(expiry)))
+  //   return Array.from(unique)
     
-  }, [assetHistory, allOTokens])
+  // }, [assetHistory, allOTokens])
 
   const haveValidSelection = useMemo(()=>allOracleAssets.length > 0 && selectedAssetIndex !== -1, 
   [allOracleAssets, selectedAssetIndex]) 
@@ -59,28 +59,28 @@ export default function Oracle() {
   [selectedAssetIndex, allOracleAssets, haveValidSelection]
   )
 
-  const setPrice = useCallback(
-    () => {
-      const selectedAsset = allOracleAssets[selectedAssetIndex].asset
-      const pricer = allOracleAssets[selectedAssetIndex].pricer.id
-      if(web3 === null) {
-        toast('Please connect wallet first')
-        return
-      }
-      if (pricerMap[selectedAsset.symbol] === PricerTypes.CTokenPricer) {
-        const contract = new CTokenPricer(web3, pricer , networkId, user)
-        return contract.setPrice(unsetExpiries[expiryIdxToSubmit].toString())
-      } else if (pricerMap[selectedAsset.symbol] === PricerTypes.USDCPricer) {
-        const contract = new USDCPricer(web3, pricer, networkId, user)
-        return contract.setPrice(unsetExpiries[expiryIdxToSubmit].toString())
-      } else {
-        const contract = new CLPricer(web3, pricer, networkId, user)
-        toast('Fetching Data from Chainlink Oracle, this could take a while...')
-        return contract.setPrice(unsetExpiries[expiryIdxToSubmit].toString(), toast, setIsSearching)
-      }
-    },
-    [allOracleAssets, selectedAssetIndex, expiryIdxToSubmit, networkId, user, web3, unsetExpiries, toast],
-  )
+  // const setPrice = useCallback(
+  //   () => {
+  //     const selectedAsset = allOracleAssets[selectedAssetIndex].asset
+  //     const pricer = allOracleAssets[selectedAssetIndex].pricer.id
+  //     if(web3 === null) {
+  //       toast('Please connect wallet first')
+  //       return
+  //     }
+  //     if (pricerMap[selectedAsset.symbol] === PricerTypes.CTokenPricer) {
+  //       const contract = new CTokenPricer(web3, pricer , networkId, user)
+  //       return contract.setPrice(unsetExpiries[expiryIdxToSubmit].toString())
+  //     } else if (pricerMap[selectedAsset.symbol] === PricerTypes.USDCPricer) {
+  //       const contract = new USDCPricer(web3, pricer, networkId, user)
+  //       return contract.setPrice(unsetExpiries[expiryIdxToSubmit].toString())
+  //     } else {
+  //       const contract = new CLPricer(web3, pricer, networkId, user)
+  //       toast('Fetching Data from Chainlink Oracle, this could take a while...')
+  //       return contract.setPrice(unsetExpiries[expiryIdxToSubmit].toString(), toast, setIsSearching)
+  //     }
+  //   },
+  //   [allOracleAssets, selectedAssetIndex, expiryIdxToSubmit, networkId, user, web3, unsetExpiries, toast],
+  // )
 
   return (
     <>
@@ -124,7 +124,7 @@ export default function Oracle() {
         </div>
       </div>
       
-      <SectionTitle title="Submit Price" />
+      {/* <SectionTitle title="Submit Price" />
 
       <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '3%' }}>
         <div style={{ width: '30%' }}>
@@ -146,7 +146,7 @@ export default function Oracle() {
             icon={isSearchingID ? <LoadingRing /> : null}
           />
         </div>
-      </div>
+      </div> */}
 
       <SectionTitle title="Price Submissions" />
       <DataView
