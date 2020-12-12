@@ -12,10 +12,12 @@ const erc20Abi = require('../../constants/abis/erc20.json')
 export class Controller extends SmartContract {
   public contract: any
   public actions: actionArg[]
-  constructor (_web3: Web3|null, networkId: number, account: string) {
+  public errCallback: Function | undefined
+  constructor (_web3: Web3|null, networkId: number, account: string, errorCallback?: Function) {
     super(_web3, networkId, account)
     const address = addressese[networkId].controller;
     this.actions = []
+    this.errCallback = errorCallback
     if (this.web3 !== null)
       this.contract = new this.web3.eth.Contract(abi, address)
   }
@@ -136,18 +138,24 @@ export class Controller extends SmartContract {
       await this.checkAndIncreaseAllowance(addLongAction.asset, this.account, addLongAction.amount) 
     }
 
-    // check allowance to add collateral
-    const addCollateralAction = this.actions.find(action => action.actionType === ActionType.DepositCollateral)
-    if (addCollateralAction !== undefined) {
-      await this.checkAndIncreaseAllowance(addCollateralAction.asset, this.account, addCollateralAction.amount)
+    try {
+      // check allowance to add collateral
+      const addCollateralAction = this.actions.find(action => action.actionType === ActionType.DepositCollateral)
+      if (addCollateralAction !== undefined) {
+        await this.checkAndIncreaseAllowance(addCollateralAction.asset, this.account, addCollateralAction.amount)
+      }
+
+      await this.contract.methods
+        .operate(this.actions)
+        .send({from: this.account})
+        .on('transactionHash', this.getCallback())
+        .on('receipt', callback);
+      this.actions = [] 
+      }
+     catch (error) {
+      if(typeof this.errCallback === 'function') this.errCallback(error)
     }
 
-    await this.contract.methods
-      .operate(this.actions)
-      .send({from: this.account})
-      .on('transactionHash', this.getCallback())
-      .on('receipt', callback);
-    this.actions = [] 
   }
 
   async checkAndIncreaseAllowance(erc20: string, from: string, amount: string) {
