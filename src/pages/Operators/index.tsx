@@ -11,6 +11,7 @@ import useAsyncMemo from '../../hooks/useAsyncMemo'
 import SectionTitle from '../../components/SectionHeader'
 import CustomIdentityBadge from '../../components/CustomIdentityBadge'
 import Status from '../../components/DataViewStatusEmpty'
+import { knownOperators } from '../../constants/addresses'
 
 import { isEOA } from '../../utils/others'
 
@@ -66,13 +67,29 @@ export default function OperatorSection() {
       <SectionTitle title="Authorized Operators" />
       <DataView
         status={isLoading ? 'loading' : 'default'}
-        fields={['address', 'tag', 'action']}
+        fields={['address', 'label', 'tag', '']}
         statusEmpty={<Status label={"No operator set"} />}
         entries={operators}
         renderEntry={({address, isEOA}) => {
-          const tag = isEOA ? <Tag> EOA </Tag> : <> </>
+          let tag = <> </>
+          let label = ''
+          const operatorInfo = knownOperators[networkId].find(info => info.address === address)
+          if (operatorInfo) {
+            if (!operatorInfo.audited) {
+              label = operatorInfo.name
+              tag = <Tag color="#FFC300" background="#FFF8BC" > unverified </Tag>
+            } else {
+              tag = <Tag color="#006600" background="#c2f0c2" > audited </Tag>
+              label = operatorInfo.name
+            }
+          } else if (isEOA) {
+            tag = <Tag color="#800000" background="#ffb3b3" > EOA </Tag> 
+          } else {
+            tag = <Tag color="#FFC300" background="#FFF8BC" > unknown </Tag>
+          }
           return [
             <CustomIdentityBadge shorten={false} entity={address} />,
+            label,
             tag,
             <Button
               label="revoke"
