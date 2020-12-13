@@ -1,6 +1,5 @@
 import React, { useContext, useState, useCallback, useMemo } from 'react'
 import { DataView, Button, useToast } from '@aragon/ui'
-import Status from '../../components/DataViewStatusEmpty'
 import SectionTitle from '../../components/SectionHeader'
 import OpynTokenAmount from '../../components/OpynTokenAmount'
 import { useOTokenBalances } from '../../hooks/useOTokenBalances'
@@ -29,7 +28,7 @@ export default function AccountBalances({account}: {account: string}) {
     }
     const controller = new Controller(web3, networkId, user)
     await controller.redeemBatch(user, [token], [amount])
-  }, [web3, networkId, user])
+  }, [web3, networkId, user, account, toast])
 
   const entries = useMemo(() => balances ?  balances : [], [balances])
 
@@ -43,7 +42,7 @@ export default function AccountBalances({account}: {account: string}) {
       '-',
       button
     ]
-  }, [])
+  }, [networkId, redeemToken, toast])
 
   return (
     <>
