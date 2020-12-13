@@ -97,7 +97,7 @@ export default function Oracle() {
         <div style={{ width: '30%' }}>
           <LabelText label='Pricer' />
           <CustomIdentityBadge 
-            label={haveValidSelection ? pricerMap[allOracleAssets[selectedAssetIndex].asset.symbol] : 'Unkown'}  
+            label={haveValidSelection ? pricerMap[allOracleAssets[selectedAssetIndex].asset.symbol] : 'Unknown'}  
             entity={haveValidSelection ? allOracleAssets[selectedAssetIndex].pricer.id : ZERO_ADDR}
           />
         </div>

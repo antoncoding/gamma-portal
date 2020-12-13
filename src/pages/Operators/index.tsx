@@ -85,7 +85,7 @@ export default function OperatorSection() {
           } else if (isEOA) {
             tag = <Tag color="#800000" background="#ffb3b3" > EOA </Tag> 
           } else {
-            tag = <Tag color="#FFC300" background="#FFF8BC" > unkown </Tag>
+            tag = <Tag color="#FFC300" background="#FFF8BC" > unknown </Tag>
           }
           return [
             <CustomIdentityBadge shorten={false} entity={address} />,
