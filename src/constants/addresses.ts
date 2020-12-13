@@ -50,7 +50,7 @@ type GammaAddress = {
   };
 };
 
-export const addressese: GammaAddress = {
+export const addresses: GammaAddress = {
   '1': {
     controller: '',
     factory: '',

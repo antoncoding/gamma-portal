@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import Web3 from 'web3' 
 import {SmartContract} from './base'
-import {addressese, ZERO_ADDR} from '../../constants/addresses'
+import {addresses, ZERO_ADDR} from '../../constants/addresses'
 import {actionArg, ActionType} from '../../types'
 import {getPreference} from '../../utils/storage'
 import {MAX_UINT} from '../../constants/others'
@@ -15,7 +15,7 @@ export class Controller extends SmartContract {
   public errCallback: Function | undefined
   constructor (_web3: Web3|null, networkId: number, account: string, errorCallback?: Function) {
     super(_web3, networkId, account)
-    const address = addressese[networkId].controller;
+    const address = addresses[networkId].controller;
     this.actions = []
     this.errCallback = errorCallback
     if (this.web3 !== null)
@@ -160,7 +160,7 @@ export class Controller extends SmartContract {
 
   async checkAndIncreaseAllowance(erc20: string, from: string, amount: string) {
     if (!this.web3) return
-    const pool = addressese[this.networkId].pool;
+    const pool = addresses[this.networkId].pool;
     const token = new this.web3.eth.Contract(erc20Abi, erc20)
     const allowance = await token.methods.allowance(from, pool).call()
     if (new BigNumber(allowance).lt(new BigNumber(amount))) {
