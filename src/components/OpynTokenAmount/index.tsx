@@ -16,7 +16,7 @@ type TokenAmountProps = {
   chainId: number
 }
 
-export function OpynTokenAmount({token, amount, chainId} : TokenAmountProps ) {
+export default function OpynTokenAmount({token, amount, chainId} : TokenAmountProps ) {
   if (!token) return <EmptyToken/>
   let imgUrl: null|string = null;
 

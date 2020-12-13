@@ -8,9 +8,9 @@ import { walletContext } from '../../contexts/wallet'
 import { Controller } from '../../utils/contracts/controller'
 import { SubgraphVault } from '../../types'
 import SectionTitle from '../../components/SectionHeader'
-import Status from '../../components/DataViewStatusEmpty'
-import { OpynTokenAmount } from '../../components/OpynTokenAmount'
+import OpynTokenAmount from '../../components/OpynTokenAmount'
 import CustomIdentityBadge from '../../components/CustomIdentityBadge';
+import { VAULTS } from '../../constants/dataviewContents'
 
 export default function AccountVaults() {
   const { web3, networkId, user } = useContext(walletContext)
@@ -97,7 +97,7 @@ export default function AccountVaults() {
           'Collateral',
           <div style={{ display: 'flex' }}> <span style={{ paddingRight: '8px' }}> Long </span> <Help > the oToken you put into a vault to create a spread. </Help> </div>,
           <div style={{ display: 'flex' }}> <span style={{ paddingRight: '8px' }}> Short </span> <Help> the oToken you minted by putting down collateral. Or the short position you create. </Help> </div>, '']}
-        statusEmpty={<Status label={"No vaults"} />}
+        emptyState={VAULTS}
         entries={vaults}
         renderEntry={renderRow}
       />

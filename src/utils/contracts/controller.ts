@@ -114,6 +114,16 @@ export class Controller extends SmartContract {
     await this.operate(args)
   }
 
+  async redeemBatch(to: string, tokens: string[], amounts: BigNumber[]) {
+    const args: actionArg[] = []
+    for(let i = 0; i < tokens.length; i++) {
+      args.push(createRedeemArg(tokens[i], amounts[i].toString(), to))
+    }
+    if (args.length === 0 && typeof this.errCallback === 'function') this.errCallback('No tokens to redeem.')
+
+    await this.operate(args)
+  }
+
   async refreshConfig() {
     if (this.web3 === null) {
       return
@@ -278,6 +288,19 @@ function createSettleArg(account: string, to: string, vaultId: BigNumber) : acti
     asset: ZERO_ADDR,
     vaultId: vaultId.toString(),
     amount: '0',
+    index: '0',
+    data: ZERO_ADDR,
+  }
+}
+
+function createRedeemArg(token: string, amount: string, to:string) : actionArg {
+  return {
+    actionType: ActionType.Redeem,
+    owner: ZERO_ADDR,
+    secondAddress: to,
+    asset: token,
+    vaultId: '0',
+    amount: amount,
     index: '0',
     data: ZERO_ADDR,
   }

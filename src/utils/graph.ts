@@ -341,7 +341,8 @@ export async function getBalances(
         ...b,
         balance: new BigNumber(b.balance),
       };
-    });
+    })
+    .filter(b => !b.balance.isZero())
   } catch (error) {
     errorCallback(error.toString());
     return null;

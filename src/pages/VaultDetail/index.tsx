@@ -1,21 +1,22 @@
 import React, { useContext, useMemo, useState, useCallback, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import { useParams } from 'react-router-dom';
-
 import { TextInput, Button, DataView, useToast, Tag, Header, IconCirclePlus, IconCircleMinus, DropDown, LoadingRing } from '@aragon/ui'
 import History from './history'
 
 import { walletContext } from '../../contexts/wallet'
 import { Controller } from '../../utils/contracts/controller'
-import { getVault, getLiveOTokens } from '../../utils/graph'
 import CustomIdentityBadge from '../../components/CustomIdentityBadge'
-import Status from '../../components/DataViewStatusEmpty'
-import { ZERO_ADDR, tokens } from '../../constants/addresses'
+
+import useAsyncMemo from '../../hooks/useAsyncMemo';
 import { useTokenByAddress } from '../../hooks/useToken'
 import { useOTokenBalances } from '../../hooks/useOTokenBalances'
 import { useTokenBalance } from '../../hooks/useTokenBalance'
+
+import { getVault, getLiveOTokens } from '../../utils/graph'
 import { toTokenAmount, fromTokenAmount } from '../../utils/math'
-import useAsyncMemo from '../../hooks/useAsyncMemo';
+import { isExpired } from '../../utils/others'
+import { ZERO_ADDR, tokens } from '../../constants/addresses'
 import { SubgraphOToken } from '../../types'
 
 export default function VaultDetail() {
@@ -191,13 +192,13 @@ export default function VaultDetail() {
     setPendingShortAmount(` - ${changeShortAmount.toString()}`)
   }, [toast, vaultDetail, shortOtoken, controller, user, vaultId, changeShortAmount])
 
-  const isExpired = useMemo(() => {
+  const expired = useMemo(() => {
     if (!vaultDetail) return false
 
-    if (vaultDetail.shortOToken && Number(vaultDetail.shortOToken.expiryTimestamp) < Date.now() / 1000)
+    if (vaultDetail.shortOToken && isExpired(vaultDetail.shortOToken))
       return true
 
-    if (vaultDetail.longOToken && Number(vaultDetail.longOToken.expiryTimestamp) < Date.now() / 1000)
+    if (vaultDetail.longOToken && isExpired(vaultDetail.longOToken))
       return true;
 
     return false
@@ -227,12 +228,12 @@ export default function VaultDetail() {
       balanceToDisplay,
       amountToDisplay,
       <>
-        <TextInput type="number" disabled={isExpired} onChange={onInputChange} value={inputValue} />
-        <Button label="Add" disabled={isExpired} display="icon" icon={<IconCirclePlus />} onClick={onClickAdd} />
-        <Button label="Remove" disabled={isExpired} display="icon" icon={<IconCircleMinus />} onClick={onClickMinus} />
+        <TextInput type="number" disabled={expired} onChange={onInputChange} value={inputValue} />
+        <Button label="Add" disabled={expired} display="icon" icon={<IconCirclePlus />} onClick={onClickAdd} />
+        <Button label="Remove" disabled={expired} display="icon" icon={<IconCircleMinus />} onClick={onClickMinus} />
       </>
     ]
-  }, [isExpired])
+  }, [expired])
 
   return (
     <>
@@ -243,7 +244,7 @@ export default function VaultDetail() {
           </div>
         }
         secondary={
-          isExpired
+          expired
             ? <Button label="Settle" onClick={simpleSettle} />
             : <Button
               mode="strong"
@@ -264,7 +265,6 @@ export default function VaultDetail() {
         mode="table"
         status={isLoading ? 'loading' : 'default'}
         fields={['type', 'asset', 'wallet balance', 'vault balance', '']}
-        statusEmpty={<Status label={"No vaults"} />}
         entries={[
           {
             label: 'Collateral',
