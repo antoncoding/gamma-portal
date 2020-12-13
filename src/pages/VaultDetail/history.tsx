@@ -6,14 +6,18 @@ import BigNumber from 'bignumber.js'
 
 import { walletContext } from '../../contexts/wallet'
 
-import { getVaultHistory } from '../../utils/graph'
+import ActionBadgeFromId from '../../components/ActionBadge'
 import SectionTitle from '../../components/SectionHeader'
 import TokenAddress from '../../components/TokenAddress'
+
+import { getVaultHistory } from '../../utils/graph'
 import { timeSince } from '../../utils/math'
-import {ActionBadgeFromId} from '../../components/ActionBadge'
+import { toTokenAmount } from '../../utils/math';
+
 import {SubgraphVaultAction} from '../../types'
 import useAsyncMemo from '../../hooks/useAsyncMemo';
-import { toTokenAmount } from '../../utils/math';
+
+import { VAULT_HISTORY } from '../../constants/dataviewContents'
 
 export default function VaultHistory() {
 
@@ -73,6 +77,7 @@ export default function VaultHistory() {
         status={isLoading ? 'loading' : 'default'}
         fields={['tx', 'action', 'amount', 'asset', 'timestamp']}
         renderEntry={renderRow}
+        emptyState={VAULT_HISTORY}
       />
     </>
   )

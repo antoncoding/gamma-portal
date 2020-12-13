@@ -10,9 +10,9 @@ import useAsyncMemo from '../../hooks/useAsyncMemo'
 
 import SectionTitle from '../../components/SectionHeader'
 import CustomIdentityBadge from '../../components/CustomIdentityBadge'
-import Status from '../../components/DataViewStatusEmpty'
-import { knownOperators } from '../../constants/addresses'
 
+import { knownOperators } from '../../constants/addresses'
+import { OPERATORS } from '../../constants/dataviewContents'
 import { isEOA } from '../../utils/others'
 
 export default function OperatorSection() {
@@ -68,7 +68,7 @@ export default function OperatorSection() {
       <DataView
         status={isLoading ? 'loading' : 'default'}
         fields={['address', 'label', 'tag', '']}
-        statusEmpty={<Status label={"No operator set"} />}
+        emptyState={OPERATORS}
         entries={operators}
         renderEntry={({address, isEOA}) => {
           let tag = <> </>

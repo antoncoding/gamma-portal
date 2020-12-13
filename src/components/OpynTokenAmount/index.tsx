@@ -16,7 +16,7 @@ type TokenAmountProps = {
   chainId: number
 }
 
-export function OpynTokenAmount({token, amount, chainId} : TokenAmountProps ) {
+export default function OpynTokenAmount({token, amount, chainId} : TokenAmountProps ) {
   if (!token) return <EmptyToken/>
   let imgUrl: null|string = null;
 
@@ -37,6 +37,7 @@ export function OpynTokenAmount({token, amount, chainId} : TokenAmountProps ) {
       symbol={token.symbol}
       decimals={token.decimals}
       iconUrl={imgUrl}
+      digits={8}
     /> 
   )
 }

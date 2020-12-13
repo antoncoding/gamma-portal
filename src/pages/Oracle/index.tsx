@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react'
 import { Header, DataView, DropDown, useToast, Tag, Help } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
-import Status from '../../components/DataViewStatusEmpty'
 import LabelText from '../../components/LabelText'
 import CustomIdentityBadge from '../../components/CustomIdentityBadge'
 import { walletContext } from '../../contexts/wallet'
@@ -14,6 +13,7 @@ import { SubgraphPriceEntry } from '../../types'
 // import { CTokenPricer, USDCPricer, CLPricer } from '../../utils/contracts/pricers'
 import { pricerMap } from './config'
 import { ZERO_ADDR } from '../../constants/addresses'
+import { PRICE_SUBMISSION } from '../../constants/dataviewContents'
 
 export default function Oracle() {
 
@@ -152,7 +152,7 @@ export default function Oracle() {
       <DataView
         status={isLoadingHistory ? 'loading' : 'default'}
         fields={['Expiry', 'Price', 'Submitted Timestamp', 'Submitted By']}
-        statusEmpty={<Status label={"No submissions"} />}
+        emptyState={PRICE_SUBMISSION}
         entriesPerPage={8}
         entries={assetHistory.sort((a,b) => Number(a.expiry) > Number(b.expiry) ? -1 : 1)}
         renderEntry={({expiry, reportedTimestamp, price, isDisputed}: SubgraphPriceEntry) => {

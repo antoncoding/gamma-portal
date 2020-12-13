@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Tag } from '@aragon/ui'
 
-export function ActionBadgeFromId({id}: {id: string}) {
+export default function ActionBadgeFromId({id}: {id: string}) {
   if (id.includes('DEPOSIT-COLLATERAL')) {
     return DepositCollateralBadge()
   } else if (id.includes('WITHDRAW-COLLATERAL')){
