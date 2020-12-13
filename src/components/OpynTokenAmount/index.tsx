@@ -37,6 +37,7 @@ export default function OpynTokenAmount({token, amount, chainId} : TokenAmountPr
       symbol={token.symbol}
       decimals={token.decimals}
       iconUrl={imgUrl}
+      digits={8}
     /> 
   )
 }
