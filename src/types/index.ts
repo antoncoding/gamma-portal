@@ -1,11 +1,11 @@
 import { BigNumber } from 'bignumber.js'
 
 export type Token = {
-  address: string;
-  name: string;
-  symbol: string;
-  decimals: number;
-};
+  address: string
+  name: string
+  symbol: string
+  decimals: number
+}
 
 export type Product = {
   collateral: Token
@@ -29,34 +29,34 @@ export enum ActionType {
 }
 
 export type actionArg = {
-  actionType: ActionType;
-  owner: string;
-  secondAddress: string;
-  asset: string;
-  vaultId: string;
-  amount: string;
-  index: string;
-  data: string;
-};
+  actionType: ActionType
+  owner: string
+  secondAddress: string
+  asset: string
+  vaultId: string
+  amount: string
+  index: string
+  data: string
+}
 
 export type SubgraphVault = {
   vaultId: string
-  collateralAmount: string | null;
-  collateralAsset: SubgraphToken | null;
-  longAmount: string | null;
-  longOToken: SubgraphOToken | null;
-  shortAmount: string | null;
-  shortOToken: SubgraphOToken | null;
-};
+  collateralAmount: string | null
+  collateralAsset: SubgraphToken | null
+  longAmount: string | null
+  longOToken: SubgraphOToken | null
+  shortAmount: string | null
+  shortOToken: SubgraphOToken | null
+}
 
 export type SubgraphVaultAction = {
   id: string
-  transactionHash: string;
-  timestamp: string;
-  oToken: null | { id: string; symbol: string; decimals: number, collateralAsset: SubgraphToken };
-  asset: { id: string; symbol: string; decimals: number };
-  amount: null| string;
-};
+  transactionHash: string
+  timestamp: string
+  oToken: null | { id: string; symbol: string; decimals: number; collateralAsset: SubgraphToken }
+  asset: { id: string; symbol: string; decimals: number }
+  amount: null | string
+}
 
 export type SubgraphToken = {
   id: string
@@ -67,7 +67,7 @@ export type SubgraphToken = {
 
 export type SubgraphOToken = SubgraphToken & {
   underlyingAsset: SubgraphToken
-  strikeAsset: SubgraphToken,
+  strikeAsset: SubgraphToken
   collateralAsset: SubgraphToken
   strikePrice: string
   expiryTimestamp: string
@@ -96,6 +96,6 @@ export type SubgraphPricer = {
 }
 
 export type OTokenBalance = {
-  token: SubgraphOToken;
-  balance: BigNumber;
-};
+  token: SubgraphOToken
+  balance: BigNumber
+}

@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react'
 // import Moment from 'react-moment';
-import 'moment-timezone';
+import 'moment-timezone'
 
 import { Main, Layout } from '@aragon/ui'
 import { walletContext } from './contexts/wallet'
-import NavBar from "./components/NavBar"
-import SideBar from "./components/SideBar"
+import NavBar from './components/NavBar'
+import SideBar from './components/SideBar'
 
 import Factory from './pages/Factory'
 import ProtocolHome from './pages/Protocol'
@@ -21,9 +21,8 @@ import { useConnection } from './hooks/useConnection'
 
 import { getPreference } from './utils/storage'
 
-import { HashRouter as Router, Switch, Route } from 'react-router-dom';
+import { HashRouter as Router, Switch, Route } from 'react-router-dom'
 function App() {
-
   const wallet = useConnection()
   const defaultTheme = getPreference('theme', 'light')
   const [theme, setTheme] = useState(defaultTheme)
@@ -38,7 +37,7 @@ function App() {
               <SideBar />
             </div>
             <div style={{ width: '80%', marginRight: '2%' }}>
-              <Layout >
+              <Layout>
                 <Switch>
                   <Route path="/account/:account/operators">
                     <Operators />
@@ -65,23 +64,19 @@ function App() {
                     <ProtocolHome />
                   </Route>
                   <Route path="/settings/">
-                    <Settings setTheme={setTheme}/>
+                    <Settings setTheme={setTheme} />
                   </Route>
                   <Route path="/">
                     <HomePage />
                   </Route>
-
                 </Switch>
-              </Layout >
+              </Layout>
             </div>
-
           </div>
-
         </walletContext.Provider>
-
       </Main>
     </Router>
-  );
+  )
 }
 
-export default App;
+export default App

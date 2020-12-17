@@ -1,11 +1,10 @@
-import React from 'react';
+import React from 'react'
 
-import { Bar } from '@aragon/ui';
-import ConnectButton from './ConnectButton';
+import { Bar } from '@aragon/ui'
+import ConnectButton from './ConnectButton'
 import Settings from './SettingsButton'
 
 function MyBar() {
-
   return (
     <Bar
       style={{ margin: 0 }}
@@ -16,8 +15,7 @@ function MyBar() {
         </>
       }
     />
-
-  );
+  )
 }
 
-export default MyBar;
+export default MyBar

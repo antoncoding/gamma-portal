@@ -5,48 +5,48 @@ const EmptyState = <img src={emptyStateRedSrc} alt="" width="185" />
 
 export const VAULTS = {
   default: {
-    title: "No vaults", 
+    title: 'No vaults',
     subtitle: 'Click on Open Vault to start minting oTokens!',
     illustration: EmptyState,
   },
   loading: {
     title: 'Loading',
-    subtitle: 'Fetching user vaults...'
-  }
+    subtitle: 'Fetching user vaults...',
+  },
 }
 
 export const VAULT_HISTORY = {
   default: {
-    title: "No entry", 
+    title: 'No entry',
     subtitle: 'No operation has been done on this vault.',
     illustration: EmptyState,
   },
   loading: {
     title: 'Loading',
-    subtitle: 'Fetching vault history'
-  }
+    subtitle: 'Fetching vault history',
+  },
 }
 
 export const OPERATORS = {
   default: {
-    title: "No Operators", 
+    title: 'No Operators',
     subtitle: 'You can add operators to act on your behave',
     illustration: EmptyState,
   },
   loading: {
     title: 'Loading',
-    subtitle: 'Fetching operators...'
-  }
+    subtitle: 'Fetching operators...',
+  },
 }
 
 export const PRICE_SUBMISSION = {
   default: {
-    title: "No Submissions", 
+    title: 'No Submissions',
     subtitle: 'no price submission history on this asset',
     illustration: EmptyState,
   },
   loading: {
     title: 'Loading',
-    subtitle: 'Fetching historical price'
-  }
+    subtitle: 'Fetching historical price',
+  },
 }
