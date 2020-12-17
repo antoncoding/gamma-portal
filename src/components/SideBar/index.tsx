@@ -1,10 +1,12 @@
 import React, { useState, useContext } from 'react'
 import { useHistory } from 'react-router-dom'
-import { useTheme, IconHome, IconUser, IconConfiguration } from '@aragon/ui'
+import { useTheme, IconHome, IconUser, IconConfiguration, LinkBase } from '@aragon/ui'
 import SidebarTitle from './SidebarTitle'
 import SubButton from './SubButton'
 
 import { walletContext } from '../../contexts/wallet'
+
+const hash = process.env.REACT_APP_VERSION || '0x00'
 
 export default function SideBar() {
   const theme = useTheme()
@@ -93,6 +95,20 @@ export default function SideBar() {
           isSelected={selectedTab === 3 && subSelected === 'oracle'}
           shown={selectedTab === 3}
         />
+      </div>
+      <div
+        style={{
+          color: theme.contentSecondary,
+          padding: '10px',
+          position: 'fixed',
+          bottom: '0px',
+        }}
+      >
+        Commit Hash{' '}
+        <LinkBase external href={`https://github.com/antoncoding/opyn-v2-portal/commit/${hash}`}>
+          {' '}
+          {hash}{' '}
+        </LinkBase>
       </div>
     </div>
   )
