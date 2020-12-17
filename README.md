@@ -2,7 +2,7 @@
 
 <p align="center">
 
-<img width=100 src="src/imgs/miscs/man-astronaut-microsoft.png">
+<img width=100 src="src/imgs/misc/man-astronaut-microsoft.png">
 <br>
 <br>
 
