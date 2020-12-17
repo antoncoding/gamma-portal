@@ -6,7 +6,7 @@ type commentProps = {
 
 function Comment({ text }: commentProps) {
   return (
-    <div style={{ padding: 5, opacity: 0.5 }}>
+    <div style={{ padding: 5, opacity: 0.7 }}>
       {text}
     </div>
   );

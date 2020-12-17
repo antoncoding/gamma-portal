@@ -1,4 +1,4 @@
-# Opyn V2 dashboard
+# Opyn V2 Portal
 
 now hosted on https://opynv2-portal.netlify.app/
 
