@@ -20,5 +20,5 @@
 
 ## Intro
 
-This is an open-sourced alternative front end to interace with [Gamma portocol](https://github.com/opynfinance/GammaProtocol), or,  Opyn V2.
+This is an open-sourced alternative front end to interact with [Gamma protocol](https://github.com/opynfinance/GammaProtocol), or,  Opyn V2.
  
