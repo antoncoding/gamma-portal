@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import {
-  Header, Box, LinkBase, Tag, IconSwap, IconUser, IconConfiguration
+  Header, Box, LinkBase, Tag, Help, IconUser, IconConfiguration
 } from '@aragon/ui';
 
 import Comment from '../../components/Comment'
@@ -12,8 +12,14 @@ function HomePage() {
 
   return (
     <>
-      <Header primary="Welcome to Opyn V2" />
-      <Comment text="Tools for DeFi Risk Management."/>
+      <Header primary="Welcome to Opyn V2 Portal" />
+      <div style={{display: 'flex'}}>
+      <Comment text="Create, manage and trade decentralized options"/>
+      <Help hint={"What is Opyn V2"}>
+      To learn about Opyn V2, visit <LinkBase external href="https://opyn.gitbook.io/opyn-v2/" > GitBook </LinkBase>
+      </Help>
+      </div>
+      <br />
       <div style={{ padding: 5, display: 'flex', alignItems: 'center' }}>
         <div style={{ width: '30%', marginRight: '3%' }}>
 
@@ -27,7 +33,7 @@ function HomePage() {
           />
         </div>
 
-        <div style={{ width: '30%' }}>
+        {/* <div style={{ width: '30%',  marginRight: '3%' }}>
           <MainButton
             title="Trade"
             description="Coming Soon"
@@ -36,9 +42,9 @@ function HomePage() {
               history.push('/trade/');
             }}
           />
+        </div> */}
 
-        </div>
-        <div style={{ width: '30%', marginLeft: '3%' }}>
+        <div style={{ width: '30%' }}>
           <MainButton
             title="Protocol"
             description="Protocol configs"
