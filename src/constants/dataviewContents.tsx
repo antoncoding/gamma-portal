@@ -30,7 +30,7 @@ export const VAULT_HISTORY = {
 export const OPERATORS = {
   default: {
     title: 'No Operators',
-    subtitle: 'You can add operators to act on your behave',
+    subtitle: 'You can add operators to act on your behalf',
     illustration: EmptyState,
   },
   loading: {

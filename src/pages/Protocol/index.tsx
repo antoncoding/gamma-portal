@@ -14,12 +14,12 @@ function ProtocolPage() {
   return (
     <>
       <Header primary="Protocol" />
-      <Comment text="Advance Settings of opyn v2" />
+      <Comment text="Advanced Settings of Opyn v2" />
       <div style={{ padding: 5, display: 'flex', alignItems: 'center' }}>
         <div style={{ width: '30%', marginRight: '3%' }}>
           <MainButton
             title="Oracle"
-            description="Submit Price / See oracl config"
+            description="Submit Price / See oracle config"
             icon={<IconCoin size="large" />}
             onClick={() => {
               history.push('/system/oracle/')
