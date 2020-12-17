@@ -16,7 +16,6 @@ import { ZERO_ADDR } from '../../constants/addresses'
 import { PRICE_SUBMISSION } from '../../constants/dataviewContents'
 
 export default function Oracle() {
-
   const { networkId } = useContext(walletContext)
   const toast = useToast()
   const [isLoadingHistory, setIsLoadingHistory] = useState(true)
@@ -26,12 +25,16 @@ export default function Oracle() {
 
   // const [expiryIdxToSubmit, setExpiryIdxToSubmit] = useState(-1)
 
-  const allOracleAssets = useAsyncMemo(async () => {
-    const assets = await getOracleAssetsAndPricers(networkId, toast)
-    setIsLoadingHistory(false)
-    if(assets && assets.length > 0) setSelectedAssetIndex(0)
-    return assets === null ? [] : assets
-  }, [], [])
+  const allOracleAssets = useAsyncMemo(
+    async () => {
+      const assets = await getOracleAssetsAndPricers(networkId, toast)
+      setIsLoadingHistory(false)
+      if (assets && assets.length > 0) setSelectedAssetIndex(0)
+      return assets === null ? [] : assets
+    },
+    [],
+    [],
+  )
 
   // const allOTokens = useAsyncMemo(async () => {
   //   const oTokens = await getOTokens(networkId, toast)
@@ -45,19 +48,19 @@ export default function Oracle() {
   //     .filter(expiry => expiry < Date.now() / 1000)
   //     .filter(expiry => !alreadySet.includes(expiry)))
   //   return Array.from(unique)
-    
+
   // }, [assetHistory, allOTokens])
 
-  const haveValidSelection = useMemo(()=>allOracleAssets.length > 0 && selectedAssetIndex !== -1, 
-  [allOracleAssets, selectedAssetIndex]) 
-  
+  const haveValidSelection = useMemo(() => allOracleAssets.length > 0 && selectedAssetIndex !== -1, [
+    allOracleAssets,
+    selectedAssetIndex,
+  ])
+
   // update ths history array
   useEffect(() => {
     if (!haveValidSelection) return
     setAssetHistory(allOracleAssets[selectedAssetIndex].prices)
-  },
-  [selectedAssetIndex, allOracleAssets, haveValidSelection]
-  )
+  }, [selectedAssetIndex, allOracleAssets, haveValidSelection])
 
   // const setPrice = useCallback(
   //   () => {
@@ -95,35 +98,38 @@ export default function Oracle() {
       <SectionTitle title="Asset Detail" />
       <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '3%' }}>
         <div style={{ width: '30%' }}>
-          <LabelText label='Pricer' />
-          <CustomIdentityBadge 
-            label={haveValidSelection ? pricerMap[allOracleAssets[selectedAssetIndex].asset.symbol] : 'Unknown'}  
+          <LabelText label="Pricer" />
+          <CustomIdentityBadge
+            label={haveValidSelection ? pricerMap[allOracleAssets[selectedAssetIndex].asset.symbol] : 'Unknown'}
             entity={haveValidSelection ? allOracleAssets[selectedAssetIndex].pricer.id : ZERO_ADDR}
           />
         </div>
 
         <div style={{ width: '30%' }}>
-        <div style={{display:'flex'}}>
-          <LabelText label='Locking Period' /> 
-          <Help hint={"What is locking period"} > 
-            Period of time after expiry that price submission will not be accepted.
-          </Help>
-        </div>
-          <div style={{paddingTop: '3%'}}>
-          { haveValidSelection ? Number(allOracleAssets[selectedAssetIndex].pricer.lockingPeriod) / 60 : 0 } Minutes
+          <div style={{ display: 'flex' }}>
+            <LabelText label="Locking Period" />
+            <Help hint={'What is locking period'}>
+              Period of time after expiry that price submission will not be accepted.
+            </Help>
+          </div>
+          <div style={{ paddingTop: '3%' }}>
+            {haveValidSelection ? Number(allOracleAssets[selectedAssetIndex].pricer.lockingPeriod) / 60 : 0} Minutes
           </div>
         </div>
 
         <div style={{ width: '30%' }}>
-          <div style={{display:'flex'}}> <LabelText label='Dispute Period' /> <Help hint={"What is dispute period"} > 
-            Period of time after price submission that the price can be overrided by the disputer.
-          </Help> </div>
-          <div style={{paddingTop: '3%'}}>
-          { haveValidSelection ? Number(allOracleAssets[selectedAssetIndex].pricer.disputePeriod) / 60 : 0 } Minutes
+          <div style={{ display: 'flex' }}>
+            {' '}
+            <LabelText label="Dispute Period" />{' '}
+            <Help hint={'What is dispute period'}>
+              Period of time after price submission that the price can be overrided by the disputer.
+            </Help>{' '}
+          </div>
+          <div style={{ paddingTop: '3%' }}>
+            {haveValidSelection ? Number(allOracleAssets[selectedAssetIndex].pricer.disputePeriod) / 60 : 0} Minutes
           </div>
         </div>
       </div>
-      
       {/* <SectionTitle title="Submit Price" />
 
       <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '3%' }}>
@@ -147,22 +153,21 @@ export default function Oracle() {
           />
         </div>
       </div> */}
-
       <SectionTitle title="Price Submissions" />
       <DataView
         status={isLoadingHistory ? 'loading' : 'default'}
         fields={['Expiry', 'Price', 'Submitted Timestamp', 'Submitted By']}
         emptyState={PRICE_SUBMISSION}
         entriesPerPage={8}
-        entries={assetHistory.sort((a,b) => Number(a.expiry) > Number(b.expiry) ? -1 : 1)}
-        renderEntry={({expiry, reportedTimestamp, price, isDisputed}: SubgraphPriceEntry) => {
+        entries={assetHistory.sort((a, b) => (Number(a.expiry) > Number(b.expiry) ? -1 : 1))}
+        renderEntry={({ expiry, reportedTimestamp, price, isDisputed }: SubgraphPriceEntry) => {
           const tag = isDisputed ? <Tag mode="new"> Disputer </Tag> : <Tag> Pricer </Tag>
           return [
             expiryToDate(expiry),
             `${toTokenAmount(new BigNumber(price), 8).toString()} USD`,
             reportedTimestamp,
-            tag
-            ]
+            tag,
+          ]
         }}
       />
     </>

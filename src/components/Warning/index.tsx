@@ -1,16 +1,9 @@
-import React from 'react';
-import { useTheme } from '@aragon/ui';
+import React from 'react'
+import { useTheme } from '@aragon/ui'
 
-function WarningText({ text, show = false }:{text:string, show: boolean}) {
-  const theme = useTheme();
-  return (
-    show ?
-    <div style={{ color: theme.warning, fontSize: 12, padding: '3px' }}>
-      {text}
-    </div> :
-    <></>
-  );
+function WarningText({ text, show = false }: { text: string; show: boolean }) {
+  const theme = useTheme()
+  return show ? <div style={{ color: theme.warning, fontSize: 12, padding: '3px' }}>{text}</div> : <></>
 }
 
-
-export default WarningText;
+export default WarningText

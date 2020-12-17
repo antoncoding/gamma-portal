@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { getPreference, storePreference } from '../utils/storage'
-import Onboard from 'bnc-onboard';
-import Web3 from 'web3';
+import Onboard from 'bnc-onboard'
+import Web3 from 'web3'
 
-const INFURA_KEY = process.env.REACT_APP_INFURA_KEY;
-const BLOCKNATIVE_KEY = process.env.REACT_APP_BLOCKNATIVE_KEY;
-const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY;
+const INFURA_KEY = process.env.REACT_APP_INFURA_KEY
+const BLOCKNATIVE_KEY = process.env.REACT_APP_BLOCKNATIVE_KEY
+const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY
 
 export const useConnection = () => {
   const [user, setUser] = useState<string>('')
@@ -25,49 +25,45 @@ export const useConnection = () => {
   }, [])
 
   // function for block native sdk when wallet is updated
-  const setWalletCallback = useCallback((wallet) => {
-    storePreference('selectedWallet', wallet.name);
-    const web3Instance = new Web3(wallet.provider);
+  const setWalletCallback = useCallback(wallet => {
+    storePreference('selectedWallet', wallet.name)
+    const web3Instance = new Web3(wallet.provider)
     setWeb3(web3Instance)
   }, [])
 
   const onboard = useMemo(() => {
     return initOnboard(setAddressCallback, setWalletCallback, networkId)
-  }, [setAddressCallback, setWalletCallback, networkId]
-  )
+  }, [setAddressCallback, setWalletCallback, networkId])
 
   // get last connection info and try to set default user to previous connected account.
   useEffect(() => {
     async function getDefault() {
-      const previouslySelectedWallet = getPreference('selectedWallet', 'null');
+      const previouslySelectedWallet = getPreference('selectedWallet', 'null')
       if (previouslySelectedWallet === 'null') return
       const selected = await onboard.walletSelect(previouslySelectedWallet)
 
       if (selected) {
-        const address = onboard.getState().address;
-        if (address !== null) setAddressCallback(address);
+        const address = onboard.getState().address
+        if (address !== null) setAddressCallback(address)
       }
-
-    };
-    getDefault();
-  },
-    [onboard, setAddressCallback]
-  )
+    }
+    getDefault()
+  }, [onboard, setAddressCallback])
 
   const connect = useCallback(async () => {
-    const selected = await onboard.walletSelect();
-    if (!selected) return false;
-    const checked = await onboard.walletCheck();
-    if (!checked) return false;
-    const account = onboard.getState().address;
+    const selected = await onboard.walletSelect()
+    if (!selected) return false
+    const checked = await onboard.walletCheck()
+    if (!checked) return false
+    const account = onboard.getState().address
     setUser(account)
     return account
-  }, [onboard]);
+  }, [onboard])
 
   const disconnect = useCallback(async () => {
-    onboard.walletReset();
+    onboard.walletReset()
     setUser('')
-  }, [onboard]);
+  }, [onboard])
 
   return { networkId, setNetworkId, user, setUser, web3, connect, disconnect, readOnlyUser, setReadOnlyUser }
 }
@@ -104,7 +100,6 @@ export const initOnboard = (addressChangeCallback, walletChangeCallback, network
       { checkName: 'accounts' },
       { checkName: 'network' },
     ],
-  });
+  })
   return onboard
-
-};
+}

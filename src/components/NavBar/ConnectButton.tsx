@@ -1,21 +1,18 @@
-import React, { useContext } from 'react';
+import React, { useContext } from 'react'
 
-import {
-  Button, IconConnect, Box, IconPower, IdentityBadge
-} from '@aragon/ui';
+import { Button, IconConnect, Box, IconPower, IdentityBadge } from '@aragon/ui'
 
-import { checkAddressAndAddToStorage } from '../../utils/storage';
+import { checkAddressAndAddToStorage } from '../../utils/storage'
 import { walletContext } from '../../contexts/wallet'
 
 function ConnectButton() {
-
   const { connect, disconnect, user } = useContext(walletContext)
 
   const connectWeb3 = async () => {
-    const address = await connect();
-    if (!address) return;
-    checkAddressAndAddToStorage(address);
-  };
+    const address = await connect()
+    if (!address) return
+    checkAddressAndAddToStorage(address)
+  }
 
   return user !== '' ? (
     <>
@@ -23,17 +20,19 @@ function ConnectButton() {
         <IdentityBadge
           entity={user}
           popoverAction={{
-            label: <><IconPower></IconPower> Disconnect </>,
-            onClick: disconnect
+            label: (
+              <>
+                <IconPower></IconPower> Disconnect{' '}
+              </>
+            ),
+            onClick: disconnect,
           }}
         />
       </Box>
-
     </>
   ) : (
-      <Button mode="normal" icon={<IconConnect />} label="Connect" onClick={connectWeb3} />
-    );
+    <Button mode="normal" icon={<IconConnect />} label="Connect" onClick={connectWeb3} />
+  )
 }
 
-
-export default ConnectButton;
+export default ConnectButton

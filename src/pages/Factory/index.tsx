@@ -14,7 +14,6 @@ import { ZERO_ADDR } from '../../constants/addresses'
 import WarningText from '../../components/Warning'
 
 export default function CreateOption() {
-
   const { networkId, web3, user } = useContext(walletContext)
   const toast = useToast()
   const [selectedProductIndex, setSelectedProductIndex] = useState(-1)
@@ -32,28 +31,32 @@ export default function CreateOption() {
     try {
       const date = new Date(expiryTimestamp.times(1000).toNumber()).toISOString().split('T')[0]
       return date
-    } catch(error) {
+    } catch (error) {
       return ''
     }
   }, [expiryTimestamp])
 
-  const allProducts = useAsyncMemo(async () => {
-    const products = await getWhitelistedProducts(networkId, toast)
-    if (products === null) return []
+  const allProducts = useAsyncMemo(
+    async () => {
+      const products = await getWhitelistedProducts(networkId, toast)
+      if (products === null) return []
 
-    return products.map(product => {
-      const type = product.isPut ? 'Put' : 'Call'
-      const optionName = `${product.underlying.symbol}-${product.strike.symbol} ${type} ${product.collateral.symbol} Collateral`
-      return {
-        label: optionName,
-        ...product
-      }
-    })
-  }, [], [])
+      return products.map(product => {
+        const type = product.isPut ? 'Put' : 'Call'
+        const optionName = `${product.underlying.symbol}-${product.strike.symbol} ${type} ${product.collateral.symbol} Collateral`
+        return {
+          label: optionName,
+          ...product,
+        }
+      })
+    },
+    [],
+    [],
+  )
 
   // make sure expiry to be UTC 0800
   useEffect(() => {
-    if ((expiryTimestamp.minus(28800)).mod(86400).isGreaterThan(0)) {
+    if (expiryTimestamp.minus(28800).mod(86400).isGreaterThan(0)) {
       setHasWarning(true)
       setExpiryWarning('Expiry time need to be 08:00 AM UTC')
     } else {
@@ -77,33 +80,42 @@ export default function CreateOption() {
     // check if the option has been created.
     try {
       await factory.createOToken(underlying.id, strike.id, collateral.id, strikePrice, expiryTimestamp, isPut)
-    } catch(error) {}
-    finally {
+    } catch (error) {
+    } finally {
       setIsCreating(false)
     }
   }
 
-  const computeAddress = useCallback(async (idx, strikePrice, expiry)=> {
-    const factory = new OTokenFactory(web3, networkId, user)
-    if (idx === -1) {
-      return
-    }
-    const underlying = allProducts[idx].underlying
-    const strike = allProducts[idx].strike
-    const collateral = allProducts[idx].collateral
-    const isPut = allProducts[idx].isPut
-    // check if the option has been created.
-    const targetAddress = await factory.getTargetOtokenAddress(underlying.id, strike.id, collateral.id, strikePrice, expiry, isPut)
-    setTargetAddress(targetAddress)
-    const isCreated = await factory.isCreated(underlying.id, strike.id, collateral.id, strikePrice, expiry, isPut)
-    setIsDuplicated(isCreated)
-  }, [allProducts, networkId, user, web3])
+  const computeAddress = useCallback(
+    async (idx, strikePrice, expiry) => {
+      const factory = new OTokenFactory(web3, networkId, user)
+      if (idx === -1) {
+        return
+      }
+      const underlying = allProducts[idx].underlying
+      const strike = allProducts[idx].strike
+      const collateral = allProducts[idx].collateral
+      const isPut = allProducts[idx].isPut
+      // check if the option has been created.
+      const targetAddress = await factory.getTargetOtokenAddress(
+        underlying.id,
+        strike.id,
+        collateral.id,
+        strikePrice,
+        expiry,
+        isPut,
+      )
+      setTargetAddress(targetAddress)
+      const isCreated = await factory.isCreated(underlying.id, strike.id, collateral.id, strikePrice, expiry, isPut)
+      setIsDuplicated(isCreated)
+    },
+    [allProducts, networkId, user, web3],
+  )
 
   // recompute address when input changes
   useEffect(() => {
     computeAddress(selectedProductIndex, strikePrice, expiryTimestamp)
   }, [computeAddress, selectedProductIndex, strikePrice, expiryTimestamp])
-
 
   return (
     <>
@@ -115,72 +127,97 @@ export default function CreateOption() {
         selected={selectedProductIndex}
         onChange={setSelectedProductIndex}
       />
-      <br/><br/>
+      <br />
+      <br />
       <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '3%' }}>
-
         <div style={{ width: '20%', marginRight: '5%' }}>
-          <LabelText label='Underlying' />
-          <TokenAddress token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].underlying : null} nullLabel="N/A" />
+          <LabelText label="Underlying" />
+          <TokenAddress
+            token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].underlying : null}
+            nullLabel="N/A"
+          />
         </div>
 
         <div style={{ width: '20%', marginRight: '5%' }}>
-          <LabelText label='Strike' />
-          <TokenAddress token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].strike : null} nullLabel="N/A" />
+          <LabelText label="Strike" />
+          <TokenAddress
+            token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].strike : null}
+            nullLabel="N/A"
+          />
         </div>
 
         <div style={{ width: '20%', marginRight: '5%' }}>
-          <LabelText label='Collateral' />
-          <TokenAddress token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].collateral : null} nullLabel="N/A" />
+          <LabelText label="Collateral" />
+          <TokenAddress
+            token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].collateral : null}
+            nullLabel="N/A"
+          />
         </div>
 
         <div style={{ width: '20%', marginRight: '5%' }}>
           <LabelText label="Type" />
-          {allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].isPut ? "Put" : "Call": 'Put'} Option
+          {allProducts[selectedProductIndex] ? (allProducts[selectedProductIndex].isPut ? 'Put' : 'Call') : 'Put'}{' '}
+          Option
         </div>
-
       </div>
       <SectionTitle title="Details" />
 
-
       <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '1%' }}>
-
         <div style={{ width: '20%' }}>
-          <LabelText label='Strike Price' />
-          <TextInput type="number" value={strikePriceReadable} onChange={(e) => setStrikePriceReadable(new BigNumber(e.target.value))} wide />
+          <LabelText label="Strike Price" />
+          <TextInput
+            type="number"
+            value={strikePriceReadable}
+            onChange={e => setStrikePriceReadable(new BigNumber(e.target.value))}
+            wide
+          />
         </div>
 
         <div style={{ width: '20%', marginLeft: '5%' }}>
-          <LabelText label='Expiry Date (08:00 UTC)' />
-          <TextInput 
-            type="date" 
-            value={expiryDate} 
-            onChange={(e) => {
+          <LabelText label="Expiry Date (08:00 UTC)" />
+          <TextInput
+            type="date"
+            value={expiryDate}
+            onChange={e => {
               const dateSelected = new Date(e.target.value)
               const dateUTC = Date.UTC(dateSelected.getFullYear(), dateSelected.getMonth(), dateSelected.getDate(), 8)
               const expiry = new BigNumber(dateUTC / 1000)
               setExpiryTimestamp(expiry)
-            }} 
-            wide />
+            }}
+            wide
+          />
           <Warning text={expiryWarning} show={hasExpiryWarning} />
         </div>
 
         <div style={{ width: '20%', marginLeft: '5%' }}>
-          <div style={{display: 'flex'}}> <LabelText label='Create!' /> <WarningText text="This option has been created" show={isDuplicated} /> </div>
-          <Button wide disabled={isDuplicated || isCreating} onClick={createOToken}> {isCreating ? <> <LoadingRing /> <span style={{paddingLeft: '5px'}}>Createing </span>  </> : "Create"}  </Button>
+          <div style={{ display: 'flex' }}>
+            {' '}
+            <LabelText label="Create!" /> <WarningText text="This option has been created" show={isDuplicated} />{' '}
+          </div>
+          <Button wide disabled={isDuplicated || isCreating} onClick={createOToken}>
+            {' '}
+            {isCreating ? (
+              <>
+                {' '}
+                <LoadingRing /> <span style={{ paddingLeft: '5px' }}>Createing </span>{' '}
+              </>
+            ) : (
+              'Create'
+            )}{' '}
+          </Button>
         </div>
 
         <div style={{ width: '20%', marginLeft: '5%' }}>
-          <div style={{display: 'flex'}}> 
-            <LabelText label='Output' /> 
-            <Help hint={"What is this output address"}>
-              The address the new oToken will be created at.
-              In Opyn V2, we use CREATE2 opcode to create new oToken contracts, so we can predict a contract address before actual deployments.
+          <div style={{ display: 'flex' }}>
+            <LabelText label="Output" />
+            <Help hint={'What is this output address'}>
+              The address the new oToken will be created at. In Opyn V2, we use CREATE2 opcode to create new oToken
+              contracts, so we can predict a contract address before actual deployments.
             </Help>
           </div>
-          <AddressField address={targetAddress}/>
+          <AddressField address={targetAddress} />
         </div>
       </div>
-
     </>
   )
 }

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext } from 'react'
 
 import SectionTitle from '../../components/SectionHeader'
 
@@ -10,17 +10,17 @@ import { SupportedNetworks } from '../../constants/networks'
 
 const items = [
   {
-    title: 'Mainnet', 
-    description: `Subgraph endpoint: ${subgraph[SupportedNetworks.Mainnet]}`
+    title: 'Mainnet',
+    description: `Subgraph endpoint: ${subgraph[SupportedNetworks.Mainnet]}`,
   },
   // {
-  //   title: 'Rinkeby', 
+  //   title: 'Rinkeby',
   //   description: `Subgraph endpoint: ${subgraph[SupportedNetworks.Rinkeby]}`
   // },
   {
-    title: 'Kovan', 
-    description: `Subgraph endpoint: ${subgraph[SupportedNetworks.Kovan]}`
-  }
+    title: 'Kovan',
+    description: `Subgraph endpoint: ${subgraph[SupportedNetworks.Kovan]}`,
+  },
 ]
 
 const idxToNetworkId = [1, 42, 4]
@@ -34,18 +34,17 @@ function Network() {
   const toast = useToast()
   const { networkId, setNetworkId } = useContext(walletContext)
 
-  const [selectedIdx, setSelectedIdx] = useState(networkIdToIdx[networkId]) 
+  const [selectedIdx, setSelectedIdx] = useState(networkIdToIdx[networkId])
 
   return (
     <>
       <SectionTitle title="Network" />
-      <div style={{display: 'flex'}}>
-        <RadioList 
+      <div style={{ display: 'flex' }}>
+        <RadioList
           title={'Switch between networks'}
           items={items}
           selected={selectedIdx}
           onChange={(selectedIdx: number) => {
-            
             const newNetworkId = idxToNetworkId[selectedIdx]
             if (newNetworkId === 1) {
               toast('Mainnet not ready yet!')
@@ -60,7 +59,7 @@ function Network() {
         />
       </div>
     </>
-  );
+  )
 }
 
-export default Network;
+export default Network

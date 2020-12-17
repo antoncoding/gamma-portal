@@ -1,4 +1,4 @@
-import {SupportedNetworks} from './networks'
+import { SupportedNetworks } from './networks'
 
 type graphEndPointType = {
   [key in SupportedNetworks]: string

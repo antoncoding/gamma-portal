@@ -1,14 +1,25 @@
 import React, { useContext, useMemo, useState, useCallback, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
-import { useParams } from 'react-router-dom';
-import { TextInput, Button, DataView, useToast, Tag, Header, IconCirclePlus, IconCircleMinus, DropDown, LoadingRing } from '@aragon/ui'
+import { useParams } from 'react-router-dom'
+import {
+  TextInput,
+  Button,
+  DataView,
+  useToast,
+  Tag,
+  Header,
+  IconCirclePlus,
+  IconCircleMinus,
+  DropDown,
+  LoadingRing,
+} from '@aragon/ui'
 import History from './history'
 
 import { walletContext } from '../../contexts/wallet'
 import { Controller } from '../../utils/contracts/controller'
 import CustomIdentityBadge from '../../components/CustomIdentityBadge'
 
-import useAsyncMemo from '../../hooks/useAsyncMemo';
+import useAsyncMemo from '../../hooks/useAsyncMemo'
 import { useTokenByAddress } from '../../hooks/useToken'
 import { useOTokenBalances } from '../../hooks/useOTokenBalances'
 import { useTokenBalance } from '../../hooks/useTokenBalance'
@@ -20,7 +31,6 @@ import { ZERO_ADDR, tokens } from '../../constants/addresses'
 import { SubgraphOToken } from '../../types'
 
 export default function VaultDetail() {
-
   const [vaultExpiry, setVaultExpiry] = useState<string>('0')
   const [isLoading, setIsLoading] = useState(true)
 
@@ -43,23 +53,36 @@ export default function VaultDetail() {
   const { owner, vaultId } = useParams()
   const toast = useToast()
 
-  const vaultDetail = useAsyncMemo(async () => {
-    const result = await getVault(networkId, owner, vaultId, toast)
-    setIsLoading(false)
-    return result
-  }, null, [networkId, owner, toast, vaultId])
+  const vaultDetail = useAsyncMemo(
+    async () => {
+      const result = await getVault(networkId, owner, vaultId, toast)
+      setIsLoading(false)
+      return result
+    },
+    null,
+    [networkId, owner, toast, vaultId],
+  )
 
-  const allOtokens = useAsyncMemo(async () => {
-    const result = await getLiveOTokens(networkId, toast)
-    return result
-  }, [], [networkId, toast])
+  const allOtokens = useAsyncMemo(
+    async () => {
+      const result = await getLiveOTokens(networkId, toast)
+      return result
+    },
+    [],
+    [networkId, toast],
+  )
 
   const { balances } = useOTokenBalances(user, networkId)
 
   /**
    * Use asyncMemo to trigger a rerender when isSendingTx changes.
    */
-  const controller = useAsyncMemo(async () => new Controller(web3, networkId, user), new Controller(null, 42, ''), [networkId, user, web3, isSendingTx])
+  const controller = useAsyncMemo(async () => new Controller(web3, networkId, user), new Controller(null, 42, ''), [
+    networkId,
+    user,
+    web3,
+    isSendingTx,
+  ])
 
   const isAuthorized = useMemo(() => {
     if (vaultDetail === null) return false
@@ -67,13 +90,22 @@ export default function VaultDetail() {
     else return vaultDetail.owner.operators.map(o => o.operator.id).includes(user)
   }, [vaultDetail, owner, user])
 
-  const collateralToken = useTokenByAddress(vaultDetail && vaultDetail.collateralAsset ? vaultDetail.collateralAsset.id : tokens[networkId][selectedCollateralIndex].address, networkId)
+  const collateralToken = useTokenByAddress(
+    vaultDetail && vaultDetail.collateralAsset
+      ? vaultDetail.collateralAsset.id
+      : tokens[networkId][selectedCollateralIndex].address,
+    networkId,
+  )
 
-  const shortOtoken = useMemo(() => (vaultDetail && vaultDetail.shortOToken) || selectedShort || null
-    , [vaultDetail, selectedShort])
+  const shortOtoken = useMemo(() => (vaultDetail && vaultDetail.shortOToken) || selectedShort || null, [
+    vaultDetail,
+    selectedShort,
+  ])
 
-  const longOtoken = useMemo(() => (vaultDetail && vaultDetail.longOToken) || selectedLong || null
-    , [vaultDetail, selectedLong])
+  const longOtoken = useMemo(() => (vaultDetail && vaultDetail.longOToken) || selectedLong || null, [
+    vaultDetail,
+    selectedLong,
+  ])
 
   const collateralBalance = useTokenBalance(collateralToken.address, user, 20)
 
@@ -89,7 +121,6 @@ export default function VaultDetail() {
     return target ? target.balance : new BigNumber(0)
   }, [balances, shortOtoken])
 
-
   useEffect(() => {
     if (shortOtoken) {
       setVaultExpiry(shortOtoken.expiryTimestamp)
@@ -101,7 +132,6 @@ export default function VaultDetail() {
       setSelectedCollateralIndex(collateralIdx)
     } else {
       setVaultExpiry('0')
-
     }
   }, [networkId, shortOtoken, longOtoken, setVaultExpiry])
 
@@ -109,7 +139,9 @@ export default function VaultDetail() {
   const allShorts = useMemo(() => {
     if (!allOtokens) return []
 
-    const sameCollateral = allOtokens.filter(o => o.collateralAsset.id === collateralToken.address || collateralToken.address === ZERO_ADDR)
+    const sameCollateral = allOtokens.filter(
+      o => o.collateralAsset.id === collateralToken.address || collateralToken.address === ZERO_ADDR,
+    )
 
     const sameExpiry = sameCollateral.filter(o => o.expiryTimestamp === vaultExpiry || vaultExpiry === '0')
 
@@ -119,12 +151,12 @@ export default function VaultDetail() {
   // long tokens needs to be something that user have in their wallet.
   const allLongs = useMemo(() => {
     if (!allOtokens) return []
-    if (!balances) return allShorts;
+    if (!balances) return allShorts
     // which user has balance
     const hasBalance = allShorts.filter(short => {
       const target = balances.find(b => b.token.id === short.id)
       return target !== undefined && target.balance.gt(new BigNumber(0))
-    });
+    })
     return hasBalance
   }, [allOtokens, balances, allShorts])
 
@@ -133,7 +165,13 @@ export default function VaultDetail() {
       toast('Select collateral asset first')
       return
     }
-    controller.pushAddCollateralArg(user, vaultId, user, collateralToken.address, fromTokenAmount(changeCollateralAmount, collateralToken.decimals))
+    controller.pushAddCollateralArg(
+      user,
+      vaultId,
+      user,
+      collateralToken.address,
+      fromTokenAmount(changeCollateralAmount, collateralToken.decimals),
+    )
     setChangeCollateralAmount(new BigNumber(0))
     setPendingCollateralAmount(` + ${changeCollateralAmount.toString()}`)
   }, [collateralToken, controller, user, vaultId, changeCollateralAmount, toast])
@@ -143,7 +181,13 @@ export default function VaultDetail() {
       toast('Select collateral asset first')
       return
     }
-    controller.pushRemoveCollateralArg(user, vaultId, user, collateralToken.address, fromTokenAmount(changeCollateralAmount, collateralToken.decimals))
+    controller.pushRemoveCollateralArg(
+      user,
+      vaultId,
+      user,
+      collateralToken.address,
+      fromTokenAmount(changeCollateralAmount, collateralToken.decimals),
+    )
     setChangeCollateralAmount(new BigNumber(0))
     setPendingCollateralAmount(` - ${changeCollateralAmount.toString()}`)
   }, [controller, user, vaultId, collateralToken.address, collateralToken.decimals, changeCollateralAmount, toast])
@@ -195,11 +239,9 @@ export default function VaultDetail() {
   const expired = useMemo(() => {
     if (!vaultDetail) return false
 
-    if (vaultDetail.shortOToken && isExpired(vaultDetail.shortOToken))
-      return true
+    if (vaultDetail.shortOToken && isExpired(vaultDetail.shortOToken)) return true
 
-    if (vaultDetail.longOToken && isExpired(vaultDetail.longOToken))
-      return true;
+    if (vaultDetail.longOToken && isExpired(vaultDetail.longOToken)) return true
 
     return false
   }, [vaultDetail])
@@ -208,45 +250,80 @@ export default function VaultDetail() {
     await controller.simpleSettle(user, vaultId, user)
   }, [controller, user, vaultId])
 
-  const renderRow = useCallback(({ label, symbol, asset, amount, balance, decimals, onInputChange, inputValue, onClickAdd, onClickMinus, dropdownSelected, dropdownOnChange, dropdownItems, pendingAmount }) => {
-    const amountToDisplay = amount
-      ? <div> {toTokenAmount(new BigNumber(amount), decimals).toString()} <span style={{ opacity: 0.5 }}> {pendingAmount} </span> </div>
-      : <div> 0 <span style={{ opacity: 0.5 }}> {pendingAmount} </span> </div>
-    const pendingBalance = label === 'Short' ? pendingAmount : inversePendingAmountString(pendingAmount)
-    const balanceToDisplay =
-      <div> {toTokenAmount(balance, decimals).toString()} <span style={{ opacity: 0.5 }}> {pendingBalance}  </span> </div>
+  const renderRow = useCallback(
+    ({
+      label,
+      symbol,
+      asset,
+      amount,
+      balance,
+      decimals,
+      onInputChange,
+      inputValue,
+      onClickAdd,
+      onClickMinus,
+      dropdownSelected,
+      dropdownOnChange,
+      dropdownItems,
+      pendingAmount,
+    }) => {
+      const amountToDisplay = amount ? (
+        <div>
+          {' '}
+          {toTokenAmount(new BigNumber(amount), decimals).toString()}{' '}
+          <span style={{ opacity: 0.5 }}> {pendingAmount} </span>{' '}
+        </div>
+      ) : (
+        <div>
+          {' '}
+          0 <span style={{ opacity: 0.5 }}> {pendingAmount} </span>{' '}
+        </div>
+      )
+      const pendingBalance = label === 'Short' ? pendingAmount : inversePendingAmountString(pendingAmount)
+      const balanceToDisplay = (
+        <div>
+          {' '}
+          {toTokenAmount(balance, decimals).toString()} <span style={{ opacity: 0.5 }}> {pendingBalance} </span>{' '}
+        </div>
+      )
 
-    return [
-      <div style={{ opacity: 0.8 }}> {label} </div>,
-      asset
-        ? <CustomIdentityBadge shorten={true} entity={asset} label={symbol} />
-        : <DropDown
-          items={dropdownItems}
-          selected={dropdownSelected}
-          onChange={dropdownOnChange}
-        />,
-      balanceToDisplay,
-      amountToDisplay,
-      <>
-        <TextInput type="number" disabled={expired} onChange={onInputChange} value={inputValue} />
-        <Button label="Add" disabled={expired} display="icon" icon={<IconCirclePlus />} onClick={onClickAdd} />
-        <Button label="Remove" disabled={expired} display="icon" icon={<IconCircleMinus />} onClick={onClickMinus} />
-      </>
-    ]
-  }, [expired])
+      return [
+        <div style={{ opacity: 0.8 }}> {label} </div>,
+        asset ? (
+          <CustomIdentityBadge shorten={true} entity={asset} label={symbol} />
+        ) : (
+          <DropDown items={dropdownItems} selected={dropdownSelected} onChange={dropdownOnChange} />
+        ),
+        balanceToDisplay,
+        amountToDisplay,
+        <>
+          <TextInput type="number" disabled={expired} onChange={onInputChange} value={inputValue} />
+          <Button label="Add" disabled={expired} display="icon" icon={<IconCirclePlus />} onClick={onClickAdd} />
+          <Button label="Remove" disabled={expired} display="icon" icon={<IconCircleMinus />} onClick={onClickMinus} />
+        </>,
+      ]
+    },
+    [expired],
+  )
 
   return (
     <>
       <Header
         primary={
           <div style={{ fontSize: 26 }}>
-            Vault Detail {isAuthorized && <span style={{ paddingBottom: 10 }}><Tag mode="new">My vault</Tag></span>}
+            Vault Detail{' '}
+            {isAuthorized && (
+              <span style={{ paddingBottom: 10 }}>
+                <Tag mode="new">My vault</Tag>
+              </span>
+            )}
           </div>
         }
         secondary={
-          expired
-            ? <Button label="Settle" onClick={simpleSettle} />
-            : <Button
+          expired ? (
+            <Button label="Settle" onClick={simpleSettle} />
+          ) : (
+            <Button
               mode="strong"
               disabled={controller.actions.length === 0 || isSendingTx}
               onClick={() => {
@@ -255,12 +332,20 @@ export default function VaultDetail() {
                   setIsSendingTx(false)
                 })
               }}
-            > Operate {
-                isSendingTx
-                  ? <LoadingRing />
-                  : <span style={{ paddingLeft: '7px' }}><Tag>{controller.actions.length}</Tag></span>}
+            >
+              {' '}
+              Operate{' '}
+              {isSendingTx ? (
+                <LoadingRing />
+              ) : (
+                <span style={{ paddingLeft: '7px' }}>
+                  <Tag>{controller.actions.length}</Tag>
+                </span>
+              )}
             </Button>
-        } />
+          )
+        }
+      />
       <DataView
         mode="table"
         status={isLoading ? 'loading' : 'default'}
@@ -274,9 +359,10 @@ export default function VaultDetail() {
             amount: vaultDetail?.collateralAmount,
             pendingAmount: pendingCollateralAmount,
             inputValue: changeCollateralAmount,
-            onInputChange: (e) => (e.target.value ? setChangeCollateralAmount(new BigNumber(e.target.value))
-              : setChangeCollateralAmount(new BigNumber(0))
-            ),
+            onInputChange: e =>
+              e.target.value
+                ? setChangeCollateralAmount(new BigNumber(e.target.value))
+                : setChangeCollateralAmount(new BigNumber(0)),
             onClickAdd: pushAddCollateral,
             onClickMinus: pushRemoveCollateral,
             dropdownSelected: selectedCollateralIndex,
@@ -292,9 +378,10 @@ export default function VaultDetail() {
             amount: vaultDetail?.longAmount,
             pendingAmount: pendingLongAmount,
             inputValue: changeLongAmount,
-            onInputChange: (e) => (e.target.value ? setChangeLongAmount(new BigNumber(e.target.value))
-              : setChangeLongAmount(new BigNumber(0))
-            ),
+            onInputChange: e =>
+              e.target.value
+                ? setChangeLongAmount(new BigNumber(e.target.value))
+                : setChangeLongAmount(new BigNumber(0)),
             onClickAdd: pushAddLong,
             onClickMinus: pushRemoveLong,
             dropdownSelected: longOtoken ? allLongs.findIndex(o => o.id === longOtoken.id) : -1,
@@ -303,7 +390,7 @@ export default function VaultDetail() {
               else setLongOToken(allLongs[idx])
             },
             dropdownItems: allLongs.map(o => o.symbol),
-            balance: longBalance
+            balance: longBalance,
           },
           {
             label: 'Short',
@@ -313,9 +400,10 @@ export default function VaultDetail() {
             amount: vaultDetail?.shortAmount,
             pendingAmount: pendingShortAmount,
             inputValue: changeShortAmount,
-            onInputChange: (e) => (e.target.value ? setChangeShortAmount(new BigNumber(e.target.value))
-              : setChangeShortAmount(new BigNumber(0))
-            ),
+            onInputChange: e =>
+              e.target.value
+                ? setChangeShortAmount(new BigNumber(e.target.value))
+                : setChangeShortAmount(new BigNumber(0)),
             onClickAdd: pushMint,
             onClickMinus: pushBurn,
             dropdownSelected: shortOtoken ? allShorts.findIndex(o => o.id === shortOtoken.id) : -1,
@@ -324,14 +412,14 @@ export default function VaultDetail() {
               else setShortOToken(allShorts[idx])
             },
             dropdownItems: allShorts.map(o => o.symbol),
-            balance: shortBalance
-          }
+            balance: shortBalance,
+          },
         ]}
         renderEntry={renderRow}
       />
-      <br /><br />
+      <br />
+      <br />
       <History />
-
     </>
   )
 }

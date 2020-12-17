@@ -17,7 +17,9 @@ function CustomIdentityBadge({ entity, connectedAccount, label, shorten }: Custo
   const { networkId } = useContext(walletContext)
   const theme = useTheme()
 
-  const [storedLabels, setAllLabels] = useState<{address: string, label: string}[]>(JSON.parse(getPreference('labels', '[]')))
+  const [storedLabels, setAllLabels] = useState<{ address: string; label: string }[]>(
+    JSON.parse(getPreference('labels', '[]')),
+  )
   const [open, setOpened] = useState(false)
 
   const [displayLabel, setDisplayLabel] = useState(label)
@@ -36,14 +38,12 @@ function CustomIdentityBadge({ entity, connectedAccount, label, shorten }: Custo
         setDisplayLabel(label)
       }
     }
-    
-    return () => {
-      
-    }
+
+    return () => {}
   }, [storedLabels, entity, label])
 
   const onClickSave = () => {
-    if (!entity || !newLabel) return;
+    if (!entity || !newLabel) return
     const entry = { address: entity, label: newLabel }
     const newInfos = storedLabels.filter(labels => labels.address !== entity).concat(entry)
     setAllLabels(newInfos)
@@ -57,7 +57,7 @@ function CustomIdentityBadge({ entity, connectedAccount, label, shorten }: Custo
     storePreference('labels', JSON.stringify(newInfos))
     setOpened(false)
   }
-  
+
   return (
     <>
       <IdentityBadge
@@ -67,11 +67,22 @@ function CustomIdentityBadge({ entity, connectedAccount, label, shorten }: Custo
         label={displayLabel}
         shorten={shorten}
         popoverAction={{
-          label: <><IconLabel></IconLabel> Add custom label </>,
-          onClick: () => { setOpened(true) }
+          label: (
+            <>
+              <IconLabel></IconLabel> Add custom label{' '}
+            </>
+          ),
+          onClick: () => {
+            setOpened(true)
+          },
         }}
       />
-      <Modal visible={open} onClose={() => { setOpened(false) }}>
+      <Modal
+        visible={open}
+        onClose={() => {
+          setOpened(false)
+        }}
+      >
         <Header primary={'Add Custom Label'} />
         This label would be displayed instead of the following address and only be stored on this device.
         <br />
@@ -79,13 +90,19 @@ function CustomIdentityBadge({ entity, connectedAccount, label, shorten }: Custo
         <br />
         <br />
         <Label theme={theme}> Custom Label </Label>
-        <TextInput value={newLabel} onChange={(e) => { setNewLabel(e.target.value) }} wide />
+        <TextInput
+          value={newLabel}
+          onChange={e => {
+            setNewLabel(e.target.value)
+          }}
+          wide
+        />
         <div style={{ display: 'flex', paddingTop: '10px' }}>
           <div style={{ marginLeft: 'auto' }}>
-            <Button label="Remove" onClick={onClickRemove}/><Button label="Save" onClick={onClickSave} mode="strong" />
+            <Button label="Remove" onClick={onClickRemove} />
+            <Button label="Save" onClick={onClickSave} mode="strong" />
           </div>
         </div>
-
       </Modal>
     </>
   )
@@ -95,6 +112,6 @@ export default CustomIdentityBadge
 
 const Label = styled.div`
   ${textStyle('label1')}
-  color: ${(props) => props.theme.contentSecondary};
-  padding-bottom: 10px
+  color: ${props => props.theme.contentSecondary};
+  padding-bottom: 10px;
 `
