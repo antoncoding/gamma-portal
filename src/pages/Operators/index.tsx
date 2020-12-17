@@ -62,7 +62,7 @@ export default function OperatorSection() {
   return (
     <>
       <Header primary="Operators" />
-      Operators are addresses which can manipulate your vaults on your behave.
+      Operators are addresses which can manipulate your vaults on your behalf.
       <SectionTitle title="Authorized Operators" />
       <DataView
         status={isLoading ? 'loading' : 'default'}
