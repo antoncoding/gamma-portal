@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import BigNumber from 'bignumber.js'
 import { Header, TextInput, Button, DropDown, useToast, LoadingRing, AddressField, Help } from '@aragon/ui'
 import LabelText from '../../components/LabelText'
 import Warning from '../../components/Warning'
-import { walletContext } from '../../contexts/wallet'
+import { useConnectedWallet } from '../../contexts/wallet'
 import { useAsyncMemo } from '../../hooks/useAsyncMemo'
 import { OTokenFactory } from '../../utils/contracts/factory'
 import { getNextFriday, fromTokenAmount } from '../../utils/math'
@@ -14,7 +14,7 @@ import { ZERO_ADDR } from '../../constants/addresses'
 import WarningText from '../../components/Warning'
 
 export default function CreateOption() {
-  const { networkId, web3, user } = useContext(walletContext)
+  const { networkId, web3, user } = useConnectedWallet()
   const toast = useToast()
   const [selectedProductIndex, setSelectedProductIndex] = useState(-1)
 

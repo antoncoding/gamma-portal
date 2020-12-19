@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useHistory } from 'react-router-dom'
 import { TextInput, DataView, Button, LinkBase, EthIdenticon, useToast, Header } from '@aragon/ui'
 import { getPreference, checkAddressAndAddToStorage } from '../../utils/storage'
 
 import Comment from '../../components/Comment'
-import { walletContext } from '../../contexts/wallet'
+import { useConnectedWallet } from '../../contexts/wallet'
 import { isAddress } from '../../utils/math'
 import { resolveENS } from '../../utils/others'
 
 function Login() {
-  const { user, networkId } = useContext(walletContext)
+  const { user, networkId } = useConnectedWallet()
   const history = useHistory()
   const toast = useToast()
   const [InAddress, setAddress] = useState('')

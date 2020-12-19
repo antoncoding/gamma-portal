@@ -1,8 +1,8 @@
-import React, { useContext, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Button, DataView, TextInput, Header, useToast, Tag } from '@aragon/ui'
 import { useParams } from 'react-router-dom'
 
-import { walletContext } from '../../contexts/wallet'
+import { useConnectedWallet } from '../../contexts/wallet'
 import { Controller } from '../../utils/contracts/controller'
 
 import { getAccount } from '../../utils/graph'
@@ -19,7 +19,7 @@ export default function OperatorSection() {
   const { account } = useParams()
 
   const [isLoading, setIsLoading] = useState(true)
-  const { web3, networkId, user } = useContext(walletContext)
+  const { web3, networkId, user } = useConnectedWallet()
 
   const toast = useToast()
 

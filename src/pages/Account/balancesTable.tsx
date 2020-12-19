@@ -1,10 +1,10 @@
-import React, { useContext, useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { DataView, Button, useToast } from '@aragon/ui'
 import SectionTitle from '../../components/SectionHeader'
 import OpynTokenAmount from '../../components/OpynTokenAmount'
 import { useOTokenBalances } from '../../hooks/useOTokenBalances'
 
-import { walletContext } from '../../contexts/wallet'
+import { useConnectedWallet } from '../../contexts/wallet'
 import { OTokenBalance } from '../../types'
 import { sortByExpiryThanStrike, isExpired } from '../../utils/others'
 
@@ -12,7 +12,7 @@ import { Controller } from '../../utils/contracts/controller'
 import BigNumber from 'bignumber.js'
 
 export default function AccountBalances({ account }: { account: string }) {
-  const { networkId, web3, user } = useContext(walletContext)
+  const { networkId, web3, user } = useConnectedWallet()
 
   const toast = useToast()
 

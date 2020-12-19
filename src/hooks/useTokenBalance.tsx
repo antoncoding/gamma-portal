@@ -1,7 +1,7 @@
-import { useEffect, useState, useContext } from 'react'
+import { useEffect, useState } from 'react'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
-import { walletContext } from '../contexts/wallet'
+import { useConnectedWallet } from '../contexts/wallet'
 import { ZERO_ADDR } from '../constants/addresses'
 
 const erc20Abi = require('../constants/abis/erc20.json')
@@ -14,7 +14,7 @@ const erc20Abi = require('../constants/abis/erc20.json')
  */
 export const useTokenBalance = (token: string, account: string, refetchIntervalSec: number): BigNumber => {
   const [balance, setBalance] = useState(new BigNumber(0))
-  const { web3, networkId } = useContext(walletContext)
+  const { web3, networkId } = useConnectedWallet()
   useEffect(() => {
     let isCancelled = false
 

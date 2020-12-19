@@ -1,10 +1,10 @@
-import React, { useContext, useMemo, useCallback, useState } from 'react'
+import React, { useMemo, useCallback, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { Button, DataView, useToast, Header, Tag, Help } from '@aragon/ui'
 import useAsyncMemo from '../../hooks/useAsyncMemo'
 import { getAccount } from '../../utils/graph'
 
-import { walletContext } from '../../contexts/wallet'
+import { useConnectedWallet } from '../../contexts/wallet'
 import { Controller } from '../../utils/contracts/controller'
 import { SubgraphVault } from '../../types'
 import SectionTitle from '../../components/SectionHeader'
@@ -13,7 +13,7 @@ import CustomIdentityBadge from '../../components/CustomIdentityBadge'
 import { VAULTS } from '../../constants/dataviewContents'
 
 export default function AccountVaults() {
-  const { web3, networkId, user } = useContext(walletContext)
+  const { web3, networkId, user } = useConnectedWallet()
   const { account } = useParams()
 
   const [isLoading, setIsLoading] = useState(true)

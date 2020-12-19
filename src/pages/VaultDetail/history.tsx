@@ -1,10 +1,10 @@
-import React, { useContext, useState, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { DataView, useToast, TransactionBadge } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
 
-import { walletContext } from '../../contexts/wallet'
+import { useConnectedWallet } from '../../contexts/wallet'
 
 import ActionBadgeFromId from '../../components/ActionBadge'
 import SectionTitle from '../../components/SectionHeader'
@@ -22,7 +22,7 @@ import { VAULT_HISTORY } from '../../constants/dataviewContents'
 export default function VaultHistory() {
   const [isLoading, setIsLoading] = useState(true)
 
-  const { networkId } = useContext(walletContext)
+  const { networkId } = useConnectedWallet()
   const { owner, vaultId } = useParams()
   const toast = useToast()
 

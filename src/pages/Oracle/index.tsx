@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Header, DataView, DropDown, useToast, Tag, Help } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
 import LabelText from '../../components/LabelText'
 import CustomIdentityBadge from '../../components/CustomIdentityBadge'
-import { walletContext } from '../../contexts/wallet'
+import { useConnectedWallet } from '../../contexts/wallet'
 import { useAsyncMemo } from '../../hooks/useAsyncMemo'
 import { expiryToDate, toTokenAmount } from '../../utils/math'
 import { getOracleAssetsAndPricers } from '../../utils/graph'
@@ -16,7 +16,7 @@ import { ZERO_ADDR } from '../../constants/addresses'
 import { PRICE_SUBMISSION } from '../../constants/dataviewContents'
 
 export default function Oracle() {
-  const { networkId } = useContext(walletContext)
+  const { networkId } = useConnectedWallet()
   const toast = useToast()
   const [isLoadingHistory, setIsLoadingHistory] = useState(true)
   const [selectedAssetIndex, setSelectedAssetIndex] = useState(-1)
