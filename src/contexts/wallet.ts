@@ -1,4 +1,4 @@
-import { createContext } from 'react'
+import { createContext, useContext } from 'react'
 import Web3 from 'web3'
 import { SupportedNetworks } from '../constants/networks'
 export interface Wallet {
@@ -14,7 +14,7 @@ export interface Wallet {
 }
 
 export const DEFAULT: Wallet = {
-  networkId: 4,
+  networkId: 42,
   web3: null,
   user: '',
   setNetworkId: (networkId: number) => {},
@@ -26,3 +26,4 @@ export const DEFAULT: Wallet = {
 }
 
 export const walletContext = createContext(DEFAULT)
+export const useConnectedWallet = () => useContext(walletContext)

@@ -1,12 +1,12 @@
-import React, { useContext } from 'react'
+import React from 'react'
 
 import { Button, IconConnect, Box, IconPower, IdentityBadge } from '@aragon/ui'
 
 import { checkAddressAndAddToStorage } from '../../utils/storage'
-import { walletContext } from '../../contexts/wallet'
+import { useConnectedWallet } from '../../contexts/wallet'
 
 function ConnectButton() {
-  const { connect, disconnect, user } = useContext(walletContext)
+  const { connect, disconnect, user } = useConnectedWallet()
 
   const connectWeb3 = async () => {
     const address = await connect()

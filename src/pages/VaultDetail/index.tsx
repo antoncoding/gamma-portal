@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState, useCallback, useEffect } from 'react'
+import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import { useParams } from 'react-router-dom'
 import {
@@ -15,7 +15,7 @@ import {
 } from '@aragon/ui'
 import History from './history'
 
-import { walletContext } from '../../contexts/wallet'
+import { useConnectedWallet } from '../../contexts/wallet'
 import { Controller } from '../../utils/contracts/controller'
 import CustomIdentityBadge from '../../components/CustomIdentityBadge'
 
@@ -49,7 +49,7 @@ export default function VaultDetail() {
   const [selectedLong, setLongOToken] = useState<SubgraphOToken | null>(null)
   const [selectedShort, setShortOToken] = useState<SubgraphOToken | null>(null)
 
-  const { web3, networkId, user } = useContext(walletContext)
+  const { web3, networkId, user } = useConnectedWallet()
   const { owner, vaultId } = useParams()
   const toast = useToast()
 

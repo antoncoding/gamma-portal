@@ -4,7 +4,6 @@ const BLOCKNATIVE_KEY = process.env.REACT_APP_BLOCKNATIVE_KEY
 
 export const networkIdToUrl = {
   '1': 'https://etherscan.io/tx',
-  '4': 'https://rinkeby.etherscan.io/tx',
   '42': 'https://kovan.etherscan.io/tx',
 }
 

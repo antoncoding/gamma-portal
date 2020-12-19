@@ -1,10 +1,10 @@
-import React, { useState, useContext } from 'react'
+import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTheme, IconHome, IconUser, IconConfiguration, LinkBase } from '@aragon/ui'
 import SidebarTitle from './SidebarTitle'
 import SubButton from './SubButton'
 
-import { walletContext } from '../../contexts/wallet'
+import { useConnectedWallet } from '../../contexts/wallet'
 
 const hash = process.env.REACT_APP_VERSION || '0x00'
 
@@ -17,7 +17,7 @@ export default function SideBar() {
     setSelectedSubButton(locationToSubButtomId(location))
   })
 
-  const { user, readOnlyUser } = useContext(walletContext)
+  const { user, readOnlyUser } = useConnectedWallet()
 
   const defaultSelectedTab = locationToTabId(history.location)
 
