@@ -12,7 +12,7 @@ export const useConnection = () => {
   const [readOnlyUser, setReadOnlyUser] = useState<string>('')
   const [web3, setWeb3] = useState<Web3 | null>(null)
 
-  const storedNetwork = Number(getPreference('networkId', '4'))
+  const storedNetwork = Number(getPreference('networkId', '42'))
   const [networkId, setNetworkId] = useState<number>(storedNetwork)
 
   // function for block native sdk when address is updated
