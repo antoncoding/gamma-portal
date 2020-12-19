@@ -106,12 +106,15 @@ export default function AccountVaults() {
           <div style={{ display: 'flex' }}>
             {' '}
             <span style={{ paddingRight: '8px' }}> Long </span>{' '}
-            <Help> the oToken you put into a vault to create a spread. </Help>{' '}
+            <Help hint={'What is Long oToken?'}> the oToken you put into a vault to create a spread. </Help>{' '}
           </div>,
           <div style={{ display: 'flex' }}>
             {' '}
             <span style={{ paddingRight: '8px' }}> Short </span>{' '}
-            <Help> the oToken you minted by putting down collateral. Or the short position you create. </Help>{' '}
+            <Help hint={'What is Short oToken?'}>
+              {' '}
+              the oToken you minted by putting down collateral. Or the short position you create.{' '}
+            </Help>{' '}
           </div>,
           '',
         ]}
