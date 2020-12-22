@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import SectionTitle from '../../components/SectionHeader'
 
-import { RadioList, useToast } from '@aragon/ui'
+import { RadioList } from '@aragon/ui'
 import { storePreference } from '../../utils/storage'
 import { subgraph } from '../../constants/endpoints'
 import { useConnectedWallet } from '../../contexts/wallet'
@@ -10,7 +10,7 @@ import { SupportedNetworks } from '../../constants/networks'
 
 const items = [
   {
-    title: 'Mainnet',
+    title: 'Mainnet Beta',
     description: `Subgraph endpoint: ${subgraph[SupportedNetworks.Mainnet]}`,
   },
   {
@@ -26,8 +26,8 @@ const networkIdToIdx = {
 }
 
 function Network() {
-  const toast = useToast()
-  const { networkId, setNetworkId } = useConnectedWallet()
+  // const toast = useToast()
+  const { networkId, handleNetworkChange } = useConnectedWallet()
 
   const [selectedIdx, setSelectedIdx] = useState(networkIdToIdx[networkId])
 
@@ -41,15 +41,11 @@ function Network() {
           selected={selectedIdx}
           onChange={(selectedIdx: number) => {
             const newNetworkId = idxToNetworkId[selectedIdx]
-            if (newNetworkId === 1) {
-              toast('Mainnet not ready yet!')
-              return
-            }
             setSelectedIdx(selectedIdx)
             // const newNetworkId = checked ? 4 : 1
-            setNetworkId(newNetworkId)
+            handleNetworkChange(newNetworkId)
             storePreference('networkId', newNetworkId.toString())
-            window.location.reload()
+            // window.location.reload()
           }}
         />
       </div>

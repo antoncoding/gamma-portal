@@ -23,6 +23,12 @@ export const tokens: TokensTyps = {
       symbol: 'USDC',
       decimals: 6,
     },
+    {
+      name: 'Wrapped Ether',
+      address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+      symbol: 'WETH',
+      decimals: 18,
+    },
   ],
   '42': [
     emptyToken,
@@ -52,10 +58,10 @@ type GammaAddress = {
 
 export const addresses: GammaAddress = {
   '1': {
-    controller: '',
-    factory: '',
-    addressBook: '',
-    pool: '',
+    controller: '0xde158Fa7022f11707d4a3570eec4621B35d83829',
+    factory: '0xE21127f47B365d3b1467746804f32BF8dCf47e26',
+    addressBook: '0x57ADe7D5E9D2F45A07f8039Da7228ACC305fbeaF',
+    pool: '0x0Cb5BDBf1726f7CC720B21EA910ACeda9FdDf680',
   },
   '42': {
     controller: '0x37adb373e5f986a31a3441a24453bc047f26c46c',
@@ -73,7 +79,13 @@ export const blacklistOTokens = {
 export const knownOperators: {
   [key in SupportedNetworks]: { address: string; name: string; audited: boolean }[]
 } = {
-  '1': [],
+  '1': [
+    {
+      address: '0xa05157B27B7Db2Eb63bb0c11412B71E7dE027F89',
+      name: 'PayableProxy',
+      audited: true,
+    },
+  ],
   '42': [
     {
       address: '0x3bee6b613b3e52020fa958ebd9ca691c11a55995',

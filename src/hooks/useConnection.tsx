@@ -35,6 +35,17 @@ export const useConnection = () => {
     return initOnboard(setAddressCallback, setWalletCallback, networkId)
   }, [setAddressCallback, setWalletCallback, networkId])
 
+  const handleNetworkChange = useCallback(
+    (_networkId: number) => {
+      setNetworkId(_networkId)
+      if (onboard)
+        onboard.config({
+          networkId: _networkId,
+        })
+    },
+    [onboard],
+  )
+
   // get last connection info and try to set default user to previous connected account.
   useEffect(() => {
     async function getDefault() {
@@ -65,7 +76,7 @@ export const useConnection = () => {
     setUser('')
   }, [onboard])
 
-  return { networkId, setNetworkId, user, setUser, web3, connect, disconnect, readOnlyUser, setReadOnlyUser }
+  return { networkId, handleNetworkChange, user, setUser, web3, connect, disconnect, readOnlyUser, setReadOnlyUser }
 }
 
 export const initOnboard = (addressChangeCallback, walletChangeCallback, networkId) => {
