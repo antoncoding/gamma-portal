@@ -12,8 +12,11 @@ export const useConnection = () => {
   const [readOnlyUser, setReadOnlyUser] = useState<string>('')
   const [web3, setWeb3] = useState<Web3 | null>(null)
 
-  const storedNetwork = Number(getPreference('networkId', '42'))
+  const storedNetwork = Number(getPreference('gamma-networkId', '1'))
+  console.log(`storedNetwork`, storedNetwork)
   const [networkId, setNetworkId] = useState<number>(storedNetwork)
+
+  console.log(`networkId`, networkId)
 
   // function for block native sdk when address is updated
   const setAddressCallback = useCallback((address: string | undefined) => {
@@ -32,19 +35,17 @@ export const useConnection = () => {
   }, [])
 
   const onboard = useMemo(() => {
-    return initOnboard(setAddressCallback, setWalletCallback, networkId)
-  }, [setAddressCallback, setWalletCallback, networkId])
-
-  const handleNetworkChange = useCallback(
-    (_networkId: number) => {
+    function _handleNetworkChange(_networkId) {
       setNetworkId(_networkId)
+      storePreference('gamma-networkId', networkId.toString())
       if (onboard)
         onboard.config({
           networkId: _networkId,
         })
-    },
-    [onboard],
-  )
+    }
+
+    return initOnboard(setAddressCallback, setWalletCallback, _handleNetworkChange, networkId)
+  }, [setAddressCallback, setWalletCallback, networkId])
 
   // get last connection info and try to set default user to previous connected account.
   useEffect(() => {
@@ -76,10 +77,10 @@ export const useConnection = () => {
     setUser('')
   }, [onboard])
 
-  return { networkId, handleNetworkChange, user, setUser, web3, connect, disconnect, readOnlyUser, setReadOnlyUser }
+  return { networkId, user, setUser, web3, connect, disconnect, readOnlyUser, setReadOnlyUser }
 }
 
-export const initOnboard = (addressChangeCallback, walletChangeCallback, networkId) => {
+export const initOnboard = (addressChangeCallback, walletChangeCallback, networkChangeCallback, networkId) => {
   const onboard = Onboard({
     darkMode: getPreference('theme', 'light') === 'dark',
     dappId: BLOCKNATIVE_KEY, // [String] The API key created by step one above
@@ -87,6 +88,7 @@ export const initOnboard = (addressChangeCallback, walletChangeCallback, network
     subscriptions: {
       address: addressChangeCallback,
       wallet: walletChangeCallback,
+      network: networkChangeCallback,
     },
     walletSelect: {
       description: 'Please select a wallet to connect to the blockchain',

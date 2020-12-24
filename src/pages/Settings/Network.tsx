@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import SectionTitle from '../../components/SectionHeader'
 
 import { RadioList } from '@aragon/ui'
-import { storePreference } from '../../utils/storage'
 import { subgraph } from '../../constants/endpoints'
 import { useConnectedWallet } from '../../contexts/wallet'
 import { SupportedNetworks } from '../../constants/networks'
@@ -19,17 +18,15 @@ const items = [
   },
 ]
 
-const idxToNetworkId = [1, 42, 4]
 const networkIdToIdx = {
   1: 0,
   42: 1,
 }
 
 function Network() {
-  // const toast = useToast()
-  const { networkId, handleNetworkChange } = useConnectedWallet()
+  const { networkId } = useConnectedWallet()
 
-  const [selectedIdx, setSelectedIdx] = useState(networkIdToIdx[networkId])
+  const selectedIdx = networkIdToIdx[networkId]
 
   return (
     <>
@@ -39,14 +36,14 @@ function Network() {
           title={'Switch between networks'}
           items={items}
           selected={selectedIdx}
-          onChange={(selectedIdx: number) => {
-            const newNetworkId = idxToNetworkId[selectedIdx]
-            setSelectedIdx(selectedIdx)
-            // const newNetworkId = checked ? 4 : 1
-            handleNetworkChange(newNetworkId)
-            storePreference('networkId', newNetworkId.toString())
-            // window.location.reload()
-          }}
+          // onChange={(selectedIdx: number) => {
+          //   const newNetworkId = idxToNetworkId[selectedIdx]
+          //   setSelectedIdx(selectedIdx)
+          //   // const newNetworkId = checked ? 4 : 1
+          //   handleNetworkChange(newNetworkId)
+          //   storePreference('networkId', newNetworkId.toString())
+          //   // window.location.reload()
+          // }}
         />
       </div>
     </>
