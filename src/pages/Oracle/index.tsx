@@ -91,6 +91,7 @@ export default function Oracle() {
       In Opyn v2, we need on-chain prices for underlying, strike and collateral assets to settle oTokens.
       <SectionTitle title="Choose an Asset" />
       <DropDown
+        disabled={!allOracleAssets || allOracleAssets.length === 0}
         items={allOracleAssets ? allOracleAssets.map(p => p.asset.symbol) : []}
         selected={selectedAssetIndex}
         onChange={setSelectedAssetIndex}
