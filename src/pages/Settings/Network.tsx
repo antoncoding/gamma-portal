@@ -32,19 +32,7 @@ function Network() {
     <>
       <SectionTitle title="Network" />
       <div style={{ display: 'flex' }}>
-        <RadioList
-          title={'Switch between networks'}
-          items={items}
-          selected={selectedIdx}
-          // onChange={(selectedIdx: number) => {
-          //   const newNetworkId = idxToNetworkId[selectedIdx]
-          //   setSelectedIdx(selectedIdx)
-          //   // const newNetworkId = checked ? 4 : 1
-          //   handleNetworkChange(newNetworkId)
-          //   storePreference('networkId', newNetworkId.toString())
-          //   // window.location.reload()
-          // }}
-        />
+        <RadioList title={'Network Settings'} items={items} selected={selectedIdx} />
       </div>
     </>
   )
