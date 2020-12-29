@@ -292,7 +292,13 @@ export default function VaultDetail() {
         asset ? (
           <CustomIdentityBadge shorten={true} entity={asset} label={symbol} />
         ) : (
-          <DropDown items={dropdownItems} selected={dropdownSelected} onChange={dropdownOnChange} />
+          <DropDown
+            disabled={dropdownItems.length === 0}
+            placeholder={dropdownItems.length === 0 ? 'No Asset available' : 'Select an item'}
+            items={dropdownItems}
+            selected={dropdownSelected}
+            onChange={dropdownOnChange}
+          />
         ),
         balanceToDisplay,
         amountToDisplay,
