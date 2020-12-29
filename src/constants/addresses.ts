@@ -81,7 +81,7 @@ export const knownOperators: {
 } = {
   '1': [
     {
-      address: '0x8f7Dd610c457FC7Cb26B0f9Db4e77581f94F70aC',
+      address: '0x8f7dd610c457fc7cb26b0f9db4e77581f94f70ac',
       name: 'PayableProxy',
       audited: true,
     },
