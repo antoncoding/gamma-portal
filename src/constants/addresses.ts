@@ -58,10 +58,10 @@ type GammaAddress = {
 
 export const addresses: GammaAddress = {
   '1': {
-    controller: '0xde158Fa7022f11707d4a3570eec4621B35d83829',
-    factory: '0xE21127f47B365d3b1467746804f32BF8dCf47e26',
-    addressBook: '0x57ADe7D5E9D2F45A07f8039Da7228ACC305fbeaF',
-    pool: '0x0Cb5BDBf1726f7CC720B21EA910ACeda9FdDf680',
+    controller: '0x4ccc2339F87F6c59c6893E1A678c2266cA58dC72',
+    factory: '0x7C06792Af1632E77cb27a558Dc0885338F4Bdf8E',
+    addressBook: '0x1E31F2DCBad4dc572004Eae6355fB18F9615cBe4',
+    pool: '0x5934807cC0654d46755eBd2848840b616256C6Ef',
   },
   '42': {
     controller: '0x37adb373e5f986a31a3441a24453bc047f26c46c',
@@ -81,7 +81,7 @@ export const knownOperators: {
 } = {
   '1': [
     {
-      address: '0xa05157b27b7db2eb63bb0c11412b71e7de027f89',
+      address: '0x8f7Dd610c457FC7Cb26B0f9Db4e77581f94F70aC',
       name: 'PayableProxy',
       audited: true,
     },
