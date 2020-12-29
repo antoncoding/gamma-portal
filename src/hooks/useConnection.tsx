@@ -13,10 +13,7 @@ export const useConnection = () => {
   const [web3, setWeb3] = useState<Web3 | null>(null)
 
   const storedNetwork = Number(getPreference('gamma-networkId', '1'))
-  console.log(`storedNetwork`, storedNetwork)
   const [networkId, setNetworkId] = useState<number>(storedNetwork)
-
-  console.log(`networkId`, networkId)
 
   // function for block native sdk when address is updated
   const setAddressCallback = useCallback((address: string | undefined) => {
