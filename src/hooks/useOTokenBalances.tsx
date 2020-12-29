@@ -9,9 +9,9 @@ import { SupportedNetworks } from '../constants/networks'
 export function useOTokenBalances(
   account: string,
   networkId: SupportedNetworks,
-): { balances: OTokenBalance[] | null; refetch: Function } {
+): { balances: OTokenBalance[] | null; refetch: Function; isLoading: boolean } {
   const [refreshCount, setRefreshCount] = useState(0)
-
+  const [isLoading, setIsLoadig] = useState(true)
   const toast = useToast()
 
   const refetch = useCallback(() => {
@@ -20,11 +20,13 @@ export function useOTokenBalances(
 
   const balances = useAsyncMemo(
     async () => {
-      return await getBalances(networkId, account, toast)
+      const balances = await getBalances(networkId, account, toast)
+      setIsLoadig(false)
+      return balances
     },
     null,
     [refreshCount, account, networkId],
   )
 
-  return { balances, refetch }
+  return { balances, isLoading, refetch }
 }

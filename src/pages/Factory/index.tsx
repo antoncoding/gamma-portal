@@ -27,14 +27,14 @@ export default function CreateOption() {
   const [isCreating, setIsCreating] = useState(Boolean)
   const [targetAddress, setTargetAddress] = useState(ZERO_ADDR)
 
-  const expiryDate = useMemo(() => {
-    try {
-      const date = new Date(expiryTimestamp.times(1000).toNumber()).toISOString().split('T')[0]
-      return date
-    } catch (error) {
-      return ''
-    }
-  }, [expiryTimestamp])
+  // const expiryDate = useMemo(() => {
+  //   try {
+  //     const date = new Date(expiryTimestamp.times(1000).toNumber()).toISOString().split('T')[0]
+  //     return date
+  //   } catch (error) {
+  //     return ''
+  //   }
+  // }, [expiryTimestamp])
 
   const allProducts = useAsyncMemo(
     async () => {
@@ -174,15 +174,12 @@ export default function CreateOption() {
         </div>
 
         <div style={{ width: '20%', marginLeft: '5%' }}>
-          <LabelText label="Expiry Date (08:00 UTC)" />
+          <LabelText label="Expiry Timestamp" />
           <TextInput
-            type="date"
-            value={expiryDate}
+            type="number"
+            value={expiryTimestamp}
             onChange={e => {
-              const dateSelected = new Date(e.target.value)
-              const dateUTC = Date.UTC(dateSelected.getFullYear(), dateSelected.getMonth(), dateSelected.getDate(), 8)
-              const expiry = new BigNumber(dateUTC / 1000)
-              setExpiryTimestamp(expiry)
+              setExpiryTimestamp(new BigNumber(e.target.value))
             }}
             wide
           />
@@ -194,7 +191,7 @@ export default function CreateOption() {
             {' '}
             <LabelText label="Create!" /> <WarningText text="This option has been created" show={isDuplicated} />{' '}
           </div>
-          <Button wide disabled={isDuplicated || isCreating} onClick={createOToken}>
+          <Button wide disabled={isDuplicated || isCreating || hasExpiryWarning} onClick={createOToken}>
             {' '}
             {isCreating ? (
               <>

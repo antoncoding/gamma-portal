@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { DataView, Button, useToast } from '@aragon/ui'
 import SectionTitle from '../../components/SectionHeader'
 import OpynTokenAmount from '../../components/OpynTokenAmount'
@@ -9,6 +9,8 @@ import { OTokenBalance } from '../../types'
 import { sortByExpiryThanStrike, isExpired } from '../../utils/others'
 
 import { Controller } from '../../utils/contracts/controller'
+import { OTOKENS } from '../../constants/dataviewContents'
+
 import BigNumber from 'bignumber.js'
 
 export default function AccountBalances({ account }: { account: string }) {
@@ -16,9 +18,7 @@ export default function AccountBalances({ account }: { account: string }) {
 
   const toast = useToast()
 
-  const [isLoading] = useState(true)
-
-  const { balances } = useOTokenBalances(account, networkId)
+  const { balances, isLoading: isLoadingBalance } = useOTokenBalances(account, networkId)
 
   const redeemToken = useCallback(
     async (token: string, amount: BigNumber) => {
@@ -55,9 +55,9 @@ export default function AccountBalances({ account }: { account: string }) {
     <>
       <SectionTitle title="Balances" />
       <DataView
-        status={isLoading ? 'loading' : 'default'}
+        status={isLoadingBalance ? 'loading' : 'default'}
         fields={['balance', 'PnL', '']}
-        emptyState={{ title: "You don't have any oTokens" }}
+        emptyState={OTOKENS}
         entries={entries.sort((a, b) => sortByExpiryThanStrike(a.token, b.token)) || []}
         renderEntry={renderRow}
       />

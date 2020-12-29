@@ -1,4 +1,4 @@
-# Opyn V2 Portal
+# Gamma Portal
 
 <p align="center">
 

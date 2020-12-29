@@ -10,7 +10,7 @@ function HomePage() {
 
   return (
     <>
-      <Header primary="Welcome to Opyn V2 Portal" />
+      <Header primary="Welcome to Gamma Portal" />
       <div style={{ display: 'flex' }}>
         <Comment text="Create, manage and trade decentralized options" />
         <Help hint={'What is Opyn V2'}>
