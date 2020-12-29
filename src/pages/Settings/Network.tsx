@@ -9,7 +9,7 @@ import { SupportedNetworks } from '../../constants/networks'
 
 const items = [
   {
-    title: 'Mainnet Beta',
+    title: 'Mainnet',
     description: `Subgraph endpoint: ${subgraph[SupportedNetworks.Mainnet]}`,
   },
   {
