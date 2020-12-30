@@ -1,6 +1,6 @@
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 
-export * from './0x'
+export * from './zeroX'
 
 export type Token = {
   address: string
