@@ -43,6 +43,8 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken }: Bo
     return _rows
   }, [oTokens])
 
+  console.log(`1rows`, rows)
+
   const renderRow = useCallback(
     (row: BoardRow) => {
       const callOnClick = () => {
@@ -53,14 +55,14 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken }: Bo
       }
       const callButton = (
         <Radio
-          disabled={!row.call}
-          onChange={renderRow}
+          disabled={row.call === undefined}
+          onChange={callOnClick}
           checked={selectedOToken && selectedOToken?.id === row.call?.id}
         />
       )
       const putButton = (
         <Radio
-          disabled={!row.put}
+          disabled={row.put === undefined}
           onChange={putOnClick}
           checked={selectedOToken && selectedOToken?.id === row.put?.id}
         />
@@ -76,17 +78,19 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken }: Bo
       const putAskSize = row.put ? onclickWrapper('0', putOnClick) : '-'
 
       return [
-        callButton,
+        '',
         callBid,
         callBidSize,
         callAsk,
         callAskSize,
+        callButton,
         strike,
+        putButton,
         putBid,
         putBidSize,
         putAsk,
         putAskSize,
-        putButton,
+        '',
       ]
     },
     [selectedOToken, setSelectedOToken],
@@ -95,9 +99,9 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken }: Bo
   return (
     <>
       <DataView
-        tableRowHeight={40}
+        tableRowHeight={35}
         status={isLoadingOrderbook ? 'loading' : 'default'}
-        fields={['Call', 'bid', 'amt', 'ask', 'amt', 'strike', 'bid', 'amt', 'ask', 'amt', 'put']}
+        fields={['Call', 'bid', 'amt', 'ask', 'amt', '', 'strike', '', 'bid', 'amt', 'ask', 'amt', 'put']}
         emptyState={OTOKENS_BOARD}
         entries={rows}
         renderEntry={renderRow}
@@ -107,7 +111,7 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken }: Bo
 }
 
 const strikePriceWrap = strikePrice => {
-  return <div style={{ fontSize: 20, width: '40px', padding: '10px' }}>{strikePrice}</div>
+  return <div style={{ fontSize: 18, width: '40px', padding: '10px' }}>{strikePrice}</div>
 }
 
 const onclickWrapper = (child: any, onClick: any) => {
