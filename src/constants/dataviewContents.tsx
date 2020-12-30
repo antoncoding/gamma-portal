@@ -3,6 +3,18 @@ import React from 'react'
 const emptyStateRedSrc = require('../imgs/aragon/empty-state-illustration-red.png')
 const EmptyState = <img src={emptyStateRedSrc} alt="" width="185" />
 
+export const OTOKENS_BOARD = {
+  default: {
+    title: 'No oTokens',
+    subtitle: 'No oTokens available',
+    illustration: EmptyState,
+  },
+  loading: {
+    title: 'Loading',
+    subtitle: 'Fetching oTokens ',
+  },
+}
+
 export const OTOKENS = {
   default: {
     title: 'No oTokens',
