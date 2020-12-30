@@ -23,8 +23,9 @@ import useAsyncMemo from '../../hooks/useAsyncMemo'
 import { useTokenByAddress } from '../../hooks/useToken'
 import { useOTokenBalances } from '../../hooks/useOTokenBalances'
 import { useTokenBalance } from '../../hooks/useTokenBalance'
+import { useLiveOTokens } from '../../hooks/useOTokens'
 
-import { getVault, getLiveOTokens } from '../../utils/graph'
+import { getVault } from '../../utils/graph'
 import { toTokenAmount, fromTokenAmount } from '../../utils/math'
 import { isExpired } from '../../utils/others'
 import { ZERO_ADDR, tokens } from '../../constants/addresses'
@@ -63,15 +64,7 @@ export default function VaultDetail() {
     [networkId, owner, toast, vaultId],
   )
 
-  const allOtokens = useAsyncMemo(
-    async () => {
-      const result = await getLiveOTokens(networkId, toast)
-      return result
-    },
-    [],
-    [networkId, toast],
-  )
-
+  const { allOtokens } = useLiveOTokens()
   const { balances } = useOTokenBalances(user, networkId)
 
   /**

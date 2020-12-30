@@ -292,6 +292,59 @@ export async function getLiveOTokens(
   }
 }
 
+/**
+ * Get all oTokens that's in the series
+ */
+export async function getLiveOTokensIsSeries(
+  networkId: SupportedNetworks,
+  underlyingAddr: string,
+  strikeAddr: string,
+  errorCallback: Function,
+): Promise<SubgraphOToken[] | null> {
+  const current = new BigNumber(Date.now()).div(1000).integerValue().toString()
+  const query = `
+  {
+    otokens (where: {
+      expiryTimestamp_gt: ${current},
+      underlyingAsset: "${underlyingAddr}",
+      strikeAsset: "${strikeAddr}",
+    }) {
+      id
+      symbol
+      name
+      decimals
+      strikeAsset {
+        id
+        symbol
+        decimals
+      }
+      underlyingAsset {
+        id
+        symbol
+        decimals
+      }
+      collateralAsset {
+        id
+        symbol
+        decimals
+      }
+      strikePrice
+      isPut
+      expiryTimestamp
+    }
+  }`
+  try {
+    const response = await postQuery(endpoints[networkId], query)
+    const oTokens = response.data.otokens.filter(
+      (otoken: { id: string }) => !blacklistOTokens[networkId].includes(otoken.id),
+    )
+    return oTokens
+  } catch (error) {
+    errorCallback(error.toString())
+    return null
+  }
+}
+
 export async function getBalances(
   networkId: SupportedNetworks,
   owner: string,

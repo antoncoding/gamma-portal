@@ -14,14 +14,13 @@ import {
 import LabelText from '../../components/LabelText'
 import Warning from '../../components/Warning'
 import { useConnectedWallet } from '../../contexts/wallet'
-import { useAsyncMemo } from '../../hooks/useAsyncMemo'
 import { OTokenFactory } from '../../utils/contracts/factory'
 import { getNextFriday, fromTokenAmount } from '../../utils/math'
-import { getWhitelistedProducts } from '../../utils/graph'
 import SectionTitle from '../../components/SectionHeader'
 import TokenAddress from '../../components/TokenAddress'
 import { ZERO_ADDR } from '../../constants/addresses'
 import WarningText from '../../components/Warning'
+import { useAllProducts } from '../../hooks/useAllProducts'
 
 export default function CreateOption() {
   const { networkId, web3, user } = useConnectedWallet()
@@ -46,23 +45,7 @@ export default function CreateOption() {
   //   }
   // }, [expiryTimestamp])
 
-  const allProducts = useAsyncMemo(
-    async () => {
-      const products = await getWhitelistedProducts(networkId, toast)
-      if (products === null) return []
-
-      return products.map(product => {
-        const type = product.isPut ? 'Put' : 'Call'
-        const optionName = `${product.underlying.symbol}-${product.strike.symbol} ${type} ${product.collateral.symbol} Collateral`
-        return {
-          label: optionName,
-          ...product,
-        }
-      })
-    },
-    [],
-    [],
-  )
+  const { allProducts } = useAllProducts()
 
   // make sure expiry to be UTC 0800
   useEffect(() => {

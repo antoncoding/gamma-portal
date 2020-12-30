@@ -17,6 +17,7 @@ import Oracle from './pages/Oracle'
 import Operators from './pages/Operators'
 import HomePage from './pages/HomePage'
 import Settings from './pages/Settings'
+import Trade from './pages/OrderBookTrade'
 import { useConnection } from './hooks/useConnection'
 
 import { getPreference } from './utils/storage'
@@ -39,6 +40,9 @@ function App() {
             <div style={{ width: '80%', marginRight: '2%' }}>
               <Layout>
                 <Switch>
+                  <Route path="/trade/">
+                    <Trade />
+                  </Route>
                   <Route path="/account/:account/operators">
                     <Operators />
                   </Route>
