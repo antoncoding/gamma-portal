@@ -34,3 +34,8 @@ export const sortByExpiryThanStrike = (a: SubgraphOToken, b: SubgraphOToken) => 
 export const isExpired = (token: SubgraphOToken) => {
   return Number(token.expiryTimestamp) < Date.now() / 1000
 }
+
+export function toUTCDateString(expiry: number): string {
+  const expiryDate = new Date(expiry * 1000)
+  return expiryDate.toUTCString().split(' ').slice(0, 4).join(' ')
+}
