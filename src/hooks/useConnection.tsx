@@ -33,8 +33,10 @@ export const useConnection = () => {
 
   const onboard = useMemo(() => {
     function _handleNetworkChange(_networkId) {
-      setNetworkId(_networkId)
-      storePreference('gamma-networkId', networkId.toString())
+      if (_networkId === 1 || _networkId === 42) {
+        setNetworkId(_networkId)
+        storePreference('gamma-networkId', networkId.toString())
+      }
       if (onboard)
         onboard.config({
           networkId: _networkId,
@@ -78,6 +80,8 @@ export const useConnection = () => {
 }
 
 export const initOnboard = (addressChangeCallback, walletChangeCallback, networkChangeCallback, networkId) => {
+  const networkname = networkId === 1 ? 'mainnet' : 'kovan'
+  const RPC_URL = `https://${networkname}.infura.io/v3/${INFURA_KEY}`
   const onboard = Onboard({
     darkMode: getPreference('theme', 'light') === 'dark',
     dappId: BLOCKNATIVE_KEY, // [String] The API key created by step one above
@@ -90,18 +94,18 @@ export const initOnboard = (addressChangeCallback, walletChangeCallback, network
     walletSelect: {
       description: 'Please select a wallet to connect to the blockchain',
       wallets: [
-        { walletName: 'metamask' },
+        { walletName: 'metamask', preferred: true },
         {
           walletName: 'walletConnect',
           infuraKey: INFURA_KEY,
+          preferred: true,
         },
         {
           walletName: 'fortmatic',
           apiKey: FORTMATIC_KEY,
+          preferred: true,
         },
-        { walletName: 'trust' },
-        { walletName: 'coinbase' },
-        { walletName: 'status' },
+        { walletName: 'lattice', appName: 'Gamma Portal', rpcUrl: RPC_URL, preferred: true },
       ],
     },
     walletCheck: [
