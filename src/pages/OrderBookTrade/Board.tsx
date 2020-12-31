@@ -43,8 +43,6 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken }: Bo
     return _rows
   }, [oTokens])
 
-  console.log(`1rows`, rows)
-
   const renderRow = useCallback(
     (row: BoardRow) => {
       const callOnClick = () => {
@@ -69,49 +67,74 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken }: Bo
       )
       const callBid = row.call ? onclickWrapper(green('0'), callOnClick) : '-'
       const callBidSize = row.call ? onclickWrapper('0', callOnClick) : '-'
+      const callBidIv = row.call ? onclickWrapper('0', callOnClick) : '-'
+
       const callAsk = row.call ? onclickWrapper(red('0'), callOnClick) : '-'
       const callAskSize = row.call ? onclickWrapper('0', callOnClick) : '-'
-      const strike = strikePriceWrap(toTokenAmount(row.strikePrice, 8).toString())
+      const callAskIv = row.call ? onclickWrapper('0', callOnClick) : '-'
+
+      const strike = bold(toTokenAmount(row.strikePrice, 8).toString())
       const putBid = row.put ? onclickWrapper(green('0'), putOnClick) : '-'
       const putBidSize = row.put ? onclickWrapper('0', putOnClick) : '-'
+      const putBidIv = row.put ? onclickWrapper('0', putOnClick) : '-'
+
       const putAsk = row.put ? onclickWrapper(red('0'), putOnClick) : '-'
       const putAskSize = row.put ? onclickWrapper('0', putOnClick) : '-'
+      const putAskIv = row.put ? onclickWrapper('0', putOnClick) : '-'
 
       return [
-        '',
         callBid,
+        callBidIv,
         callBidSize,
+
         callAsk,
+        callAskIv,
         callAskSize,
+
         callButton,
         strike,
         putButton,
+
         putBid,
+        putBidIv,
         putBidSize,
+
         putAsk,
+        putAskIv,
         putAskSize,
-        '',
       ]
     },
     [selectedOToken, setSelectedOToken],
   )
 
   return (
-    <>
+    <div style={{ minWidth: 600 }}>
       <DataView
         tableRowHeight={35}
         status={isLoadingOrderbook ? 'loading' : 'default'}
-        fields={['Call', 'bid', 'amt', 'ask', 'amt', '', 'strike', '', 'bid', 'amt', 'ask', 'amt', 'put']}
+        fields={[
+          'bid',
+          'iv',
+          'amt',
+          'ask',
+          'iv',
+          'amt',
+          bold('call'),
+          'strike',
+          bold('put'),
+          'bid',
+          'iv',
+          'amt',
+          'ask',
+          'iv',
+          'amt',
+        ]}
         emptyState={OTOKENS_BOARD}
         entries={rows}
         renderEntry={renderRow}
       />
-    </>
+    </div>
   )
-}
-
-const strikePriceWrap = strikePrice => {
-  return <div style={{ fontSize: 18, width: '40px', padding: '10px' }}>{strikePrice}</div>
 }
 
 const onclickWrapper = (child: any, onClick: any) => {
@@ -124,4 +147,8 @@ const green = text => {
 
 const red = text => {
   return <div style={{ color: '#da5750' }}> {text} </div>
+}
+
+const bold = text => {
+  return <div style={{ fontWeight: 'bolder' }}> {text} </div>
 }

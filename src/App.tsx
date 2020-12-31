@@ -38,43 +38,64 @@ function App() {
               <SideBar />
             </div>
             <div style={{ width: '80%', marginRight: '2%' }}>
-              <Layout>
-                <Switch>
-                  <Route path="/trade/">
-                    <Trade />
-                  </Route>
-                  <Route path="/account/:account/operators">
+              <Switch>
+                {/* without layout */}
+                <Route path="/trade/0x">
+                  <Trade />
+                </Route>
+
+                {/* pages with layout */}
+                <Route path="/account/:account/operators">
+                  <Layout>
                     <Operators />
-                  </Route>
-                  <Route path="/account/:account/vaults/">
+                  </Layout>
+                </Route>
+                <Route path="/account/:account/vaults/">
+                  <Layout>
                     <AccountVault />
-                  </Route>
-                  <Route path="/account/:account">
+                  </Layout>
+                </Route>
+                <Route path="/account/:account">
+                  <Layout>
                     <Account />
-                  </Route>
-                  <Route path="/account/">
+                  </Layout>
+                </Route>
+                <Route path="/account/">
+                  <Layout>
                     <ConnectWallet />
-                  </Route>
-                  <Route path="/vault/:owner/:vaultId">
+                  </Layout>
+                </Route>
+                <Route path="/vault/:owner/:vaultId">
+                  <Layout>
                     <Vault />
-                  </Route>
-                  <Route path="/system/oracle">
+                  </Layout>
+                </Route>
+                <Route path="/system/oracle">
+                  <Layout>
                     <Oracle />
-                  </Route>
-                  <Route path="/system/factory/">
+                  </Layout>
+                </Route>
+                <Route path="/system/factory/">
+                  <Layout>
                     <Factory />
-                  </Route>
-                  <Route path="/system/">
+                  </Layout>
+                </Route>
+                <Route path="/system/">
+                  <Layout>
                     <ProtocolHome />
-                  </Route>
-                  <Route path="/settings/">
+                  </Layout>
+                </Route>
+                <Route path="/settings/">
+                  <Layout>
                     <Settings setTheme={setTheme} />
-                  </Route>
-                  <Route path="/">
+                  </Layout>
+                </Route>
+                <Route path="/">
+                  <Layout>
                     <HomePage />
-                  </Route>
-                </Switch>
-              </Layout>
+                  </Layout>
+                </Route>
+              </Switch>
             </div>
           </div>
         </walletContext.Provider>
