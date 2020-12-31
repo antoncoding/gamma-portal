@@ -9,13 +9,13 @@ const FEE_PERORDER_PER_GWEI = 0.00007
 
 type zeroXContextProps = {
   getProtocolFee: (numbOfOrders: number) => BigNumber
-  orderBooks: OTokenOrderBook[]
+  orderbooks: OTokenOrderBook[]
   isLoading: boolean
 }
 
 const initialContext = {
   getProtocolFee: (num: number) => new BigNumber(30).times(num).times(FEE_PERORDER_PER_GWEI),
-  orderBooks: [],
+  orderbooks: [],
   isLoading: false,
 }
 
@@ -26,7 +26,7 @@ const OrderbookProvider = ({ children }) => {
   const { fast } = useGasPrice(10)
 
   const { allOtokens: oTokens, isLoading: isLoadingOTokens } = useLiveOTokens()
-  const { orderBooks, isLoading: isLoadingOrderBook } = use0xOrderBooks(oTokens)
+  const { orderbooks, isLoading: isLoadingOrderBook } = use0xOrderBooks(oTokens)
 
   const getProtocolFee = useCallback(
     (numOfOrders: number) => {
@@ -38,7 +38,7 @@ const OrderbookProvider = ({ children }) => {
   return (
     <zeroXContext.Provider
       value={{
-        orderBooks,
+        orderbooks,
         isLoading: isLoadingOrderBook || isLoadingOTokens,
         getProtocolFee,
       }}

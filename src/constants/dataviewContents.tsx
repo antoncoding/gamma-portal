@@ -3,6 +3,29 @@ import React from 'react'
 const emptyStateRedSrc = require('../imgs/aragon/empty-state-illustration-red.png')
 const EmptyState = <img src={emptyStateRedSrc} alt="" width="185" />
 
+export const NO_TOKEN_SELECTED = {
+  default: {
+    title: 'No oToken Selected',
+    subtitle: 'select an oToken to proceed',
+    illustration: null,
+  },
+}
+
+export const generateNoOrderContent = (type: 'bids' | 'asks', symbol: string) => {
+  return {
+    default: {
+      title: `No ${type}`,
+      subtitle: `No ${type} orders for ${symbol}`,
+      illustration: null,
+    },
+    loading: {
+      title: 'Loading',
+      subtitle: `Fetching ${type}`,
+      illustration: null,
+    },
+  }
+}
+
 export const OTOKENS_BOARD = {
   default: {
     title: 'No oTokens',

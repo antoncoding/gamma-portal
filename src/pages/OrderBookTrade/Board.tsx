@@ -1,11 +1,13 @@
 import React, { useMemo, useCallback } from 'react'
 
-import { DataView, Radio, LinkBase } from '@aragon/ui'
+import { DataView, Radio } from '@aragon/ui'
 import { SubgraphOToken } from '../../types'
 import { OTOKENS_BOARD } from '../../constants/dataviewContents'
 import { toTokenAmount } from '../../utils/math'
 import { useOrderbook } from '../../contexts/orderbook'
 import { getOrderBookDetail } from '../../utils/0x-utils'
+
+import { green, red, onclickWrapper, bold } from './StyleDiv'
 
 type BoardRow = {
   strikePrice: string
@@ -31,7 +33,7 @@ type BoardProps = {
 }
 
 export default function Board({ oTokens, selectedOToken, setSelectedOToken }: BoardProps) {
-  const { isLoading: isLoadingOrderbook, orderBooks } = useOrderbook()
+  const { isLoading: isLoadingOrderbook, orderbooks } = useOrderbook()
 
   const rows = useMemo(() => {
     let _rows: BoardRow[] = []
@@ -58,8 +60,8 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken }: Bo
 
   const rowsWithDetail = useMemo(() => {
     return rows.map(row => {
-      const callbook = orderBooks.find(b => b.id === row.call?.id)
-      const putbook = row.put ? orderBooks.find(b => b.id === row.put?.id) : undefined
+      const callbook = orderbooks.find(b => b.id === row.call?.id)
+      const putbook = row.put ? orderbooks.find(b => b.id === row.put?.id) : undefined
       const {
         bestBidPrice: callBid,
         totalBidAmt: callBidSize,
@@ -86,7 +88,7 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken }: Bo
         putAskSize,
       }
     })
-  }, [rows, orderBooks])
+  }, [rows, orderbooks])
 
   const renderRow = useCallback(
     (row: RowWithDetail) => {
@@ -180,20 +182,4 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken }: Bo
       />
     </div>
   )
-}
-
-const onclickWrapper = (child: any, onClick: any) => {
-  return <LinkBase onClick={onClick}> {child} </LinkBase>
-}
-
-const green = text => {
-  return <div style={{ color: '#7aae1a' }}> {text} </div>
-}
-
-const red = text => {
-  return <div style={{ color: '#da5750' }}> {text} </div>
-}
-
-const bold = text => {
-  return <div style={{ fontWeight: 'bolder' }}> {text} </div>
 }

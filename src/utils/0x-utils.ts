@@ -155,7 +155,7 @@ export async function filter0xAvailablePairs(networkId: 1 | 42, oTokens: OToken[
  *
  * @param {OrderWithMetaData} order
  */
-export const getRemainingMakerAndTakerAmount = (
+export const getRemainingAmounts = (
   order: OrderWithMetaData,
 ): {
   remainingTakerAssetAmount: BigNumber
@@ -361,7 +361,7 @@ export const getAskPrice = (ask: SignedOrder, makerAssetDecimals: number, takerA
  */
 export const getTotalAskAmount = (asks: OrderWithMetaData[], decimals: number): BigNumber => {
   return asks.reduce(
-    (prev, cur) => prev.plus(toTokenAmount(getRemainingMakerAndTakerAmount(cur).remainingMakerAssetAmount, decimals)),
+    (prev, cur) => prev.plus(toTokenAmount(getRemainingAmounts(cur).remainingMakerAssetAmount, decimals)),
     new BigNumber(0),
   )
 }

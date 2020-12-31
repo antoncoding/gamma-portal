@@ -12,7 +12,7 @@ export function use0xOrderBooks(oTokens: SubgraphOToken[], completeCallback?: an
 
   const [isLoading, setIsLoading] = useState(true)
 
-  const [orderBooksBasic, setOrderBooksBasic] = useState<OTokenOrderBook[]>([])
+  const [orderbooksBasic, setOrderBooksBasic] = useState<OTokenOrderBook[]>([])
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(
     wsUrl,
@@ -57,16 +57,16 @@ export function use0xOrderBooks(oTokens: SubgraphOToken[], completeCallback?: an
   // filter out invalid orders every 5 sec
   useEffect(() => {
     const interval = setInterval(() => {
-      const orderBooksCopy = [...orderBooksBasic]
-      for (let orderbook of orderBooksCopy) {
+      const orderbooksCopy = [...orderbooksBasic]
+      for (let orderbook of orderbooksCopy) {
         // const { bids, asks } = orderbook
         orderbook.bids = orderbook.bids.filter(order => isValid(order))
         orderbook.asks = orderbook.asks.filter(order => isValid(order))
       }
-      setOrderBooksBasic([...orderBooksCopy])
+      setOrderBooksBasic([...orderbooksCopy])
     }, 5000)
     return () => clearInterval(interval)
-  }, [orderBooksBasic])
+  }, [orderbooksBasic])
 
   const [lastUpdatedMsg, setLastUpdatedMsg] = useState<any>(null)
 
@@ -75,7 +75,7 @@ export function use0xOrderBooks(oTokens: SubgraphOToken[], completeCallback?: an
     if (!lastMessage || !lastMessage.data) return
     if (lastMessage === lastUpdatedMsg) return
 
-    const orderbooksCopy = [...orderBooksBasic]
+    const orderbooksCopy = [...orderbooksBasic]
 
     const data = JSON.parse(lastMessage.data)
     const orders: OrderWithMetaData[] = data.payload
@@ -131,7 +131,7 @@ export function use0xOrderBooks(oTokens: SubgraphOToken[], completeCallback?: an
     }
     setLastUpdatedMsg(lastMessage)
     if (hasOTokenOrder) setOrderBooksBasic(orderbooksCopy)
-  }, [lastUpdatedMsg, lastMessage, orderBooksBasic, oTokens, networkId])
+  }, [lastUpdatedMsg, lastMessage, orderbooksBasic, oTokens, networkId])
 
-  return { orderBooks: orderBooksBasic, isLoading }
+  return { orderbooks: orderbooksBasic, isLoading }
 }

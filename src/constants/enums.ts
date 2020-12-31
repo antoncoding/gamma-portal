@@ -3,3 +3,8 @@ export enum OrderType {
   BID,
   ASK,
 }
+
+export enum TradeAction {
+  Buy = 'buy',
+  Sell = 'sell',
+}
