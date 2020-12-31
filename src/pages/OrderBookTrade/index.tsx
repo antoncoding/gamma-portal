@@ -1,6 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
-
-import { Main } from '@aragon/ui'
+import React, { useState } from 'react'
 
 import TradeHeader from './Header'
 import Board from './Board'

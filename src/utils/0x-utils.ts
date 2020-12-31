@@ -86,7 +86,19 @@ export const getAsksSummary = (asks: OrderWithMetaData[]) => {
   }
 }
 
-export const getOrderBookDetail = (basicBook: OTokenOrderBook): OTokenOrderBookWithDetail => {
+export const getOrderBookDetail = (basicBook: OTokenOrderBook | undefined): OTokenOrderBookWithDetail => {
+  if (basicBook === undefined) {
+    return {
+      id: '0',
+      bids: [],
+      asks: [],
+      bestBidPrice: '0.0',
+      bestAskPrice: '0.0',
+      totalAskAmt: '0.0',
+      totalBidAmt: '0.0',
+    }
+  }
+
   const bids = basicBook.bids.filter(order => isValid(order))
   const asks = basicBook.asks.filter(order => isValid(order))
 
@@ -97,10 +109,10 @@ export const getOrderBookDetail = (basicBook: OTokenOrderBook): OTokenOrderBookW
     id: basicBook.id,
     bids,
     asks,
-    bestBidPrice,
-    bestAskPrice,
-    totalAskAmt,
-    totalBidAmt,
+    bestBidPrice: bestBidPrice.toFixed(2),
+    bestAskPrice: bestAskPrice.toFixed(2),
+    totalAskAmt: totalAskAmt.toFixed(2),
+    totalBidAmt: totalBidAmt.toFixed(2),
   }
 }
 

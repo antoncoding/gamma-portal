@@ -5,7 +5,7 @@ import { useConnectedWallet } from '../contexts/wallet'
 import { OrderWithMetaData, SubgraphOToken, OTokenOrderBook } from '../types'
 import { categorizeOrder, getBasePairAskAndBids, sortBids, sortAsks, isValid } from '../utils/0x-utils'
 
-export default function use0xOrderBooks(oTokens: SubgraphOToken[], completeCallback?: any) {
+export function use0xOrderBooks(oTokens: SubgraphOToken[], completeCallback?: any) {
   const { networkId } = useConnectedWallet()
 
   const wsUrl = useMemo(() => ZeroXEndpoint[networkId].ws, [networkId])

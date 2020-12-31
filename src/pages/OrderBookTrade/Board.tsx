@@ -1,14 +1,27 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react'
+import React, { useMemo, useCallback } from 'react'
 
 import { DataView, Radio, LinkBase } from '@aragon/ui'
 import { SubgraphOToken } from '../../types'
 import { OTOKENS_BOARD } from '../../constants/dataviewContents'
 import { toTokenAmount } from '../../utils/math'
+import { useOrderbook } from '../../contexts/orderbook'
+import { getOrderBookDetail } from '../../utils/0x-utils'
 
 type BoardRow = {
   strikePrice: string
   put?: SubgraphOToken
   call?: SubgraphOToken
+}
+
+type RowWithDetail = BoardRow & {
+  callBid: string
+  callBidSize: string
+  callAsk: string
+  callAskSize: string
+  putBid: string
+  putBidSize: string
+  putAsk: string
+  putAskSize: string
 }
 
 type BoardProps = {
@@ -18,7 +31,7 @@ type BoardProps = {
 }
 
 export default function Board({ oTokens, selectedOToken, setSelectedOToken }: BoardProps) {
-  const [isLoadingOrderbook, setIsloadingOrderbook] = useState(false)
+  const { isLoading: isLoadingOrderbook, orderBooks } = useOrderbook()
 
   const rows = useMemo(() => {
     let _rows: BoardRow[] = []
@@ -43,8 +56,40 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken }: Bo
     return _rows
   }, [oTokens])
 
+  const rowsWithDetail = useMemo(() => {
+    return rows.map(row => {
+      const callbook = orderBooks.find(b => b.id === row.call?.id)
+      const putbook = row.put ? orderBooks.find(b => b.id === row.put?.id) : undefined
+      const {
+        bestBidPrice: callBid,
+        totalBidAmt: callBidSize,
+        bestAskPrice: callAsk,
+        totalAskAmt: callAskSize,
+      } = getOrderBookDetail(callbook)
+
+      const {
+        bestBidPrice: putBid,
+        totalBidAmt: putBidSize,
+        bestAskPrice: putAsk,
+        totalAskAmt: putAskSize,
+      } = getOrderBookDetail(putbook)
+
+      return {
+        ...row,
+        callBid,
+        callBidSize,
+        callAsk,
+        callAskSize,
+        putBid,
+        putBidSize,
+        putAsk,
+        putAskSize,
+      }
+    })
+  }, [rows, orderBooks])
+
   const renderRow = useCallback(
-    (row: BoardRow) => {
+    (row: RowWithDetail) => {
       const callOnClick = () => {
         setSelectedOToken(row.call)
       }
@@ -65,43 +110,43 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken }: Bo
           checked={selectedOToken && selectedOToken?.id === row.put?.id}
         />
       )
-      const callBid = row.call ? onclickWrapper(green('0'), callOnClick) : '-'
-      const callBidSize = row.call ? onclickWrapper('0', callOnClick) : '-'
-      const callBidIv = row.call ? onclickWrapper('0', callOnClick) : '-'
+      const callBidCell = row.call ? onclickWrapper(green(row.callBid), callOnClick) : '-'
+      const callBidSizeCell = row.call ? onclickWrapper(row.callBidSize, callOnClick) : '-'
+      const callBidIvCell = row.call ? onclickWrapper('0', callOnClick) : '-'
 
-      const callAsk = row.call ? onclickWrapper(red('0'), callOnClick) : '-'
-      const callAskSize = row.call ? onclickWrapper('0', callOnClick) : '-'
-      const callAskIv = row.call ? onclickWrapper('0', callOnClick) : '-'
+      const callAskCell = row.call ? onclickWrapper(red(row.callAsk), callOnClick) : '-'
+      const callAskSizeCell = row.call ? onclickWrapper(row.callAskSize, callOnClick) : '-'
+      const callAskIvCell = row.call ? onclickWrapper('0', callOnClick) : '-'
 
       const strike = bold(toTokenAmount(row.strikePrice, 8).toString())
-      const putBid = row.put ? onclickWrapper(green('0'), putOnClick) : '-'
-      const putBidSize = row.put ? onclickWrapper('0', putOnClick) : '-'
-      const putBidIv = row.put ? onclickWrapper('0', putOnClick) : '-'
+      const putBidCell = row.put ? onclickWrapper(green(row.putBid), putOnClick) : '-'
+      const putBidSizeCell = row.put ? onclickWrapper(row.putBidSize, putOnClick) : '-'
+      const putBidIvCell = row.put ? onclickWrapper('0', putOnClick) : '-'
 
-      const putAsk = row.put ? onclickWrapper(red('0'), putOnClick) : '-'
-      const putAskSize = row.put ? onclickWrapper('0', putOnClick) : '-'
-      const putAskIv = row.put ? onclickWrapper('0', putOnClick) : '-'
+      const putAskCell = row.put ? onclickWrapper(red(row.putAsk), putOnClick) : '-'
+      const putAskSizeCell = row.put ? onclickWrapper(row.putAskSize, putOnClick) : '-'
+      const putAskIvCell = row.put ? onclickWrapper('0', putOnClick) : '-'
 
       return [
-        callBid,
-        callBidIv,
-        callBidSize,
+        callBidCell,
+        callBidIvCell,
+        callBidSizeCell,
 
-        callAsk,
-        callAskIv,
-        callAskSize,
+        callAskCell,
+        callAskIvCell,
+        callAskSizeCell,
 
         callButton,
         strike,
         putButton,
 
-        putBid,
-        putBidIv,
-        putBidSize,
+        putBidCell,
+        putBidIvCell,
+        putBidSizeCell,
 
-        putAsk,
-        putAskIv,
-        putAskSize,
+        putAskCell,
+        putAskIvCell,
+        putAskSizeCell,
       ]
     },
     [selectedOToken, setSelectedOToken],
@@ -130,7 +175,7 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken }: Bo
           'amt',
         ]}
         emptyState={OTOKENS_BOARD}
-        entries={rows}
+        entries={rowsWithDetail}
         renderEntry={renderRow}
       />
     </div>

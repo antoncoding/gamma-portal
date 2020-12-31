@@ -1,5 +1,3 @@
-import BigNumber from 'bignumber.js'
-
 export type OrderWithMetaData = {
   order: SignedOrder
   metaData: {
@@ -35,8 +33,8 @@ export type OTokenOrderBook = {
 }
 
 export type OTokenOrderBookWithDetail = OTokenOrderBook & {
-  bestAskPrice: BigNumber
-  bestBidPrice: BigNumber
-  totalBidAmt: BigNumber
-  totalAskAmt: BigNumber
+  bestAskPrice: string
+  bestBidPrice: string
+  totalBidAmt: string
+  totalAskAmt: string
 }

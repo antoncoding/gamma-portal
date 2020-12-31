@@ -4,6 +4,8 @@ import 'moment-timezone'
 
 import { Main, Layout } from '@aragon/ui'
 import { walletContext } from './contexts/wallet'
+import { OrderbookProvider } from './contexts/orderbook'
+
 import NavBar from './components/NavBar'
 import SideBar from './components/SideBar'
 
@@ -32,72 +34,74 @@ function App() {
     <Router>
       <Main layout={false} theme={theme}>
         <walletContext.Provider value={wallet}>
-          <NavBar />
-          <div style={{ display: 'flex', height: '100%' }}>
-            <div style={{ width: '15%', marginRight: '3%' }}>
-              <SideBar />
-            </div>
-            <div style={{ width: '80%', marginRight: '2%' }}>
-              <Switch>
-                {/* without layout */}
-                <Route path="/trade/0x">
-                  <Trade />
-                </Route>
+          <OrderbookProvider>
+            <NavBar />
+            <div style={{ display: 'flex', height: '100%' }}>
+              <div style={{ width: '15%', marginRight: '3%' }}>
+                <SideBar />
+              </div>
+              <div style={{ width: '80%', marginRight: '2%' }}>
+                <Switch>
+                  {/* without layout */}
+                  <Route path="/trade/0x">
+                    <Trade />
+                  </Route>
 
-                {/* pages with layout */}
-                <Route path="/account/:account/operators">
-                  <Layout>
-                    <Operators />
-                  </Layout>
-                </Route>
-                <Route path="/account/:account/vaults/">
-                  <Layout>
-                    <AccountVault />
-                  </Layout>
-                </Route>
-                <Route path="/account/:account">
-                  <Layout>
-                    <Account />
-                  </Layout>
-                </Route>
-                <Route path="/account/">
-                  <Layout>
-                    <ConnectWallet />
-                  </Layout>
-                </Route>
-                <Route path="/vault/:owner/:vaultId">
-                  <Layout>
-                    <Vault />
-                  </Layout>
-                </Route>
-                <Route path="/system/oracle">
-                  <Layout>
-                    <Oracle />
-                  </Layout>
-                </Route>
-                <Route path="/system/factory/">
-                  <Layout>
-                    <Factory />
-                  </Layout>
-                </Route>
-                <Route path="/system/">
-                  <Layout>
-                    <ProtocolHome />
-                  </Layout>
-                </Route>
-                <Route path="/settings/">
-                  <Layout>
-                    <Settings setTheme={setTheme} />
-                  </Layout>
-                </Route>
-                <Route path="/">
-                  <Layout>
-                    <HomePage />
-                  </Layout>
-                </Route>
-              </Switch>
+                  {/* pages with layout */}
+                  <Route path="/account/:account/operators">
+                    <Layout>
+                      <Operators />
+                    </Layout>
+                  </Route>
+                  <Route path="/account/:account/vaults/">
+                    <Layout>
+                      <AccountVault />
+                    </Layout>
+                  </Route>
+                  <Route path="/account/:account">
+                    <Layout>
+                      <Account />
+                    </Layout>
+                  </Route>
+                  <Route path="/account/">
+                    <Layout>
+                      <ConnectWallet />
+                    </Layout>
+                  </Route>
+                  <Route path="/vault/:owner/:vaultId">
+                    <Layout>
+                      <Vault />
+                    </Layout>
+                  </Route>
+                  <Route path="/system/oracle">
+                    <Layout>
+                      <Oracle />
+                    </Layout>
+                  </Route>
+                  <Route path="/system/factory/">
+                    <Layout>
+                      <Factory />
+                    </Layout>
+                  </Route>
+                  <Route path="/system/">
+                    <Layout>
+                      <ProtocolHome />
+                    </Layout>
+                  </Route>
+                  <Route path="/settings/">
+                    <Layout>
+                      <Settings setTheme={setTheme} />
+                    </Layout>
+                  </Route>
+                  <Route path="/">
+                    <Layout>
+                      <HomePage />
+                    </Layout>
+                  </Route>
+                </Switch>
+              </div>
             </div>
-          </div>
+          </OrderbookProvider>
         </walletContext.Provider>
       </Main>
     </Router>
