@@ -7,7 +7,6 @@ import Orderbook from './Orderbook'
 
 import { SubgraphOToken, OrderWithMetaData } from '../../types'
 import SectionTitle from '../../components/SectionHeader'
-import { useOrderbook } from '../../contexts/orderbook'
 import { TradeAction } from '../../constants'
 
 export default function TradePage() {
@@ -18,8 +17,6 @@ export default function TradePage() {
   const [mintPanelOpened, setMintPanelOpened] = useState(false)
 
   const [selectedOrders, setSelectedOrders] = useState<OrderWithMetaData[]>([])
-
-  const { orderbooks } = useOrderbook()
 
   // reset selected orders when oToken change
   useEffect(() => {

@@ -1,7 +1,7 @@
-import React, { useMemo, useCallback, useState, useEffect } from 'react'
+import React, { useMemo, useCallback, useState } from 'react'
 
 import { DataView, Timer } from '@aragon/ui'
-import { SubgraphOToken, OrderWithMetaData, ActionType } from '../../types'
+import { SubgraphOToken, OrderWithMetaData } from '../../types'
 import { useOrderbook } from '../../contexts/orderbook'
 import { getAskPrice, getBidPrice, getOrderFillRatio, getRemainingAmounts } from '../../utils/0x-utils'
 import { green, red } from './StyleDiv'
@@ -28,13 +28,10 @@ export default function Orderbook({
   const [bidPage, setBidPage] = useState(0)
 
   const [selectedAskIdxs, setSelectedAskIdxs] = useState<number[]>([])
+
   const [selectedBidIdxs, setSelectedBidIdxs] = useState<number[]>([])
 
   const { orderbooks } = useOrderbook()
-
-  useEffect(() => {
-    console.log(`selectedOrders updated`, selectedOrders)
-  }, [selectedOrders])
 
   const thisBook = useMemo(
     () => (selectedOToken ? orderbooks.find(book => book.id === selectedOToken.id) : undefined),
@@ -66,29 +63,28 @@ export default function Orderbook({
 
   // user wants to buy will click on asks
   const onSelectAskEntry = useCallback(
-    idx => {
-      const ask = asks[idx]
-      if (action === TradeAction.Buy) {
-        setSelectedOrders([...selectedOrders, ask])
-      } else {
-        setAction(TradeAction.Sell)
+    (entries, indexes) => {
+      setSelectedOrders(entries)
+      setSelectedAskIdxs(indexes)
+      setSelectedBidIdxs([])
+      if (action === TradeAction.Sell) {
+        setAction(TradeAction.Buy)
       }
     },
-    [asks, action, setAction, setSelectedOrders, selectedOrders],
+    [action, setAction, setSelectedOrders],
   )
 
   // user wants to sell will click on bids
   const onSelectBidEntry = useCallback(
-    idx => {
-      const bid = bids[idx]
+    (entries, indexes) => {
+      setSelectedOrders(entries)
+      setSelectedBidIdxs(indexes)
+      setSelectedAskIdxs([])
       if (action === TradeAction.Buy) {
         setAction(TradeAction.Sell)
-        setSelectedOrders([bid])
-      } else {
-        setSelectedOrders([...selectedOrders, bid])
       }
     },
-    [bids, action, setAction, setSelectedOrders, selectedOrders],
+    [action, setAction, setSelectedOrders],
   )
 
   return (
@@ -101,7 +97,7 @@ export default function Orderbook({
           onPageChange={setAskPage}
           entries={asks}
           tableRowHeight={40}
-          onSelectEntries={setSelectedAskIdxs}
+          onSelectEntries={onSelectAskEntry}
           // If other operation reset selected orders, should change selected accordingly
           selection={selectedAskIdxs}
           renderSelectionCount={x => `${x} Orders Selected`}
@@ -117,7 +113,7 @@ export default function Orderbook({
           onPageChange={setBidPage}
           entries={bids}
           tableRowHeight={40}
-          onSelectEntries={setSelectedBidIdxs}
+          onSelectEntries={onSelectBidEntry}
           // If other operation reset selected orders, should change selected accordingly
           selection={selectedBidIdxs}
           renderSelectionCount={x => `${x} Orders Selected`}
