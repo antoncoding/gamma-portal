@@ -32,6 +32,10 @@ export default function Orderbook({
 
   const { orderbooks } = useOrderbook()
 
+  useEffect(() => {
+    console.log(`selectedOrders updated`, selectedOrders)
+  }, [selectedOrders])
+
   const thisBook = useMemo(
     () => (selectedOToken ? orderbooks.find(book => book.id === selectedOToken.id) : undefined),
     [selectedOToken, orderbooks],
@@ -97,7 +101,7 @@ export default function Orderbook({
           onPageChange={setAskPage}
           entries={asks}
           tableRowHeight={40}
-          onSelectEntries={onSelectAskEntry}
+          onSelectEntries={setSelectedAskIdxs}
           // If other operation reset selected orders, should change selected accordingly
           selection={selectedAskIdxs}
           renderSelectionCount={x => `${x} Orders Selected`}
@@ -113,7 +117,7 @@ export default function Orderbook({
           onPageChange={setBidPage}
           entries={bids}
           tableRowHeight={40}
-          // onSelectEntries={onSelectAskEntry}
+          onSelectEntries={setSelectedBidIdxs}
           // If other operation reset selected orders, should change selected accordingly
           selection={selectedBidIdxs}
           renderSelectionCount={x => `${x} Orders Selected`}

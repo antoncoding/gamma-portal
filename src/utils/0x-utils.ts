@@ -336,8 +336,8 @@ export const sortBids = (a: OrderWithMetaData, b: OrderWithMetaData): 1 | -1 => 
  * @param b
  */
 export const sortAsks = (a: OrderWithMetaData, b: OrderWithMetaData): 1 | -1 => {
-  const priceA = getBidPrice(a.order, 6, 8)
-  const priceB = getBidPrice(b.order, 6, 8)
+  const priceA = getAskPrice(a.order, 8, 6)
+  const priceB = getAskPrice(b.order, 8, 6)
   return priceA.gt(priceB) ? 1 : -1
 }
 
