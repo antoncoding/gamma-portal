@@ -6,7 +6,6 @@ import Orderbook from './Orderbook'
 import TradePanel from './TradePanel'
 
 import { SubgraphOToken, OrderWithMetaData } from '../../types'
-import SectionTitle from '../../components/SectionHeader'
 import { TradeAction } from '../../constants'
 import { useTokenPrice } from '../../hooks'
 import { emptyToken } from '../../constants/addresses'
@@ -37,9 +36,8 @@ export default function TradePage() {
         selectedOToken={selectedOToken}
         setSelectedOToken={setSelectedOToken}
       />
-      <div style={{ display: 'flex' }}>
-        <div style={{ width: '40%' }}>
-          <SectionTitle title="Order Book" />
+      <div style={{ display: 'flex', paddingTop: '15px' }}>
+        <div style={{ width: '30%' }}>
           <Orderbook
             selectedOToken={selectedOToken}
             setSelectedOrders={setSelectedOrders}
@@ -47,8 +45,7 @@ export default function TradePage() {
             action={action}
           />
         </div>
-        <div style={{ paddingLeft: '15px', width: '60%' }}>
-          <SectionTitle title="Make Orders" />
+        <div style={{ paddingLeft: '15px', width: '70%' }}>
           <TradePanel
             selectedOToken={selectedOToken}
             setSelectedOrders={setSelectedOrders}

@@ -19,13 +19,7 @@ type TradeDetailProps = {
   setSelectedOrders: React.Dispatch<React.SetStateAction<OrderWithMetaData[]>>
 }
 
-export default function TradePanel({
-  selectedOToken,
-  action,
-  setAction,
-  selectedOrders,
-  setSelectedOrders,
-}: TradeDetailProps) {
+export default function TradePanel({ selectedOToken, action, setAction }: TradeDetailProps) {
   const titleText = useMemo(
     () =>
       `${action === TradeAction.Buy ? 'Buy' : 'Sell'} ${
@@ -35,7 +29,7 @@ export default function TradePanel({
   )
 
   return (
-    <Box>
+    <Box heading="fill orders">
       <Split
         primary={<SectionTitle title={titleText} paddingTop={0} />}
         secondary={

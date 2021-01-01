@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useState } from 'react'
 
-import { DataView, Timer } from '@aragon/ui'
+import { DataView, Timer, Box } from '@aragon/ui'
 import { SubgraphOToken, OrderWithMetaData } from '../../types'
 import { useOrderbook } from '../../contexts/orderbook'
 import { getAskPrice, getBidPrice, getRemainingAmounts } from '../../utils/0x-utils'
@@ -80,15 +80,15 @@ export default function Orderbook({ selectedOToken, action, setAction, setSelect
   // )
 
   return (
-    <div>
-      <div style={{ minWidth: 450 }}>
+    <Box heading={'Order book'}>
+      {action === TradeAction.Buy ? (
         <DataView
           emptyState={
             selectedOToken
               ? generateNoOrderContent('asks', simplifyOTokenSymbol(selectedOToken?.symbol))
               : NO_TOKEN_SELECTED
           }
-          entriesPerPage={4}
+          entriesPerPage={6}
           page={askPage}
           onPageChange={setAskPage}
           entries={asks}
@@ -100,15 +100,14 @@ export default function Orderbook({ selectedOToken, action, setAction, setSelect
           fields={['ask price', 'amount', 'expiration']}
           renderEntry={renderAskRow}
         />
-      </div>
-      <div style={{ paddingTop: '20px', minWidth: 450 }}>
+      ) : (
         <DataView
           emptyState={
             selectedOToken
               ? generateNoOrderContent('bids', simplifyOTokenSymbol(selectedOToken?.symbol))
               : NO_TOKEN_SELECTED
           }
-          entriesPerPage={4}
+          entriesPerPage={6}
           page={bidPage}
           onPageChange={setBidPage}
           entries={bids}
@@ -120,7 +119,7 @@ export default function Orderbook({ selectedOToken, action, setAction, setSelect
           fields={['bid price', 'amount', 'expiration']}
           renderEntry={renderBidRow}
         />
-      </div>
-    </div>
+      )}
+    </Box>
   )
 }
