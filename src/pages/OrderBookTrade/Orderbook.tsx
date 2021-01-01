@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useState } from 'react'
 
-import { DataView, Timer, Box } from '@aragon/ui'
+import { DataView, Timer } from '@aragon/ui'
 import { SubgraphOToken, OrderWithMetaData } from '../../types'
 import { useOrderbook } from '../../contexts/orderbook'
 import { getAskPrice, getBidPrice, getRemainingAmounts } from '../../utils/0x-utils'
@@ -80,7 +80,7 @@ export default function Orderbook({ selectedOToken, action, setAction }: Orderbo
   // )
 
   return (
-    <Box heading={'Order book'}>
+    <div>
       {action === TradeAction.Buy ? (
         <DataView
           emptyState={
@@ -120,6 +120,6 @@ export default function Orderbook({ selectedOToken, action, setAction }: Orderbo
           renderEntry={renderBidRow}
         />
       )}
-    </Box>
+    </div>
   )
 }

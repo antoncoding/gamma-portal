@@ -13,3 +13,8 @@ export enum MarketTypes {
   Market = 'market',
   Limit = 'limit',
 }
+
+export enum Errors {
+  NO_ERROR,
+  INSUFFICIENT_LIQUIDITY,
+}

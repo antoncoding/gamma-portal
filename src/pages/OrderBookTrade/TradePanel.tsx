@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 
-import { Box, Button, TextInput } from '@aragon/ui'
+import { Box, Button, TextInput, Split, IconArrowRight } from '@aragon/ui'
 import { SubgraphOToken, OrderWithMetaData } from '../../types'
 
 // import { getAskPrice, getBidPrice, getOrderFillRatio, getRemainingAmounts } from '../../utils/0x-utils'
@@ -11,6 +11,12 @@ import { TradeAction, MarketTypes } from '../../constants'
 import { simplifyOTokenSymbol } from '../../utils/others'
 import LabelText from '../../components/LabelText'
 import BigNumber from 'bignumber.js'
+import { useConnectedWallet } from '../../contexts/wallet'
+
+import { getUSDC } from '../../constants/addresses'
+
+import oETHIcon from '../../imgs/oETH.svg'
+import USDCIcon from '../../imgs/USDC.png'
 
 type TradeDetailProps = {
   selectedOToken: SubgraphOToken | null
@@ -20,9 +26,6 @@ type TradeDetailProps = {
 
 export default function TradePanel({ selectedOToken, action, setAction }: TradeDetailProps) {
   const [marketType, setMarketType] = useState(MarketTypes.Market)
-
-  const [price, setPrice] = useState(new BigNumber(0))
-  const [oTokenAmount, setOTokenAmount] = useState(new BigNumber(0))
 
   const titleText = useMemo(
     () =>
@@ -34,20 +37,66 @@ export default function TradePanel({ selectedOToken, action, setAction }: TradeD
 
   return (
     <Box heading={titleText}>
-      <TradeType action={action} setAction={setAction} setMarketType={setMarketType} marketType={marketType} />
-      <br />
-      <div style={{ display: 'flex' }}>
-        <div>
-          <LabelText label={`Amount to ${action}`} />
-          <TextInput adornment={`o${selectedOToken?.underlyingAsset.symbol ?? 'Token'}`} adornmentPosition="end" />
-        </div>
-
-        <div>
-          <LabelText label="Price" />
-          <TextInput adornment="USDC" adornmentPosition="end" />
-        </div>
-      </div>
+      <Split
+        primary={
+          selectedOToken === null ? (
+            <> </>
+          ) : marketType === MarketTypes.Market ? (
+            <MarketTicket action={action} selectedOToken={selectedOToken} />
+          ) : (
+            <> </>
+          )
+        }
+        secondary={
+          <TradeType action={action} setAction={setAction} setMarketType={setMarketType} marketType={marketType} />
+        }
+      />
     </Box>
+  )
+}
+
+type MarketTicketProps = {
+  action
+  selectedOToken: SubgraphOToken
+}
+
+function MarketTicket({ action, selectedOToken }: MarketTicketProps) {
+  const { networkId } = useConnectedWallet()
+
+  const paymentToken = useMemo(() => getUSDC(networkId), [networkId])
+
+  const inputToken = useMemo(() => (action === TradeAction.Buy ? paymentToken : selectedOToken), [
+    paymentToken,
+    selectedOToken,
+    action,
+  ])
+  const inputIcon = useMemo(
+    () => <img alt="inputtoken" width={23} src={action === TradeAction.Buy ? USDCIcon : oETHIcon} />,
+    [action],
+  )
+
+  const outputToken = useMemo(() => (action === TradeAction.Buy ? selectedOToken : paymentToken), [
+    paymentToken,
+    selectedOToken,
+    action,
+  ])
+  const outputIcon = useMemo(
+    () => <img alt="outputtoken" width={23} src={action === TradeAction.Buy ? oETHIcon : USDCIcon} />,
+    [action],
+  )
+
+  return (
+    <div style={{ display: 'flex' }}>
+      <div>
+        <TextInput adornment={inputIcon} adornmentPosition="end" />
+      </div>
+      <div style={{ padding: '5px' }}>
+        <IconArrowRight size="medium" />
+      </div>
+      <div>
+        <TextInput adornment={outputIcon} adornmentPosition="end" />
+      </div>
+    </div>
   )
 }
 
@@ -60,40 +109,23 @@ type TradeTypeProps = {
 
 function TradeType({ action, setAction, marketType, setMarketType }: TradeTypeProps) {
   return (
-    // <div style={{ width: '100%' }}>
     <div style={{ display: 'flex', width: '100%' }}>
-      {/* Buy or sell */}
       <div style={{ paddingRight: '20', display: 'flex', marginRight: 0, marginLeft: 'auto' }}>
         <Button
-          size="small"
-          label={'Buy'}
-          mode={action === TradeAction.Buy ? 'positive' : 'normal'}
-          onClick={() => setAction(TradeAction.Buy)}
+          label={action === TradeAction.Buy ? 'Buy' : 'Sell'}
+          mode={action === TradeAction.Buy ? 'positive' : 'negative'}
+          onClick={() => (action === TradeAction.Buy ? setAction(TradeAction.Sell) : setAction(TradeAction.Buy))}
         />
 
         <div style={{ paddingRight: '15px' }}>
           <Button
-            size="small"
-            label={'Sell'}
-            mode={action === TradeAction.Sell ? 'negative' : 'normal'}
-            onClick={() => setAction(TradeAction.Sell)}
+            label={marketType === MarketTypes.Market ? 'Market' : 'Limit'}
+            onClick={() =>
+              marketType === MarketTypes.Market ? setMarketType(MarketTypes.Limit) : setMarketType(MarketTypes.Market)
+            }
           />
         </div>
-        <Button
-          size="small"
-          label="Market"
-          mode={marketType === MarketTypes.Market ? 'strong' : 'normal'}
-          onClick={() => setMarketType(MarketTypes.Market)}
-        />
-
-        <Button
-          size="small"
-          label="Limit"
-          mode={marketType === MarketTypes.Limit ? 'strong' : 'normal'}
-          onClick={() => setMarketType(MarketTypes.Limit)}
-        />
       </div>
     </div>
-    // </div>
   )
 }

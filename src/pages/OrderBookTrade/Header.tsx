@@ -21,7 +21,7 @@ export default function TradeHeadBar({ setOTokens, setSelectedUnderlying }: Head
   const series = useMemo(() => (allSeries.length === 0 ? null : allSeries[seriesId]), [allSeries, seriesId])
 
   useEffect(() => {
-    if (series !== null) setSelectedUnderlying({ ...series.underlying, address: series.underlying.id })
+    if (series !== null) setSelectedUnderlying({ ...series.underlying, id: series.underlying.id })
   }, [series, setSelectedUnderlying])
 
   const { allOtokens: allOToken } = useOTokenInSeries(series?.underlying.id, series?.strike.id)

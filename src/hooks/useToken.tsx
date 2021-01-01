@@ -8,7 +8,7 @@ export function useTokenBySymbol(symbol: string, networkId: number): Token {
   if (token === undefined)
     return {
       name: 'Unknown',
-      address: ZERO_ADDR,
+      id: ZERO_ADDR,
       symbol: symbol,
       decimals: 18,
     }
@@ -17,12 +17,12 @@ export function useTokenBySymbol(symbol: string, networkId: number): Token {
 }
 
 export function useTokenByAddress(addr: string, networkId: number): Token {
-  const token = useMemo(() => tokens[networkId.toString()].find(token => token.address === addr), [networkId, addr])
+  const token = useMemo(() => tokens[networkId.toString()].find(token => token.id === addr), [networkId, addr])
 
   if (token === undefined)
     return {
       name: 'Unknown',
-      address: addr,
+      id: addr,
       symbol: 'Unknown',
       decimals: 18,
     }

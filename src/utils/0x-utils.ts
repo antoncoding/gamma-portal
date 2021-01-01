@@ -8,7 +8,7 @@ import {
   OTokenOrderBook,
   OTokenOrderBookWithDetail,
 } from '../types'
-import { ZeroXEndpoint, getUSDC, zx_exchange, OrderType } from '../constants'
+import { ZeroXEndpoint, getUSDC, zx_exchange, OrderType, Errors } from '../constants'
 import { sleep } from '../utils/others'
 import { toTokenAmount } from './math'
 const Promise = require('bluebird')
@@ -134,7 +134,7 @@ type PairData = {
 export async function filter0xAvailablePairs(networkId: 1 | 42, oTokens: OToken[]): Promise<OToken[]> {
   // return oTokens;
   const endpoint = ZeroXEndpoint[networkId].http
-  const usdcAddr = getUSDC(networkId).address
+  const usdcAddr = getUSDC(networkId).id
   const usdcAssetData = assetDataUtils.encodeERC20AssetData(usdcAddr)
   const url = `${endpoint}sra/v3/asset_pairs?assetDataA=${usdcAssetData}`
   const res = await fetch(url)
@@ -179,7 +179,7 @@ export async function getOTokenUSDCOrderBook(
   asks: OrderWithMetaData[]
   bids: OrderWithMetaData[]
 }> {
-  const quote = getUSDC(networkId).address
+  const quote = getUSDC(networkId).id
   const endpoint = ZeroXEndpoint[networkId].http
   const baseAsset = assetDataUtils.encodeERC20AssetData(oToken)
   const quoteAsset = assetDataUtils.encodeERC20AssetData(quote)
@@ -233,7 +233,7 @@ export const categorizeOrder = (
   oTokens: string[],
   orderInfo: OrderWithMetaData,
 ): { type: OrderType; token: string } => {
-  const usdc = getUSDC(networkId).address
+  const usdc = getUSDC(networkId).id
 
   let takerAsset = (assetDataUtils.decodeAssetDataOrThrow(orderInfo.order.takerAssetData) as ERC20AssetData)
     .tokenAddress
@@ -379,134 +379,140 @@ export const getTotalBidAmount = (bids: OrderWithMetaData[], decimals: number): 
   )
 }
 
-// /**
-//  * Calculate amount of output token to get if I supply {amount} takerAsset
-//  * @param orderInfos
-//  * @param amount
-//  */
-// export const calculateOrderOutput = (orderInfos: OrderWithMetaData[], amount: BigNumber) => {
-//   if (amount.isZero()) {
-//     return {
-//       error: Errors.NO_ERROR,
-//       ordersToFill: [] as SignedOrder[],
-//       amounts: [] as BigNumber[],
-//       sumOutput: new BigNumber(0),
-//     };
-//   }
-//   if (orderInfos.length === 0) {
-//     return {
-//       error: Errors.INSUFFICIENT_LIQUIDITY,
-//       ordersToFill: [] as SignedOrder[],
-//       amounts: [] as BigNumber[],
-//       sumOutput: new BigNumber(0),
-//     };
-//   }
-//   let inputLeft = amount.integerValue();
+/**
+ * Calculate amount of output token to get if I supply {amount} takerAsset
+ * used to calculate amount of USDC we can get after selling {amount} oToken
+ * @param orderInfos bid order
+ * @param amount oToken to sell
+ */
+export const calculateOrderOutput = (orderInfos: OrderWithMetaData[], amount: BigNumber) => {
+  if (amount.isZero()) {
+    return {
+      error: Errors.NO_ERROR,
+      ordersToFill: [] as SignedOrder[],
+      amounts: [] as BigNumber[],
+      sumOutput: new BigNumber(0),
+    }
+  }
+  if (orderInfos.length === 0) {
+    return {
+      error: Errors.INSUFFICIENT_LIQUIDITY,
+      ordersToFill: [] as SignedOrder[],
+      amounts: [] as BigNumber[],
+      sumOutput: new BigNumber(0),
+    }
+  }
+  let inputLeft = amount.integerValue()
 
-//   let sumOutput = new BigNumber(0);
+  let sumOutput = new BigNumber(0)
 
-//   const ordersToFill: SignedOrder[] = [];
-//   // amounts to fill for each order
-//   const amounts: BigNumber[] = [];
+  // array of orders to fill
+  const ordersToFill: SignedOrder[] = []
+  // amounts to fill for each order
+  const amounts: BigNumber[] = []
 
-//   for (const { metaData, order } of orderInfos) {
-//     // amonunt of oToken fillable. always integer
-//     const fillable = new BigNumber(metaData.remainingFillableTakerAssetAmount);
+  for (const { metaData, order } of orderInfos) {
+    // amonunt of oToken fillable. always an integer
+    const fillable = new BigNumber(metaData.remainingFillableTakerAssetAmount)
 
-//     ordersToFill.push(order);
+    ordersToFill.push(order)
 
-//     const price = new BigNumber(order.makerAssetAmount).div(new BigNumber(order.takerAssetAmount));
+    const price = new BigNumber(order.makerAssetAmount).div(new BigNumber(order.takerAssetAmount))
 
-//     if (fillable.lt(inputLeft)) {
-//       sumOutput = sumOutput.plus(fillable.times(price).integerValue(BigNumber.ROUND_DOWN));
-//       inputLeft = inputLeft.minus(fillable);
-//       amounts.push(fillable);
-//     } else {
-//       sumOutput = sumOutput.plus(inputLeft.times(price).integerValue(BigNumber.ROUND_DOWN));
-//       amounts.push(inputLeft);
-//       inputLeft = new BigNumber(0);
-//       break;
-//     }
-//   }
+    if (fillable.lt(inputLeft)) {
+      sumOutput = sumOutput.plus(fillable.times(price).integerValue(BigNumber.ROUND_DOWN))
+      inputLeft = inputLeft.minus(fillable)
+      // fill the full amount of this order
+      amounts.push(fillable)
+    } else {
+      sumOutput = sumOutput.plus(inputLeft.times(price).integerValue(BigNumber.ROUND_DOWN))
+      // fill the last order with only amount = inputLeft
+      amounts.push(inputLeft)
+      inputLeft = new BigNumber(0)
+      break
+    }
+  }
 
-//   if (inputLeft.gt(new BigNumber(0))) {
-//     return {
-//       error: Errors.INSUFFICIENT_LIQUIDITY,
-//       ordersToFill: [] as SignedOrder[],
-//       amounts: [] as BigNumber[],
-//       sumOutput: new BigNumber(0),
-//     };
-//   }
+  if (inputLeft.gt(new BigNumber(0))) {
+    return {
+      error: Errors.INSUFFICIENT_LIQUIDITY,
+      ordersToFill: [] as SignedOrder[],
+      amounts: [] as BigNumber[],
+      sumOutput: new BigNumber(0),
+    }
+  }
 
-//   return { error: Errors.NO_ERROR, ordersToFill, amounts, sumOutput: sumOutput.integerValue() };
-// };
+  return { error: Errors.NO_ERROR, ordersToFill, amounts, sumOutput: sumOutput.integerValue() }
+}
 
-// /**
-//  * Calculate amount of {takerAsset} (USDC) need to pay if I want {amount} output (oToken)
-//  * @param orderInfos usually ask orders
-//  * @param amount of maker asset I want
-//  */
-// export const calculateOrderInput = (orderInfos: OrderWithMetaData[], amount: BigNumber) => {
-//   if (amount.isZero()) {
-//     return {
-//       error: Errors.NO_ERROR,
-//       ordersToFill: [] as SignedOrder[],
-//       amounts: [] as BigNumber[],
-//       sumInput: new BigNumber(0),
-//     };
-//   }
-//   if (orderInfos.length === 0) {
-//     return {
-//       error: Errors.INSUFFICIENT_LIQUIDITY,
-//       ordersToFill: [] as SignedOrder[],
-//       amounts: [] as BigNumber[],
-//       sumInput: new BigNumber(0),
-//     };
-//   }
-//   let neededAmount = amount; // needed maker asset
+/**
+ * Calculate amount of {takerAsset} need to pay if I want {amount} {makerAsset}
+ * Used to calculate the USDC needed to buy {amount} oToken
+ * @param orderInfos ask orders
+ * @param amount oToken I want to buy
+ */
+export const calculateOrderInput = (orderInfos: OrderWithMetaData[], amount: BigNumber) => {
+  if (amount.isZero()) {
+    return {
+      error: Errors.NO_ERROR,
+      ordersToFill: [] as SignedOrder[],
+      amounts: [] as BigNumber[],
+      sumInput: new BigNumber(0),
+    }
+  }
+  if (orderInfos.length === 0) {
+    return {
+      error: Errors.INSUFFICIENT_LIQUIDITY,
+      ordersToFill: [] as SignedOrder[],
+      amounts: [] as BigNumber[],
+      sumInput: new BigNumber(0),
+    }
+  }
+  let neededMakerAmount = amount // needed maker asset
 
-//   const ordersToFill: SignedOrder[] = [];
-//   // amounts to fill for each order (rounded)
-//   const amounts: BigNumber[] = [];
+  const ordersToFill: SignedOrder[] = []
+  // amounts to fill for each order (rounded)
+  const amounts: BigNumber[] = []
 
-//   for (const { metaData, order } of orderInfos) {
-//     const fillableTakerAmount = new BigNumber(metaData.remainingFillableTakerAssetAmount); // usdc
+  for (const { metaData, order } of orderInfos) {
+    const fillableTakerAmount = new BigNumber(metaData.remainingFillableTakerAssetAmount) // USDC
 
-//     const fillableMakerAmount = new BigNumber(order.makerAssetAmount)
-//       .times(new BigNumber(metaData.remainingFillableTakerAssetAmount))
-//       .div(new BigNumber(order.takerAssetAmount))
-//       .integerValue(BigNumber.ROUND_DOWN);
+    const fillableMakerAmount = new BigNumber(order.makerAssetAmount)
+      .times(fillableTakerAmount)
+      .div(new BigNumber(order.takerAssetAmount))
+      .integerValue(BigNumber.ROUND_DOWN)
 
-//     ordersToFill.push(order);
+    ordersToFill.push(order)
 
-//     // const price = new BigNumber(order.makerAssetAmount).div(new BigNumber(order.takerAssetAmount));
-//     if (fillableMakerAmount.lt(neededAmount)) {
-//       // takes all fillabe amount
-//       amounts.push(fillableTakerAmount);
-//       neededAmount = neededAmount.minus(fillableMakerAmount);
-//     } else {
-//       const requiredTakerAsset = fillableTakerAmount.times(neededAmount).div(fillableMakerAmount);
-//       amounts.push(requiredTakerAsset.integerValue(BigNumber.ROUND_CEIL));
-//       neededAmount = new BigNumber(0);
-//       break;
-//     }
-//   }
+    if (fillableMakerAmount.lt(neededMakerAmount)) {
+      // takes all fillabe amount
+      amounts.push(fillableTakerAmount)
+      neededMakerAmount = neededMakerAmount.minus(fillableMakerAmount)
+    } else {
+      // only fill partial of the order
+      const requiredTakerAsset = fillableTakerAmount.times(neededMakerAmount).div(fillableMakerAmount)
+      amounts.push(requiredTakerAsset.integerValue(BigNumber.ROUND_CEIL))
+      neededMakerAmount = new BigNumber(0)
+      break
+    }
+  }
 
-//   if (neededAmount.gt(new BigNumber(0))) {
-//     return {
-//       error: Errors.INSUFFICIENT_LIQUIDITY,
-//       ordersToFill: [] as SignedOrder[],
-//       amounts: [] as BigNumber[],
-//       sumInput: new BigNumber(0),
-//     };
-//   }
+  if (neededMakerAmount.gt(new BigNumber(0))) {
+    return {
+      error: Errors.INSUFFICIENT_LIQUIDITY,
+      ordersToFill: [] as SignedOrder[],
+      amounts: [] as BigNumber[],
+      sumInput: new BigNumber(0),
+    }
+  }
 
-//   const sumInput = amounts.reduce((prev, curr) => prev.plus(curr), new BigNumber(0));
+  // sum all amounts
+  const sumInput = amounts.reduce((prev, curr) => prev.plus(curr), new BigNumber(0))
 
-//   return {
-//     error: Errors.NO_ERROR,
-//     ordersToFill,
-//     amounts,
-//     sumInput: sumInput.integerValue(),
-//   };
-// };
+  return {
+    error: Errors.NO_ERROR,
+    ordersToFill,
+    amounts,
+    sumInput: sumInput.integerValue(),
+  }
+}

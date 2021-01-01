@@ -9,7 +9,7 @@ export const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 
 export const emptyToken: Token = {
   name: 'No Token',
-  address: ZERO_ADDR,
+  id: ZERO_ADDR,
   symbol: 'N/A',
   decimals: 18,
 }
@@ -19,13 +19,13 @@ export const tokens: TokensTyps = {
     emptyToken,
     {
       name: 'USDC',
-      address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+      id: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
       symbol: 'USDC',
       decimals: 6,
     },
     {
       name: 'Wrapped Ether',
-      address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+      id: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
       symbol: 'WETH',
       decimals: 18,
     },
@@ -34,13 +34,13 @@ export const tokens: TokensTyps = {
     emptyToken,
     {
       name: 'USDC',
-      address: '0xb7a4f3e9097c08da09517b5ab877f7a917224ede',
+      id: '0xb7a4f3e9097c08da09517b5ab877f7a917224ede',
       symbol: 'USDC',
       decimals: 6,
     },
     {
       name: 'Wrapped Ether',
-      address: '0xd0a1e359811322d97991e03f863a0c30c2cf029c',
+      id: '0xd0a1e359811322d97991e03f863a0c30c2cf029c',
       symbol: 'WETH',
       decimals: 18,
     },

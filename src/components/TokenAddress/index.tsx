@@ -14,7 +14,7 @@ function TokenBadge({
   let address = ZERO_ADDR
   let label = nullLabel
   if (token !== null) {
-    address = (token as SubgraphToken).id ? (token as SubgraphToken).id : (token as Token).address
+    address = (token as SubgraphToken).id ? (token as SubgraphToken).id : (token as Token).id
     label = token.symbol
   }
   return <CustomIdentityBadge label={label} entity={address} />
