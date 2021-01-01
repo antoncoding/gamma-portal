@@ -70,7 +70,7 @@ export default function TradeHeadBar({ setOTokens, setSelectedUnderlying }: Head
               placeholder={uniqueExpiries.length === 0 ? <LoadingRing /> : 'Select Expiry'}
               items={uniqueExpiries.map(e => toUTCDateString(Number(e)))}
               disabled={uniqueExpiries.length === 0}
-              selected={seriesId}
+              selected={expiryId}
               onChange={setExpiryId}
             />
           </div>
