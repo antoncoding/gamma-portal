@@ -34,16 +34,22 @@ export default function TradePanel({
     [selectedOToken, action],
   )
 
-  console.log(`titleText`, titleText)
-
   return (
     <Box>
       <Split
         primary={<SectionTitle title={titleText} paddingTop={0} />}
         secondary={
           <div style={{ display: 'flex' }}>
-            <Button disabled={action === TradeAction.Buy} label={'Buy'} onClick={() => setAction(TradeAction.Buy)} />
-            <Button disabled={action === TradeAction.Sell} label={'Sell'} onClick={() => setAction(TradeAction.Sell)} />
+            {action === TradeAction.Buy ? (
+              <Button label={'Buy'} mode="positive" />
+            ) : (
+              <Button label={'Buy'} onClick={() => setAction(TradeAction.Buy)} />
+            )}
+            {action === TradeAction.Sell ? (
+              <Button label={'Sell'} mode="negative" />
+            ) : (
+              <Button label={'Sell'} onClick={() => setAction(TradeAction.Sell)} />
+            )}
           </div>
         }
       />
