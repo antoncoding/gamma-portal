@@ -88,7 +88,7 @@ export default function Oracle() {
   return (
     <>
       <Header primary="Oracle" />
-      In Opyn v2, we need on-chain prices for underlying, strike and collateral assets to settle oTokens.
+      In Opyn v2, we need on-chain prices for underlying assets to settle oTokens.
       <SectionTitle title="Choose an Asset" />
       <DropDown
         disabled={!allOracleAssets || allOracleAssets.length === 0}

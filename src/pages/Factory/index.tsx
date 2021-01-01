@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import BigNumber from 'bignumber.js'
-import { Header, TextInput, Button, DropDown, useToast, LoadingRing, AddressField, Help } from '@aragon/ui'
+import {
+  Header,
+  TextInput,
+  Button,
+  DropDown,
+  useToast,
+  LoadingRing,
+  AddressField,
+  Help,
+  SyncIndicator,
+} from '@aragon/ui'
 import LabelText from '../../components/LabelText'
 import Warning from '../../components/Warning'
 import { useConnectedWallet } from '../../contexts/wallet'
@@ -119,6 +129,7 @@ export default function CreateOption() {
 
   return (
     <>
+      <SyncIndicator visible={allProducts.length === 0} children={'Syncing data... 🎄'} />
       <Header primary="oToken Factory" />
       <SectionTitle title="Create new oToken" />
       <DropDown
