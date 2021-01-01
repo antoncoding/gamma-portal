@@ -5,7 +5,7 @@ const EmptyState = <img src={emptyStateRedSrc} alt="" width="185" />
 
 export const NO_TOKEN_SELECTED = {
   default: {
-    title: 'No oToken Selected',
+    title: '🧑‍🚀',
     subtitle: 'select an oToken to proceed',
     illustration: null,
   },
@@ -28,7 +28,7 @@ export const generateNoOrderContent = (type: 'bids' | 'asks', symbol: string) =>
 
 export const OTOKENS_BOARD = {
   default: {
-    title: 'No oTokens 🥺',
+    title: 'No oTokens',
     subtitle: 'No oTokens available',
     illustration: EmptyState,
   },
