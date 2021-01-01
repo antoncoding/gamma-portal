@@ -3,27 +3,21 @@ import React, { useMemo, useCallback, useState } from 'react'
 import { DataView, Timer } from '@aragon/ui'
 import { SubgraphOToken, OrderWithMetaData } from '../../types'
 import { useOrderbook } from '../../contexts/orderbook'
-import { getAskPrice, getBidPrice, getOrderFillRatio, getRemainingAmounts } from '../../utils/0x-utils'
+import { getAskPrice, getBidPrice, getRemainingAmounts } from '../../utils/0x-utils'
 import { green, red } from './StyleDiv'
 import { toTokenAmount } from '../../utils/math'
 import { generateNoOrderContent, NO_TOKEN_SELECTED } from '../../constants/dataviewContents'
 import { TradeAction } from '../../constants'
+import { simplifyOTokenSymbol } from '../../utils/others'
 
 type OrderbookProps = {
   selectedOToken: SubgraphOToken | null
   action: TradeAction
   setAction: any
-  selectedOrders: OrderWithMetaData[]
   setSelectedOrders: React.Dispatch<React.SetStateAction<OrderWithMetaData[]>>
 }
 
-export default function Orderbook({
-  selectedOToken,
-  action,
-  selectedOrders,
-  setAction,
-  setSelectedOrders,
-}: OrderbookProps) {
+export default function Orderbook({ selectedOToken, action, setAction, setSelectedOrders }: OrderbookProps) {
   const [askPage, setAskPage] = useState(0)
   const [bidPage, setBidPage] = useState(0)
 
@@ -44,8 +38,7 @@ export default function Orderbook({
   const renderAskRow = useCallback(
     (order: OrderWithMetaData) => [
       red(getAskPrice(order.order, 8, 6).toFixed(4)),
-      toTokenAmount(getRemainingAmounts(order).remainingMakerAssetAmount, 8).toFixed(4),
-      `${getOrderFillRatio(order)}%`,
+      toTokenAmount(getRemainingAmounts(order).remainingMakerAssetAmount, 8).toFixed(2),
       <Timer format="ms" showIcon end={new Date(Number(order.order.expirationTimeSeconds) * 1000)} />,
     ],
     [],
@@ -54,8 +47,7 @@ export default function Orderbook({
   const renderBidRow = useCallback(
     (order: OrderWithMetaData) => [
       green(getBidPrice(order.order, 6, 8).toFixed(4)),
-      toTokenAmount(order.metaData.remainingFillableTakerAssetAmount, 8).toFixed(4),
-      `${getOrderFillRatio(order)}%`,
+      toTokenAmount(order.metaData.remainingFillableTakerAssetAmount, 8).toFixed(2),
       <Timer format="ms" showIcon end={new Date(Number(order.order.expirationTimeSeconds) * 1000)} />,
     ],
     [],
@@ -88,11 +80,15 @@ export default function Orderbook({
   )
 
   return (
-    <div style={{ display: 'flex' }}>
-      <div style={{ minWidth: 450, width: '50%' }}>
+    <div>
+      <div style={{ minWidth: 450 }}>
         <DataView
-          emptyState={selectedOToken ? generateNoOrderContent('asks', selectedOToken?.symbol) : NO_TOKEN_SELECTED}
-          entriesPerPage={5}
+          emptyState={
+            selectedOToken
+              ? generateNoOrderContent('asks', simplifyOTokenSymbol(selectedOToken?.symbol))
+              : NO_TOKEN_SELECTED
+          }
+          entriesPerPage={4}
           page={askPage}
           onPageChange={setAskPage}
           entries={asks}
@@ -101,14 +97,18 @@ export default function Orderbook({
           // If other operation reset selected orders, should change selected accordingly
           selection={selectedAskIdxs}
           renderSelectionCount={x => `${x} Orders Selected`}
-          fields={['price', 'amount', 'filled', 'expiration']}
+          fields={['ask price', 'amount', 'expiration']}
           renderEntry={renderAskRow}
         />
       </div>
-      <div style={{ minWidth: 450, width: '50%' }}>
+      <div style={{ paddingTop: '20px', minWidth: 450 }}>
         <DataView
-          emptyState={selectedOToken ? generateNoOrderContent('bids', selectedOToken?.symbol) : NO_TOKEN_SELECTED}
-          entriesPerPage={5}
+          emptyState={
+            selectedOToken
+              ? generateNoOrderContent('bids', simplifyOTokenSymbol(selectedOToken?.symbol))
+              : NO_TOKEN_SELECTED
+          }
+          entriesPerPage={4}
           page={bidPage}
           onPageChange={setBidPage}
           entries={bids}
@@ -117,7 +117,7 @@ export default function Orderbook({
           // If other operation reset selected orders, should change selected accordingly
           selection={selectedBidIdxs}
           renderSelectionCount={x => `${x} Orders Selected`}
-          fields={['price', 'amount', 'filled', 'expiration']}
+          fields={['bid price', 'amount', 'expiration']}
           renderEntry={renderBidRow}
         />
       </div>

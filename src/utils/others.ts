@@ -43,3 +43,10 @@ export function toUTCDateString(expiry: number): string {
 export function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
+
+export function simplifyOTokenSymbol(symbol: string) {
+  // oWETHUSDC/WETH-15JAN21-680C
+  const [assets, remaining] = symbol.split('/')
+  const [, date, strike] = remaining.split('-')
+  return `${assets}-${date}-${strike}`
+}

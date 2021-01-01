@@ -14,7 +14,7 @@ export const NO_TOKEN_SELECTED = {
 export const generateNoOrderContent = (type: 'bids' | 'asks', symbol: string) => {
   return {
     default: {
-      title: `No ${type}`,
+      title: `No ${type} 🥺`,
       subtitle: `No ${type} orders for ${symbol}`,
       illustration: null,
     },
@@ -28,7 +28,7 @@ export const generateNoOrderContent = (type: 'bids' | 'asks', symbol: string) =>
 
 export const OTOKENS_BOARD = {
   default: {
-    title: 'No oTokens',
+    title: 'No oTokens 🥺',
     subtitle: 'No oTokens available',
     illustration: EmptyState,
   },

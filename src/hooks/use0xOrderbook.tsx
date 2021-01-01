@@ -1,9 +1,90 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useReducer } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { ZeroXEndpoint, OrderType } from '../constants'
 import { useConnectedWallet } from '../contexts/wallet'
 import { OrderWithMetaData, SubgraphOToken, OTokenOrderBook } from '../types'
 import { categorizeOrder, getBasePairAskAndBids, sortBids, sortAsks, isValid } from '../utils/0x-utils'
+
+enum OrderbookUpdateType {
+  Init,
+  Update,
+  Expire,
+}
+
+function orderbookReducer(
+  books: OTokenOrderBook[],
+  action: {
+    type?: OrderbookUpdateType
+    updateInfos?: {
+      type: OrderType
+      token: string
+      order: OrderWithMetaData
+    }[]
+    books?: OTokenOrderBook[]
+  },
+) {
+  switch (action.type) {
+    case OrderbookUpdateType.Init: {
+      return action.books ?? []
+    }
+    case OrderbookUpdateType.Update: {
+      if (!action.updateInfos) return books
+      let orderbooksCopy = [...books]
+      for (const { type, token, order: orderInfo } of action.updateInfos) {
+        if (type === OrderType.BID) {
+          const orderBookForThisOToken = orderbooksCopy.find(ob => ob.id === token)
+          if (orderBookForThisOToken) {
+            const bids = orderBookForThisOToken.bids
+            const existingBidIdx = bids.findIndex(bid => bid.metaData.orderHash === orderInfo.metaData.orderHash)
+            if (existingBidIdx !== -1) {
+              orderBookForThisOToken.bids[existingBidIdx] = orderInfo
+            } else {
+              orderBookForThisOToken.bids.push(orderInfo)
+              orderBookForThisOToken.bids = orderBookForThisOToken.bids.sort(sortBids)
+            }
+            orderBookForThisOToken.bids = orderBookForThisOToken.bids.filter(isValid)
+          } else {
+            // no orderbook for this oToken
+            if (orderInfo.metaData.remainingFillableTakerAssetAmount !== '0') {
+              const bids = [orderInfo]
+              orderbooksCopy.push({ bids, asks: [], id: token })
+            }
+          }
+        } else if (type === OrderType.ASK) {
+          const orderBookForThisOToken = orderbooksCopy.find(ob => ob.id === token)
+          if (orderBookForThisOToken) {
+            const asks = orderBookForThisOToken.asks
+            const existingAskIdx = asks.findIndex(ask => ask.metaData.orderHash === orderInfo.metaData.orderHash)
+            if (existingAskIdx !== -1) {
+              orderBookForThisOToken.asks[existingAskIdx] = orderInfo
+            } else {
+              orderBookForThisOToken.asks.push(orderInfo)
+              orderBookForThisOToken.asks = orderBookForThisOToken.asks.sort(sortAsks)
+            }
+            orderBookForThisOToken.asks = orderBookForThisOToken.asks.filter(isValid)
+          } else {
+            // no orderbook for this oToken
+            if (orderInfo.metaData.remainingFillableTakerAssetAmount !== '0') {
+              const asks = [orderInfo]
+              orderbooksCopy.push({ asks, bids: [], id: token })
+            }
+          }
+        }
+      }
+      return orderbooksCopy
+    }
+    case OrderbookUpdateType.Expire: {
+      const orderbooksCopy = [...books]
+      for (let orderbook of orderbooksCopy) {
+        orderbook.bids = orderbook.bids.filter(order => isValid(order))
+        orderbook.asks = orderbook.asks.filter(order => isValid(order))
+      }
+      return orderbooksCopy
+    }
+    default:
+      return books
+  }
+}
 
 export function use0xOrderBooks(oTokens: SubgraphOToken[], completeCallback?: any) {
   const { networkId } = useConnectedWallet()
@@ -12,7 +93,7 @@ export function use0xOrderBooks(oTokens: SubgraphOToken[], completeCallback?: an
 
   const [isLoading, setIsLoading] = useState(true)
 
-  const [orderbooksBasic, setOrderBooksBasic] = useState<OTokenOrderBook[]>([])
+  const [orderbooksBasic, dispatch] = useReducer(orderbookReducer, [])
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(
     wsUrl,
@@ -38,8 +119,8 @@ export function use0xOrderBooks(oTokens: SubgraphOToken[], completeCallback?: an
       if (typeof completeCallback === 'function') completeCallback()
       return result
     }
-    refreshOrders().then((orders: OTokenOrderBook[]) => {
-      setOrderBooksBasic(orders)
+    refreshOrders().then((books: OTokenOrderBook[]) => {
+      dispatch({ type: OrderbookUpdateType.Init, books })
     })
   }, [oTokens, networkId, completeCallback])
 
@@ -57,13 +138,7 @@ export function use0xOrderBooks(oTokens: SubgraphOToken[], completeCallback?: an
   // filter out invalid orders every 5 sec
   useEffect(() => {
     const interval = setInterval(() => {
-      const orderbooksCopy = [...orderbooksBasic]
-      for (let orderbook of orderbooksCopy) {
-        // const { bids, asks } = orderbook
-        orderbook.bids = orderbook.bids.filter(order => isValid(order))
-        orderbook.asks = orderbook.asks.filter(order => isValid(order))
-      }
-      setOrderBooksBasic([...orderbooksCopy])
+      dispatch({ type: OrderbookUpdateType.Expire })
     }, 5000)
     return () => clearInterval(interval)
   }, [orderbooksBasic])
@@ -75,62 +150,28 @@ export function use0xOrderBooks(oTokens: SubgraphOToken[], completeCallback?: an
     if (!lastMessage || !lastMessage.data) return
     if (lastMessage === lastUpdatedMsg) return
 
-    const orderbooksCopy = [...orderbooksBasic]
+    // const orderbooksCopy = [...orderbooksBasic]
 
     const data = JSON.parse(lastMessage.data)
     const orders: OrderWithMetaData[] = data.payload
-    let hasOTokenOrder = false
     const otokenAddrs = oTokens.map(token => token.id)
-    for (const orderInfo of orders) {
-      const { type, token } = categorizeOrder(networkId, otokenAddrs, orderInfo)
-      if (type === OrderType.BID) {
-        // const otoken = oTokens.find(o => o.id === token);
-        // console.log(`token ${otoken?.symbol} Bid coming in ${JSON.stringify(orderInfo)} `);
-        hasOTokenOrder = true
-        const orderBookForThisOToken = orderbooksCopy.find(ob => ob.id === token)
-        if (orderBookForThisOToken) {
-          const bids = orderBookForThisOToken.bids
-          const existingBidIdx = bids.findIndex(bid => bid.metaData.orderHash === orderInfo.metaData.orderHash)
-          if (existingBidIdx !== -1) {
-            orderBookForThisOToken.bids[existingBidIdx] = orderInfo
-          } else {
-            orderBookForThisOToken.bids.push(orderInfo)
-            orderBookForThisOToken.bids = orderBookForThisOToken.bids.sort(sortBids)
-          }
-          orderBookForThisOToken.bids = orderBookForThisOToken.bids.filter(isValid)
-        } else {
-          // no orderbook for this oToken
-          if (orderInfo.metaData.remainingFillableTakerAssetAmount !== '0') {
-            const bids = [orderInfo]
-            orderbooksCopy.push({ bids, asks: [], id: token })
-          }
-        }
-      } else if (type === OrderType.ASK) {
-        // const otoken = oTokens.find(o => o.id === token);
-        // console.log(`token ${otoken?.symbol} Ask coming in ${JSON.stringify(orderInfo)} `);
-        hasOTokenOrder = true
-        const orderBookForThisOToken = orderbooksCopy.find(ob => ob.id === token)
-        if (orderBookForThisOToken) {
-          const asks = orderBookForThisOToken.asks
-          const existingAskIdx = asks.findIndex(ask => ask.metaData.orderHash === orderInfo.metaData.orderHash)
-          if (existingAskIdx !== -1) {
-            orderBookForThisOToken.asks[existingAskIdx] = orderInfo
-          } else {
-            orderBookForThisOToken.asks.push(orderInfo)
-            orderBookForThisOToken.asks = orderBookForThisOToken.asks.sort(sortAsks)
-          }
-          orderBookForThisOToken.asks = orderBookForThisOToken.asks.filter(isValid)
-        } else {
-          // no orderbook for this oToken
-          if (orderInfo.metaData.remainingFillableTakerAssetAmount !== '0') {
-            const asks = [orderInfo]
-            orderbooksCopy.push({ asks, bids: [], id: token })
-          }
-        }
-      }
-    }
+
+    const updateInfos = orders
+      .map(orderInfo => {
+        const { type, token } = categorizeOrder(networkId, otokenAddrs, orderInfo)
+        return { type, token, order: orderInfo }
+      })
+      .filter(updateInfo => {
+        return updateInfo.type !== OrderType.NOT_OTOKEN
+      })
+
+    if (updateInfos.length > 0)
+      dispatch({
+        type: OrderbookUpdateType.Update,
+        updateInfos,
+      })
+
     setLastUpdatedMsg(lastMessage)
-    if (hasOTokenOrder) setOrderBooksBasic(orderbooksCopy)
   }, [lastUpdatedMsg, lastMessage, orderbooksBasic, oTokens, networkId])
 
   return { orderbooks: orderbooksBasic, isLoading }

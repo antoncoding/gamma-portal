@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 
-import { DataView, Radio } from '@aragon/ui'
+import { DataView, Radio, SyncIndicator } from '@aragon/ui'
 import { SubgraphOToken } from '../../types'
 import { OTOKENS_BOARD } from '../../constants/dataviewContents'
 import { toTokenAmount } from '../../utils/math'
@@ -156,6 +156,7 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken }: Bo
 
   return (
     <div style={{ minWidth: 600 }}>
+      <SyncIndicator visible={isLoadingOrderbook} children={'Syncing order book... 🍕'} />
       <DataView
         tableRowHeight={35}
         status={isLoadingOrderbook ? 'loading' : 'default'}
