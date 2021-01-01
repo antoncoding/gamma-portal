@@ -8,3 +8,8 @@ export enum TradeAction {
   Buy = 'buy',
   Sell = 'sell',
 }
+
+export enum MarketTypes {
+  Market = 'market',
+  Limit = 'limit',
+}

@@ -14,10 +14,10 @@ type OrderbookProps = {
   selectedOToken: SubgraphOToken | null
   action: TradeAction
   setAction: any
-  setSelectedOrders: React.Dispatch<React.SetStateAction<OrderWithMetaData[]>>
+  // setSelectedOrders: React.Dispatch<React.SetStateAction<OrderWithMetaData[]>>
 }
 
-export default function Orderbook({ selectedOToken, action, setAction, setSelectedOrders }: OrderbookProps) {
+export default function Orderbook({ selectedOToken, action, setAction }: OrderbookProps) {
   const [askPage, setAskPage] = useState(0)
   const [bidPage, setBidPage] = useState(0)
 
