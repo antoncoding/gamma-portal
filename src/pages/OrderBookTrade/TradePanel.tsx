@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 
-import { Box, Button, Split } from '@aragon/ui'
+import { Box, Button, Split, TextInput } from '@aragon/ui'
 import { SubgraphOToken, OrderWithMetaData } from '../../types'
 
 // import { getAskPrice, getBidPrice, getOrderFillRatio, getRemainingAmounts } from '../../utils/0x-utils'
@@ -53,6 +53,8 @@ export default function TradePanel({
           </div>
         }
       />
+
+      <TextInput />
     </Box>
   )
 }

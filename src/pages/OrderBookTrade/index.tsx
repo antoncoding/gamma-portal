@@ -8,8 +8,11 @@ import TradePanel from './TradePanel'
 import { SubgraphOToken, OrderWithMetaData } from '../../types'
 import SectionTitle from '../../components/SectionHeader'
 import { TradeAction } from '../../constants'
+import { useTokenPrice } from '../../hooks'
+import { emptyToken } from '../../constants/addresses'
 
 export default function TradePage() {
+  const [selectedUnderlying, setSelectedUnderlying] = useState(emptyToken)
   const [selectedOToken, setSelectedOToken] = useState<SubgraphOToken | null>(null)
   const [oTokens, setOTokens] = useState<SubgraphOToken[]>([])
   const [action, setAction] = useState<TradeAction>(TradeAction.Buy)
@@ -18,6 +21,8 @@ export default function TradePage() {
 
   const [selectedOrders, setSelectedOrders] = useState<OrderWithMetaData[]>([])
 
+  const spotPrice = useTokenPrice(selectedUnderlying.address, 5)
+
   // reset selected orders when oToken change
   useEffect(() => {
     setSelectedOrders([])
@@ -25,8 +30,13 @@ export default function TradePage() {
 
   return (
     <>
-      <TradeHeader setOTokens={setOTokens} />
-      <Board oTokens={oTokens} selectedOToken={selectedOToken} setSelectedOToken={setSelectedOToken} />
+      <TradeHeader setOTokens={setOTokens} setSelectedUnderlying={setSelectedUnderlying} />
+      <Board
+        spotPrice={spotPrice}
+        oTokens={oTokens}
+        selectedOToken={selectedOToken}
+        setSelectedOToken={setSelectedOToken}
+      />
       <div style={{ display: 'flex' }}>
         <div style={{ width: '40%' }}>
           <SectionTitle title="Order Book" />

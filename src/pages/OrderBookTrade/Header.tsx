@@ -5,14 +5,25 @@ import { Header, DropDown, LoadingRing } from '@aragon/ui'
 import { useOTokenInSeries } from '../../hooks/useOTokens'
 import { useAllSeries } from '../../hooks/useAllProducts'
 import { toUTCDateString } from '../../utils/others'
+import { Token } from '../../types'
 
-export default function TradeHeadBar({ setOTokens }: { setOTokens: any }) {
+type HeaderProps = {
+  setOTokens: any
+  setSelectedUnderlying: React.Dispatch<React.SetStateAction<Token>>
+}
+
+export default function TradeHeadBar({ setOTokens, setSelectedUnderlying }: HeaderProps) {
   const [seriesId, setSeiresId] = useState(0)
   const [expiryId, setExpiryId] = useState(0)
 
   const { allSeries } = useAllSeries()
 
   const series = useMemo(() => (allSeries.length === 0 ? null : allSeries[seriesId]), [allSeries, seriesId])
+
+  useEffect(() => {
+    if (series !== null) setSelectedUnderlying({ ...series.underlying, address: series.underlying.id })
+  }, [series, setSelectedUnderlying])
+
   const { allOtokens: allOToken } = useOTokenInSeries(series?.underlying.id, series?.strike.id)
 
   const uniqueExpiries = useMemo(() => {

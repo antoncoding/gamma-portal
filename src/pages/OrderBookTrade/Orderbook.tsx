@@ -21,9 +21,9 @@ export default function Orderbook({ selectedOToken, action, setAction, setSelect
   const [askPage, setAskPage] = useState(0)
   const [bidPage, setBidPage] = useState(0)
 
-  const [selectedAskIdxs, setSelectedAskIdxs] = useState<number[]>([])
+  // const [selectedAskIdxs, setSelectedAskIdxs] = useState<number[]>([])
 
-  const [selectedBidIdxs, setSelectedBidIdxs] = useState<number[]>([])
+  // const [selectedBidIdxs, setSelectedBidIdxs] = useState<number[]>([])
 
   const { orderbooks } = useOrderbook()
 
@@ -54,30 +54,30 @@ export default function Orderbook({ selectedOToken, action, setAction, setSelect
   )
 
   // user wants to buy will click on asks
-  const onSelectAskEntry = useCallback(
-    (entries, indexes) => {
-      setSelectedOrders(entries)
-      setSelectedAskIdxs(indexes)
-      setSelectedBidIdxs([])
-      if (action === TradeAction.Sell) {
-        setAction(TradeAction.Buy)
-      }
-    },
-    [action, setAction, setSelectedOrders],
-  )
+  // const onSelectAskEntry = useCallback(
+  //   (entries, indexes) => {
+  //     setSelectedOrders(entries)
+  //     setSelectedAskIdxs(indexes)
+  //     setSelectedBidIdxs([])
+  //     if (action === TradeAction.Sell) {
+  //       setAction(TradeAction.Buy)
+  //     }
+  //   },
+  //   [action, setAction, setSelectedOrders],
+  // )
 
   // user wants to sell will click on bids
-  const onSelectBidEntry = useCallback(
-    (entries, indexes) => {
-      setSelectedOrders(entries)
-      setSelectedBidIdxs(indexes)
-      setSelectedAskIdxs([])
-      if (action === TradeAction.Buy) {
-        setAction(TradeAction.Sell)
-      }
-    },
-    [action, setAction, setSelectedOrders],
-  )
+  // const onSelectBidEntry = useCallback(
+  //   (entries, indexes) => {
+  //     setSelectedOrders(entries)
+  //     setSelectedBidIdxs(indexes)
+  //     setSelectedAskIdxs([])
+  //     if (action === TradeAction.Buy) {
+  //       setAction(TradeAction.Sell)
+  //     }
+  //   },
+  //   [action, setAction, setSelectedOrders],
+  // )
 
   return (
     <div>
@@ -93,9 +93,9 @@ export default function Orderbook({ selectedOToken, action, setAction, setSelect
           onPageChange={setAskPage}
           entries={asks}
           tableRowHeight={40}
-          onSelectEntries={onSelectAskEntry}
+          // onSelectEntries={onSelectAskEntry}
           // If other operation reset selected orders, should change selected accordingly
-          selection={selectedAskIdxs}
+          // selection={selectedAskIdxs}
           renderSelectionCount={x => `${x} Orders Selected`}
           fields={['ask price', 'amount', 'expiration']}
           renderEntry={renderAskRow}
@@ -113,9 +113,9 @@ export default function Orderbook({ selectedOToken, action, setAction, setSelect
           onPageChange={setBidPage}
           entries={bids}
           tableRowHeight={40}
-          onSelectEntries={onSelectBidEntry}
+          // onSelectEntries={onSelectBidEntry}
           // If other operation reset selected orders, should change selected accordingly
-          selection={selectedBidIdxs}
+          // selection={selectedBidIdxs}
           renderSelectionCount={x => `${x} Orders Selected`}
           fields={['bid price', 'amount', 'expiration']}
           renderEntry={renderBidRow}

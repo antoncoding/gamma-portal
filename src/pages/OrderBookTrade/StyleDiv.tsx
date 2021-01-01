@@ -16,3 +16,7 @@ export const red = text => {
 export const bold = text => {
   return <div style={{ fontWeight: 'bolder' }}> {text} </div>
 }
+
+export function secondary(text) {
+  return <div style={{ opacity: 0.75 }}> {text} </div>
+}
