@@ -34,7 +34,6 @@ export const useTokenPrice = (token: string | undefined, refetchIntervalSec: num
 
 export const getTokenPriceCoingecko = async (token: string | undefined): Promise<BigNumber> => {
   if (!token || token === ZERO_ADDR) return new BigNumber(0)
-  console.log(`get token price called`)
   let requestAddr = token
   // map kovan address to mainnet address
   // WETH

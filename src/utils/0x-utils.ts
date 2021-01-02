@@ -381,7 +381,6 @@ export const getTotalBidAmount = (bids: OrderWithMetaData[], decimals: number): 
 
 /**
  * Calculate amount of output token to get if I supply {amount} takerAsset
- * used to calculate amount of USDC we can get after selling {amount} oToken
  * @param orderInfos bid order
  * @param amount oToken to sell
  */
@@ -447,7 +446,6 @@ export const calculateOrderOutput = (orderInfos: OrderWithMetaData[], amount: Bi
 
 /**
  * Calculate amount of {takerAsset} need to pay if I want {amount} {makerAsset}
- * Used to calculate the USDC needed to buy {amount} oToken
  * @param orderInfos ask orders
  * @param amount oToken I want to buy
  */
@@ -475,7 +473,7 @@ export const calculateOrderInput = (orderInfos: OrderWithMetaData[], amount: Big
   const amounts: BigNumber[] = []
 
   for (const { metaData, order } of orderInfos) {
-    const fillableTakerAmount = new BigNumber(metaData.remainingFillableTakerAssetAmount) // USDC
+    const fillableTakerAmount = new BigNumber(metaData.remainingFillableTakerAssetAmount)
 
     const fillableMakerAmount = new BigNumber(order.makerAssetAmount)
       .times(fillableTakerAmount)

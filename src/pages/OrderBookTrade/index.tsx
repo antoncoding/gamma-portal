@@ -18,7 +18,7 @@ export default function TradePage() {
 
   const [mintPanelOpened, setMintPanelOpened] = useState(false)
 
-  const spotPrice = useTokenPrice(selectedUnderlying.id, 5)
+  const spotPrice = useTokenPrice(selectedUnderlying.id, 10)
 
   return (
     <>
