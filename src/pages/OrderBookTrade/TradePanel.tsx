@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { Box, Button, Split } from '@aragon/ui'
 
 import MarketTicket from './MarketTicket'
+import LimitTicket from './LimitTicket'
 
 import { SubgraphOToken } from '../../types'
 import { simplifyOTokenSymbol } from '../../utils/others'
@@ -46,7 +47,12 @@ export default function TradePanel({ selectedOToken, action, setAction }: TradeD
               usdcBalance={usdcBalance}
             />
           ) : (
-            <> </>
+            <LimitTicket
+              action={action}
+              selectedOToken={selectedOToken}
+              oTokenBalances={oTokenBalances}
+              usdcBalance={usdcBalance}
+            />
           )
         }
         secondary={

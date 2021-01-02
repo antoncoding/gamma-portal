@@ -1,9 +1,8 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import { Button, TextInput, IconArrowRight, IconUnlock } from '@aragon/ui'
-import { SubgraphOToken, SignedOrder, OTokenBalance } from '../../types'
+import { SubgraphOToken, OTokenBalance } from '../../types'
 
-import { calculateOrderInput, calculateOrderOutput } from '../../utils/0x-utils'
 import { toTokenAmount, fromTokenAmount } from '../../utils/math'
 
 import { TradeAction, Errors } from '../../constants'
@@ -12,17 +11,11 @@ import { getUSDC, addresses } from '../../constants/addresses'
 
 import oETHIcon from '../../imgs/oETH.svg'
 import USDCIcon from '../../imgs/USDC.png'
-import { useOrderbook } from '../../contexts/orderbook'
 import { use0xExchange } from '../../hooks/use0xExchange'
 import { useUserAllowance } from '../../hooks/useAllowance'
 import { simplifyOTokenSymbol } from '../../utils/others'
 import WarningText from '../../components/Warning'
 import TokenBalanceEntry from '../../components/TokenBalanceEntry'
-
-enum Updates {
-  Input,
-  Output,
-}
 
 type MarketTicketProps = {
   action: TradeAction
@@ -31,32 +24,22 @@ type MarketTicketProps = {
   usdcBalance: BigNumber
 }
 
-export default function MarketTicket({ action, selectedOToken, oTokenBalances, usdcBalance }: MarketTicketProps) {
+export default function LimitTicket({ action, selectedOToken, oTokenBalances, usdcBalance }: MarketTicketProps) {
   const { networkId } = useConnectedWallet()
 
   const paymentToken = useMemo(() => getUSDC(networkId), [networkId])
 
-  const { fillOrders, getProtocolFee } = use0xExchange()
+  const { createOrder, broadcastOrder } = use0xExchange()
 
-  // what was the last amount user adjust
-  const [lastUpdate, setLastUpdate] = useState<Updates>(Updates.Input)
+  // const [duration, setDuration] = useState<number>(600)
+  const duration = 600
 
   const [error, setError] = useState(Errors.NO_ERROR)
-
-  const [ordersToFill, setOrdersToFill] = useState<SignedOrder[]>([])
-  const [amountsToFill, setAmountsToFill] = useState<BigNumber[]>([])
 
   const [inputTokenAmount, setInputTokenAmount] = useState(new BigNumber(0))
   const [outputTokenAmount, setOutputTokenAmount] = useState(new BigNumber(0))
 
-  const { orderbooks } = useOrderbook()
-
   const oTokenBalance = oTokenBalances?.find(b => b.token.id === selectedOToken.id)?.balance ?? new BigNumber(0)
-
-  const { id, bids, asks } = useMemo(() => {
-    const target = orderbooks.find(b => b.id === selectedOToken.id)
-    return target ? target : { id: '', bids: [], asks: [] }
-  }, [orderbooks, selectedOToken.id])
 
   const inputToken = useMemo(() => (action === TradeAction.Buy ? paymentToken : selectedOToken), [
     paymentToken,
@@ -96,14 +79,8 @@ export default function MarketTicket({ action, selectedOToken, oTokenBalances, u
     [action],
   )
 
-  const protocolFee = useMemo(() => {
-    return getProtocolFee(ordersToFill.length)
-  }, [getProtocolFee, ordersToFill])
-
   // when buy/sell is click, reset a few things
   useEffect(() => {
-    setOrdersToFill([])
-    setAmountsToFill([])
     setError(Errors.NO_ERROR)
     setInputTokenAmount(new BigNumber(0))
     setOutputTokenAmount(new BigNumber(0))
@@ -113,7 +90,6 @@ export default function MarketTicket({ action, selectedOToken, oTokenBalances, u
     try {
       const newAmount = new BigNumber(event.target.value)
       setInputTokenAmount(newAmount)
-      setLastUpdate(Updates.Input)
     } catch {}
   }, [])
 
@@ -121,61 +97,72 @@ export default function MarketTicket({ action, selectedOToken, oTokenBalances, u
     try {
       const newAmount = new BigNumber(event.target.value)
       setOutputTokenAmount(newAmount)
-      setLastUpdate(Updates.Output)
     } catch {}
   }, [])
 
-  // update numbers accordingly when 1. orderbook change, 2. user update either intput or output
-  useEffect(() => {
-    if (id === '') return
-    if (lastUpdate !== Updates.Input) return
-    console.log(`updating output token`)
-    // fix input, recalculate output
-    const orders = action === TradeAction.Buy ? asks : bids
-    const rawInputAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals).integerValue()
-    const { error, ordersToFill, amounts, sumOutput: rawOutput } = calculateOrderOutput(orders, rawInputAmount)
-    const outputTokenAmount = toTokenAmount(rawOutput, outputToken.decimals)
-    setOutputTokenAmount(outputTokenAmount)
-    setError(error)
-    setAmountsToFill(amounts)
-    setOrdersToFill(ordersToFill)
-  }, [asks, bids, inputTokenAmount, inputToken, outputToken, action, lastUpdate, id])
+  const price = useMemo(() => {
+    if (action === TradeAction.Sell) {
+      return inputTokenAmount.isZero() ? new BigNumber(0) : outputTokenAmount.div(inputTokenAmount)
+    } else {
+      return outputTokenAmount.isZero() ? new BigNumber(0) : inputTokenAmount.div(outputTokenAmount)
+    }
+  }, [inputTokenAmount, action, outputTokenAmount])
 
-  // triggered when output token amount is updaed
+  // check balance error
   useEffect(() => {
-    if (id === '') return
-    if (lastUpdate !== Updates.Output) return
-    const orders = action === TradeAction.Buy ? asks : bids
-    const rawOutputAmount = fromTokenAmount(outputTokenAmount, outputToken.decimals).integerValue()
-
-    const { error, ordersToFill, amounts, sumInput: rawInput } = calculateOrderInput(orders, rawOutputAmount)
-    const inputTokenAmount = toTokenAmount(rawInput, inputToken.decimals)
-    setInputTokenAmount(inputTokenAmount)
-    setError(error)
-    setAmountsToFill(amounts)
-    setOrdersToFill(ordersToFill)
-  }, [id, action, inputToken.decimals, lastUpdate, asks, bids, outputToken.decimals, outputTokenAmount])
-
-  useEffect(() => {
-    if (error !== Errors.NO_ERROR) return
+    // if (error !== Errors.NO_ERROR || error !== Errors.INSUFFICIENT_BALANCE) return
     const inputBalance = action === TradeAction.Buy ? usdcBalance : oTokenBalance
     const rawInputAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals).integerValue()
     if (rawInputAmount.gt(inputBalance)) setError(Errors.INSUFFICIENT_BALANCE)
+    else if (error === Errors.INSUFFICIENT_BALANCE) setError(Errors.NO_ERROR)
   }, [usdcBalance, oTokenBalance, inputToken, inputTokenAmount, action, error])
 
-  const fill = useCallback(async () => {
-    await fillOrders(ordersToFill, amountsToFill)
-  }, [fillOrders, ordersToFill, amountsToFill])
+  const makerFee = useMemo(
+    () =>
+      action === TradeAction.Buy
+        ? fromTokenAmount(new BigNumber(1), inputToken.decimals).integerValue()
+        : new BigNumber(0),
+    [action, inputToken],
+  )
 
-  // check has enough input
+  // check has enough input allowance
   useEffect(() => {
     const inputRawAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals)
     if (action === TradeAction.Buy) {
-      setNeedApprove(usdcAllowance.lt(inputRawAmount))
+      const fee = fromTokenAmount(new BigNumber(1), inputToken.decimals)
+      setNeedApprove(usdcAllowance.lt(inputRawAmount.plus(fee)))
     } else {
       setNeedApprove(oTokenAllowance.lt(inputRawAmount))
     }
   }, [action, oTokenAllowance, usdcAllowance, inputTokenAmount, inputToken])
+
+  const createAndPost = useCallback(async () => {
+    const makerAssetAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals).integerValue()
+    const takerAssetAmount = fromTokenAmount(outputTokenAmount, outputToken.decimals).integerValue()
+    const expiry = Date.now() / 1000 + duration
+    const order = await createOrder(
+      inputToken.id,
+      outputToken.id,
+      inputToken.id,
+      makerAssetAmount,
+      takerAssetAmount,
+      makerFee,
+      expiry,
+    )
+
+    await broadcastOrder(order)
+  }, [
+    createOrder,
+    duration,
+    makerFee,
+    inputToken.decimals,
+    inputToken.id,
+    inputTokenAmount,
+    outputToken.decimals,
+    outputToken.id,
+    outputTokenAmount,
+    broadcastOrder,
+  ])
 
   return (
     <>
@@ -204,7 +191,14 @@ export default function MarketTicket({ action, selectedOToken, oTokenBalances, u
         </div>
       </div>
       <br />
-      <TokenBalanceEntry label="Protocol Fee" amount={protocolFee.toString()} symbol="ETH" />
+      <TokenBalanceEntry label="Price" amount={price.toFixed(4)} symbol="USDC / oToken" />
+      <TokenBalanceEntry
+        label="Maker Fee"
+        amount={toTokenAmount(makerFee, inputToken.decimals).toString()}
+        symbol={inputToken.symbol}
+      />
+
+      <TokenBalanceEntry label="Expires in" amount={duration.toString()} symbol="sec" />
       <br />
       <TokenBalanceEntry
         label="oToken Balance"
@@ -220,9 +214,9 @@ export default function MarketTicket({ action, selectedOToken, oTokenBalances, u
       <div style={{ display: 'flex', paddingTop: '10px' }}>
         <Button
           disabled={needApprove || error !== Errors.NO_ERROR || inputTokenAmount.isZero()}
-          label={action === TradeAction.Buy ? 'Confirm Buy' : 'Confirm Sell'}
+          label={action === TradeAction.Buy ? 'Create Bid' : 'Create Ask'}
           mode={action === TradeAction.Buy ? 'positive' : 'negative'}
-          onClick={fill}
+          onClick={createAndPost}
         />
         {needApprove && <Button label="approve" icon={<IconUnlock />} display="icon" onClick={approve} />}
       </div>
