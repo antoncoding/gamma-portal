@@ -57,17 +57,19 @@ function TradeType({ action, setAction, marketType, setMarketType }: TradeTypePr
     <div style={{ display: 'flex' }}>
       <div style={{ paddingRight: '20', display: 'flex', marginRight: 0, marginLeft: 'auto' }}>
         <Button
-          label={action === TradeAction.Buy ? 'Buy' : 'Sell'}
-          mode={action === TradeAction.Buy ? 'positive' : 'negative'}
-          onClick={() => (action === TradeAction.Buy ? setAction(TradeAction.Sell) : setAction(TradeAction.Buy))}
+          size="small"
+          label={marketType === MarketTypes.Market ? 'Market' : 'Limit'}
+          onClick={() =>
+            marketType === MarketTypes.Market ? setMarketType(MarketTypes.Limit) : setMarketType(MarketTypes.Market)
+          }
         />
 
         <div style={{ paddingRight: '15px' }}>
           <Button
-            label={marketType === MarketTypes.Market ? 'Market' : 'Limit'}
-            onClick={() =>
-              marketType === MarketTypes.Market ? setMarketType(MarketTypes.Limit) : setMarketType(MarketTypes.Market)
-            }
+            size="small"
+            label={action === TradeAction.Buy ? 'Buy' : 'Sell'}
+            mode={action === TradeAction.Buy ? 'positive' : 'negative'}
+            onClick={() => (action === TradeAction.Buy ? setAction(TradeAction.Sell) : setAction(TradeAction.Buy))}
           />
         </div>
       </div>
