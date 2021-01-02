@@ -129,7 +129,6 @@ export default function MarketTicket({ action, selectedOToken, oTokenBalances, u
   useEffect(() => {
     if (id === '') return
     if (lastUpdate !== Updates.Input) return
-    console.log(`updating output token`)
     // fix input, recalculate output
     const orders = action === TradeAction.Buy ? asks : bids
     const rawInputAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals).integerValue()
