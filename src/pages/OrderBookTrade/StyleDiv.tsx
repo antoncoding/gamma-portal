@@ -18,5 +18,5 @@ export const bold = text => {
 }
 
 export function secondary(text) {
-  return <div style={{ opacity: 0.75 }}> {text} </div>
+  return <div style={{ opacity: 0.7 }}> {text} </div>
 }

@@ -1,23 +1,23 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
-import { Button, TextInput, IconArrowRight } from '@aragon/ui'
-import { SubgraphOToken, SignedOrder } from '../../types'
+import { Button, TextInput, IconArrowRight, IconUnlock } from '@aragon/ui'
+import { SubgraphOToken, SignedOrder, OTokenBalance } from '../../types'
 
 import { calculateOrderInput, calculateOrderOutput } from '../../utils/0x-utils'
 import { toTokenAmount, fromTokenAmount } from '../../utils/math'
 
 import { TradeAction, Errors } from '../../constants'
-
 import { useConnectedWallet } from '../../contexts/wallet'
-
 import { getUSDC, addresses } from '../../constants/addresses'
 
 import oETHIcon from '../../imgs/oETH.svg'
 import USDCIcon from '../../imgs/USDC.png'
 import { useOrderbook } from '../../contexts/orderbook'
 import { use0xExchange } from '../../hooks/use0xExchange'
-import LabelText from '../../components/LabelText'
 import { useUserAllowance } from '../../hooks/useAllowance'
+import { simplifyOTokenSymbol } from '../../utils/others'
+import WarningText from '../../components/Warning'
+import TokenBalanceEntry from '../../components/TokenBalanceEntry'
 
 enum Updates {
   Input,
@@ -27,9 +27,11 @@ enum Updates {
 type MarketTicketProps = {
   action: TradeAction
   selectedOToken: SubgraphOToken
+  oTokenBalances: OTokenBalance[] | null
+  usdcBalance: BigNumber
 }
 
-export default function MarketTicket({ action, selectedOToken }: MarketTicketProps) {
+export default function MarketTicket({ action, selectedOToken, oTokenBalances, usdcBalance }: MarketTicketProps) {
   const { networkId } = useConnectedWallet()
 
   const paymentToken = useMemo(() => getUSDC(networkId), [networkId])
@@ -49,6 +51,8 @@ export default function MarketTicket({ action, selectedOToken }: MarketTicketPro
 
   const { orderbooks } = useOrderbook()
 
+  const oTokenBalance = oTokenBalances?.find(b => b.token.id === selectedOToken.id)?.balance ?? new BigNumber(0)
+
   const { id, bids, asks } = useMemo(() => {
     const target = orderbooks.find(b => b.id === selectedOToken.id)
     return target ? target : { id: '', bids: [], asks: [] }
@@ -60,18 +64,32 @@ export default function MarketTicket({ action, selectedOToken }: MarketTicketPro
     action,
   ])
 
-  const { allowance } = useUserAllowance(inputToken.id, addresses[networkId].zeroxERCProxy)
-
-  const inputIcon = useMemo(
-    () => <img alt="inputtoken" width={25} src={action === TradeAction.Buy ? USDCIcon : oETHIcon} />,
-    [action],
-  )
-
   const outputToken = useMemo(() => (action === TradeAction.Buy ? selectedOToken : paymentToken), [
     paymentToken,
     selectedOToken,
     action,
   ])
+
+  const [needApprove, setNeedApprove] = useState(true)
+  const { allowance: usdcAllowance, approve: approveUSDC } = useUserAllowance(
+    paymentToken.id,
+    addresses[networkId].zeroxERCProxy,
+  )
+  const { allowance: oTokenAllowance, approve: approveOToken } = useUserAllowance(
+    selectedOToken.id,
+    addresses[networkId].zeroxERCProxy,
+  )
+
+  const approve = useCallback(() => {
+    const rawInputAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals)
+    if (action === TradeAction.Buy) approveUSDC(rawInputAmount)
+    else approveOToken(rawInputAmount)
+  }, [inputTokenAmount, inputToken, action, approveUSDC, approveOToken])
+
+  const inputIcon = useMemo(
+    () => <img alt="inputtoken" width={25} src={action === TradeAction.Buy ? USDCIcon : oETHIcon} />,
+    [action],
+  )
 
   const outputIcon = useMemo(
     () => <img alt="outputtoken" width={25} src={action === TradeAction.Buy ? oETHIcon : USDCIcon} />,
@@ -112,8 +130,7 @@ export default function MarketTicket({ action, selectedOToken }: MarketTicketPro
     if (lastUpdate !== Updates.Input) return
     // fix input, recalculate output
     const orders = action === TradeAction.Buy ? asks : bids
-    const rawInputAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals)
-
+    const rawInputAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals).integerValue()
     const { error, ordersToFill, amounts, sumOutput: rawOutput } = calculateOrderOutput(orders, rawInputAmount)
     const outputTokenAmount = toTokenAmount(rawOutput, outputToken.decimals)
     setOutputTokenAmount(outputTokenAmount)
@@ -127,7 +144,7 @@ export default function MarketTicket({ action, selectedOToken }: MarketTicketPro
     if (!id) return
     if (lastUpdate !== Updates.Output) return
     const orders = action === TradeAction.Buy ? asks : bids
-    const rawOutputAmount = fromTokenAmount(outputTokenAmount, outputToken.decimals)
+    const rawOutputAmount = fromTokenAmount(outputTokenAmount, outputToken.decimals).integerValue()
 
     const { error, ordersToFill, amounts, sumInput: rawInput } = calculateOrderInput(orders, rawOutputAmount)
     const inputTokenAmount = toTokenAmount(rawInput, inputToken.decimals)
@@ -135,11 +152,39 @@ export default function MarketTicket({ action, selectedOToken }: MarketTicketPro
     setError(error)
     setAmountsToFill(amounts)
     setOrdersToFill(ordersToFill)
-  }, [id, action, inputToken.decimals, lastUpdate, asks, bids, outputToken.decimals, outputTokenAmount])
+  }, [
+    id,
+    action,
+    inputToken.decimals,
+    lastUpdate,
+    asks,
+    bids,
+    outputToken.decimals,
+    outputTokenAmount,
+    oTokenBalance,
+    usdcBalance,
+  ])
+
+  useEffect(() => {
+    if (error !== Errors.NO_ERROR) return
+    const inputBalance = action === TradeAction.Buy ? usdcBalance : oTokenBalance
+    const rawInputAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals).integerValue()
+    if (rawInputAmount.gt(inputBalance)) setError(Errors.INSUFFICIENT_BALANCE)
+  }, [usdcBalance, oTokenBalance, inputToken, inputTokenAmount, action, error])
 
   const fill = useCallback(async () => {
     await fillOrders(ordersToFill, amountsToFill)
   }, [fillOrders, ordersToFill, amountsToFill])
+
+  // check has enough input
+  useEffect(() => {
+    const inputRawAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals)
+    if (action === TradeAction.Buy) {
+      setNeedApprove(usdcAllowance.lt(inputRawAmount))
+    } else {
+      setNeedApprove(oTokenAllowance.lt(inputRawAmount))
+    }
+  }, [action, oTokenAllowance, usdcAllowance, inputTokenAmount, inputToken])
 
   return (
     <>
@@ -152,6 +197,7 @@ export default function MarketTicket({ action, selectedOToken }: MarketTicketPro
             value={inputTokenAmount.toNumber()}
             onChange={handleInputChange}
           />
+          <WarningText show={error !== Errors.NO_ERROR} text={error} />
         </div>
         <div style={{ padding: '5px' }}>
           <IconArrowRight size="medium" />
@@ -166,16 +212,28 @@ export default function MarketTicket({ action, selectedOToken }: MarketTicketPro
           />
         </div>
       </div>
-      <div style={{ display: 'flex', paddingTop: '10px' }}>
-        <LabelText label="Protocol Fee" />
-        {protocolFee.toString()} ETH
-      </div>
+      <br />
+      <TokenBalanceEntry label="Protocol Fee" amount={protocolFee.toString()} symbol="ETH" />
+      <br />
+      <TokenBalanceEntry
+        label="oToken Balance"
+        amount={toTokenAmount(oTokenBalance, 8).toString()}
+        symbol={simplifyOTokenSymbol(selectedOToken.symbol)}
+      />
+      <TokenBalanceEntry
+        label="USDC Balance"
+        amount={toTokenAmount(usdcBalance, paymentToken.decimals).toString()}
+        symbol={paymentToken.symbol}
+      />
+
       <div style={{ display: 'flex', paddingTop: '10px' }}>
         <Button
+          disabled={needApprove || error !== Errors.NO_ERROR || inputTokenAmount.isZero()}
           label={action === TradeAction.Buy ? 'Confirm Buy' : 'Confirm Sell'}
           mode={action === TradeAction.Buy ? 'positive' : 'negative'}
           onClick={fill}
         />
+        {needApprove && <Button label="approve" icon={<IconUnlock />} display="icon" onClick={approve} />}
       </div>
     </>
   )

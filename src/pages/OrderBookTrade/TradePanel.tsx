@@ -6,7 +6,9 @@ import MarketTicket from './MarketTicket'
 import { SubgraphOToken } from '../../types'
 import { simplifyOTokenSymbol } from '../../utils/others'
 
-import { TradeAction, MarketTypes } from '../../constants'
+import { TradeAction, MarketTypes, getUSDC } from '../../constants'
+import { useOTokenBalances, useTokenBalance } from '../../hooks'
+import { useConnectedWallet } from '../../contexts/wallet'
 
 type TradeDetailProps = {
   selectedOToken: SubgraphOToken | null
@@ -16,6 +18,11 @@ type TradeDetailProps = {
 
 export default function TradePanel({ selectedOToken, action, setAction }: TradeDetailProps) {
   const [marketType, setMarketType] = useState(MarketTypes.Market)
+
+  const { user, networkId } = useConnectedWallet()
+
+  const { balances: oTokenBalances } = useOTokenBalances(user, networkId)
+  const usdcBalance = useTokenBalance(getUSDC(networkId).id, user, 15)
 
   const titleText = useMemo(
     () =>
@@ -32,7 +39,12 @@ export default function TradePanel({ selectedOToken, action, setAction }: TradeD
           selectedOToken === null ? (
             <> </>
           ) : marketType === MarketTypes.Market ? (
-            <MarketTicket action={action} selectedOToken={selectedOToken} />
+            <MarketTicket
+              action={action}
+              selectedOToken={selectedOToken}
+              oTokenBalances={oTokenBalances}
+              usdcBalance={usdcBalance}
+            />
           ) : (
             <> </>
           )

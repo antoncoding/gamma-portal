@@ -15,6 +15,7 @@ export enum MarketTypes {
 }
 
 export enum Errors {
-  NO_ERROR,
-  INSUFFICIENT_LIQUIDITY,
+  NO_ERROR = 'no error',
+  INSUFFICIENT_LIQUIDITY = 'Insufficient Liquidity',
+  INSUFFICIENT_BALANCE = 'Insufficient Balance',
 }
