@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
-import { Button, TextInput, IconArrowRight, IconUnlock } from '@aragon/ui'
+import { Button, TextInput, IconArrowRight, IconUnlock, Timer } from '@aragon/ui'
 import { SubgraphOToken, SignedOrder, OTokenBalance } from '../../types'
 
 import { calculateOrderInput, calculateOrderOutput } from '../../utils/0x-utils'
@@ -17,6 +17,7 @@ import { use0xExchange } from '../../hooks/use0xExchange'
 import { useUserAllowance } from '../../hooks/useAllowance'
 import { simplifyOTokenSymbol } from '../../utils/others'
 import WarningText from '../../components/Warning'
+import LabelText from '../../components/LabelText'
 import TokenBalanceEntry from '../../components/TokenBalanceEntry'
 
 enum Updates {
@@ -199,6 +200,10 @@ export default function MarketTicket({
     }
   }, [action, oTokenAllowance, usdcAllowance, inputTokenAmount, inputToken])
 
+  const closestExpry = useMemo(() => {
+    return ordersToFill.length > 0 ? Math.min(...ordersToFill.map(o => Number(o.expirationTimeSeconds))) : 0
+  }, [ordersToFill])
+
   return (
     <>
       <div style={{ display: 'flex' }}>
@@ -238,6 +243,11 @@ export default function MarketTicket({
         amount={toTokenAmount(usdcBalance, paymentToken.decimals).toString()}
         symbol={paymentToken.symbol}
       />
+
+      <div style={{ display: 'flex', paddingTop: '5px' }}>
+        <LabelText label={'Expires in'} minWidth={'150px'} />
+        <Timer end={new Date(closestExpry * 1000)} />
+      </div>
 
       <div style={{ display: 'flex', paddingTop: '20px' }}>
         <Button
