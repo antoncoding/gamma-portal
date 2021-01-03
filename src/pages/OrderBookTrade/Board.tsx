@@ -197,19 +197,19 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken, spot
         tableRowHeight={35}
         status={isLoadingOrderbook ? 'loading' : 'default'}
         fields={[
-          'bid',
+          'bid ($)',
           'iv',
           'amt',
-          'ask',
+          'ask ($)',
           'iv',
           'amt',
           bold('call'),
           'strike',
           bold('put'),
-          'bid',
+          'bid ($)',
           'iv',
           'amt',
-          'ask',
+          'ask ($)',
           'iv',
           'amt',
         ]}
