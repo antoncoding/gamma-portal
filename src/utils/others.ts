@@ -34,3 +34,19 @@ export const sortByExpiryThanStrike = (a: SubgraphOToken, b: SubgraphOToken) => 
 export const isExpired = (token: SubgraphOToken) => {
   return Number(token.expiryTimestamp) < Date.now() / 1000
 }
+
+export function toUTCDateString(expiry: number): string {
+  const expiryDate = new Date(expiry * 1000)
+  return expiryDate.toUTCString().split(' ').slice(0, 4).join(' ')
+}
+
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+export function simplifyOTokenSymbol(symbol: string) {
+  // oWETHUSDC/WETH-15JAN21-680C
+  const [assets, remaining] = symbol.split('/')
+  const [, date, strike] = remaining.split('-')
+  return `${assets}-${date}-${strike}`
+}

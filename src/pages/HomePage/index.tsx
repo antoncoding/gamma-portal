@@ -34,13 +34,13 @@ function HomePage() {
           />
         </div>
 
-        {/* <div style={{ width: '30%',  marginRight: '3%' }}>
+        {/* <div style={{ width: '30%', marginRight: '3%' }}>
           <MainButton
             title="Trade"
             description="Coming Soon"
-            icon={<IconSwap size="large"/>}
+            icon={<IconSwap size="large" />}
             onClick={() => {
-              history.push('/trade/');
+              history.push('/trade/')
             }}
           />
         </div> */}

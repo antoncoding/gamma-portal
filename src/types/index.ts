@@ -1,7 +1,9 @@
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
+
+export * from './zeroX'
 
 export type Token = {
-  address: string
+  id: string
   name: string
   symbol: string
   decimals: number

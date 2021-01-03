@@ -4,20 +4,20 @@ import { useParams } from 'react-router-dom'
 import { DataView, useToast, TransactionBadge } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
 
-import { useConnectedWallet } from '../../contexts/wallet'
+import { useConnectedWallet } from '../../../contexts/wallet'
 
-import ActionBadgeFromId from '../../components/ActionBadge'
-import SectionTitle from '../../components/SectionHeader'
-import TokenAddress from '../../components/TokenAddress'
+import ActionBadgeFromId from '../../../components/ActionBadge'
+import SectionTitle from '../../../components/SectionHeader'
+import TokenAddress from '../../../components/TokenAddress'
 
-import { getVaultHistory } from '../../utils/graph'
-import { timeSince } from '../../utils/math'
-import { toTokenAmount } from '../../utils/math'
+import { getVaultHistory } from '../../../utils/graph'
+import { timeSince } from '../../../utils/math'
+import { toTokenAmount } from '../../../utils/math'
 
-import { SubgraphVaultAction } from '../../types'
-import useAsyncMemo from '../../hooks/useAsyncMemo'
+import { SubgraphVaultAction } from '../../../types'
+import useAsyncMemo from '../../../hooks/useAsyncMemo'
 
-import { VAULT_HISTORY } from '../../constants/dataviewContents'
+import { VAULT_HISTORY } from '../../../constants/dataviewContents'
 
 export default function VaultHistory() {
   const [isLoading, setIsLoading] = useState(true)

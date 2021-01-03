@@ -1,16 +1,16 @@
 import React, { useMemo, useCallback, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { Button, DataView, useToast, Header, Tag, Help } from '@aragon/ui'
-import useAsyncMemo from '../../hooks/useAsyncMemo'
-import { getAccount } from '../../utils/graph'
+import useAsyncMemo from '../../../hooks/useAsyncMemo'
+import { getAccount } from '../../../utils/graph'
 
-import { useConnectedWallet } from '../../contexts/wallet'
-import { Controller } from '../../utils/contracts/controller'
-import { SubgraphVault } from '../../types'
-import SectionTitle from '../../components/SectionHeader'
-import OpynTokenAmount from '../../components/OpynTokenAmount'
-import CustomIdentityBadge from '../../components/CustomIdentityBadge'
-import { VAULTS } from '../../constants/dataviewContents'
+import { useConnectedWallet } from '../../../contexts/wallet'
+import { Controller } from '../../../utils/contracts/controller'
+import { SubgraphVault } from '../../../types'
+import SectionTitle from '../../../components/SectionHeader'
+import OpynTokenAmount from '../../../components/OpynTokenAmount'
+import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
+import { VAULTS } from '../../../constants/dataviewContents'
 
 export default function AccountVaults() {
   const { web3, networkId, user } = useConnectedWallet()

@@ -15,20 +15,21 @@ import {
 } from '@aragon/ui'
 import History from './history'
 
-import { useConnectedWallet } from '../../contexts/wallet'
-import { Controller } from '../../utils/contracts/controller'
-import CustomIdentityBadge from '../../components/CustomIdentityBadge'
+import { useConnectedWallet } from '../../../contexts/wallet'
+import { Controller } from '../../../utils/contracts/controller'
+import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 
-import useAsyncMemo from '../../hooks/useAsyncMemo'
-import { useTokenByAddress } from '../../hooks/useToken'
-import { useOTokenBalances } from '../../hooks/useOTokenBalances'
-import { useTokenBalance } from '../../hooks/useTokenBalance'
+import useAsyncMemo from '../../../hooks/useAsyncMemo'
+import { useTokenByAddress } from '../../../hooks/useToken'
+import { useOTokenBalances } from '../../../hooks/useOTokenBalances'
+import { useTokenBalance } from '../../../hooks/useTokenBalance'
+import { useLiveOTokens } from '../../../hooks/useOTokens'
 
-import { getVault, getLiveOTokens } from '../../utils/graph'
-import { toTokenAmount, fromTokenAmount } from '../../utils/math'
-import { isExpired } from '../../utils/others'
-import { ZERO_ADDR, tokens } from '../../constants/addresses'
-import { SubgraphOToken } from '../../types'
+import { getVault } from '../../../utils/graph'
+import { toTokenAmount, fromTokenAmount } from '../../../utils/math'
+import { isExpired } from '../../../utils/others'
+import { ZERO_ADDR, tokens } from '../../../constants/addresses'
+import { SubgraphOToken } from '../../../types'
 
 export default function VaultDetail() {
   const [vaultExpiry, setVaultExpiry] = useState<string>('0')
@@ -63,15 +64,7 @@ export default function VaultDetail() {
     [networkId, owner, toast, vaultId],
   )
 
-  const allOtokens = useAsyncMemo(
-    async () => {
-      const result = await getLiveOTokens(networkId, toast)
-      return result
-    },
-    [],
-    [networkId, toast],
-  )
-
+  const { allOtokens } = useLiveOTokens()
   const { balances } = useOTokenBalances(user, networkId)
 
   /**
@@ -93,7 +86,7 @@ export default function VaultDetail() {
   const collateralToken = useTokenByAddress(
     vaultDetail && vaultDetail.collateralAsset
       ? vaultDetail.collateralAsset.id
-      : tokens[networkId][selectedCollateralIndex].address,
+      : tokens[networkId][selectedCollateralIndex].id,
     networkId,
   )
 
@@ -107,7 +100,7 @@ export default function VaultDetail() {
     selectedLong,
   ])
 
-  const collateralBalance = useTokenBalance(collateralToken.address, user, 20)
+  const collateralBalance = useTokenBalance(collateralToken.id, user, 20)
 
   const longBalance = useMemo(() => {
     if (!balances) return new BigNumber(0)
@@ -124,11 +117,11 @@ export default function VaultDetail() {
   useEffect(() => {
     if (shortOtoken) {
       setVaultExpiry(shortOtoken.expiryTimestamp)
-      const collateralIdx = tokens[networkId].findIndex(token => token.address === shortOtoken.collateralAsset.id)
+      const collateralIdx = tokens[networkId].findIndex(token => token.id === shortOtoken.collateralAsset.id)
       setSelectedCollateralIndex(collateralIdx)
     } else if (longOtoken) {
       setVaultExpiry(longOtoken.expiryTimestamp)
-      const collateralIdx = tokens[networkId].findIndex(token => token.address === longOtoken.collateralAsset.id)
+      const collateralIdx = tokens[networkId].findIndex(token => token.id === longOtoken.collateralAsset.id)
       setSelectedCollateralIndex(collateralIdx)
     } else {
       setVaultExpiry('0')
@@ -140,7 +133,7 @@ export default function VaultDetail() {
     if (!allOtokens) return []
 
     const sameCollateral = allOtokens.filter(
-      o => o.collateralAsset.id === collateralToken.address || collateralToken.address === ZERO_ADDR,
+      o => o.collateralAsset.id === collateralToken.id || collateralToken.id === ZERO_ADDR,
     )
 
     const sameExpiry = sameCollateral.filter(o => o.expiryTimestamp === vaultExpiry || vaultExpiry === '0')
@@ -161,7 +154,7 @@ export default function VaultDetail() {
   }, [allOtokens, balances, allShorts])
 
   const pushAddCollateral = useCallback(() => {
-    if (collateralToken.address === ZERO_ADDR) {
+    if (collateralToken.id === ZERO_ADDR) {
       toast('Select collateral asset first')
       return
     }
@@ -169,7 +162,7 @@ export default function VaultDetail() {
       user,
       vaultId,
       user,
-      collateralToken.address,
+      collateralToken.id,
       fromTokenAmount(changeCollateralAmount, collateralToken.decimals),
     )
     setChangeCollateralAmount(new BigNumber(0))
@@ -177,7 +170,7 @@ export default function VaultDetail() {
   }, [collateralToken, controller, user, vaultId, changeCollateralAmount, toast])
 
   const pushRemoveCollateral = useCallback(() => {
-    if (collateralToken.address === ZERO_ADDR) {
+    if (collateralToken.id === ZERO_ADDR) {
       toast('Select collateral asset first')
       return
     }
@@ -185,12 +178,12 @@ export default function VaultDetail() {
       user,
       vaultId,
       user,
-      collateralToken.address,
+      collateralToken.id,
       fromTokenAmount(changeCollateralAmount, collateralToken.decimals),
     )
     setChangeCollateralAmount(new BigNumber(0))
     setPendingCollateralAmount(` - ${changeCollateralAmount.toString()}`)
-  }, [controller, user, vaultId, collateralToken.address, collateralToken.decimals, changeCollateralAmount, toast])
+  }, [controller, user, vaultId, collateralToken.id, collateralToken.decimals, changeCollateralAmount, toast])
 
   const pushAddLong = useCallback(() => {
     if (!longOtoken) {

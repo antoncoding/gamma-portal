@@ -3,8 +3,8 @@ import BigNumber from 'bignumber.js'
 const Web3 = require('web3')
 const web3 = new Web3()
 
-export function toTokenAmount(wei: BigNumber, decimals: number) {
-  return wei.div(new BigNumber(10).pow(new BigNumber(decimals)))
+export function toTokenAmount(wei: BigNumber | number | string, decimals: number) {
+  return new BigNumber(wei).div(new BigNumber(10).pow(new BigNumber(decimals)))
 }
 
 export function fromTokenAmount(amount: BigNumber, decimals: number) {
