@@ -13,17 +13,17 @@ import {
 } from '@aragon/ui'
 import LabelText from '../../../components/LabelText'
 import Warning from '../../../components/Warning'
-import { useConnectedWallet } from '../../../contexts/wallet'
-import { OTokenFactory } from '../../../utils/contracts/factory'
 import { getNextFriday, fromTokenAmount } from '../../../utils/math'
 import SectionTitle from '../../../components/SectionHeader'
 import TokenAddress from '../../../components/TokenAddress'
 import { ZERO_ADDR } from '../../../constants/addresses'
 import WarningText from '../../../components/Warning'
+import { useFactory } from '../../../hooks/useFactory'
 import { useAllProducts } from '../../../hooks/useAllProducts'
 
 export default function CreateOption() {
-  const { networkId, web3, user } = useConnectedWallet()
+  const factory = useFactory()
+
   const toast = useToast()
   const [selectedProductIndex, setSelectedProductIndex] = useState(-1)
 
@@ -59,8 +59,7 @@ export default function CreateOption() {
 
   const strikePrice = useMemo(() => fromTokenAmount(new BigNumber(strikePriceReadable), 8), [strikePriceReadable])
 
-  async function createOToken() {
-    const factory = new OTokenFactory(web3, networkId, user)
+  const createOToken = useCallback(async () => {
     if (selectedProductIndex === -1) {
       toast('Please select a product')
       return
@@ -77,11 +76,10 @@ export default function CreateOption() {
     } finally {
       setIsCreating(false)
     }
-  }
+  }, [factory, allProducts, selectedProductIndex, expiryTimestamp, strikePrice, toast])
 
   const computeAddress = useCallback(
     async (idx, strikePrice, expiry) => {
-      const factory = new OTokenFactory(web3, networkId, user)
       if (idx === -1) {
         return
       }
@@ -102,7 +100,7 @@ export default function CreateOption() {
       const isCreated = await factory.isCreated(underlying.id, strike.id, collateral.id, strikePrice, expiry, isPut)
       setIsDuplicated(isCreated)
     },
-    [allProducts, networkId, user, web3],
+    [allProducts, factory],
   )
 
   // recompute address when input changes

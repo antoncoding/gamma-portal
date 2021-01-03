@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
-import { ZERO_ADDR } from '../../constants/addresses'
-import { actionArg, ActionType } from '../../types'
+import { ZERO_ADDR } from '../constants/addresses'
+import { actionArg, ActionType } from '../types'
 
 export function createOpenVaultArg(account: string, vaultId: BigNumber): actionArg {
   return {
