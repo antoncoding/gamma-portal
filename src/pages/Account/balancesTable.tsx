@@ -8,28 +8,27 @@ import { useConnectedWallet } from '../../contexts/wallet'
 import { OTokenBalance } from '../../types'
 import { sortByExpiryThanStrike, isExpired } from '../../utils/others'
 
-import { Controller } from '../../utils/contracts/controller'
 import { OTOKENS } from '../../constants/dataviewContents'
 
 import BigNumber from 'bignumber.js'
+import { useController } from '../../hooks/useController'
 
 export default function AccountBalances({ account }: { account: string }) {
-  const { networkId, web3, user } = useConnectedWallet()
+  const { networkId, user } = useConnectedWallet()
 
   const toast = useToast()
 
   const { balances, isLoading: isLoadingBalance } = useOTokenBalances(account, networkId)
 
+  const { redeemBatch } = useController()
+
   const redeemToken = useCallback(
     async (token: string, amount: BigNumber) => {
-      if (user !== account) {
-        toast('Connected account is not the owner.')
-        return
-      }
-      const controller = new Controller(web3, networkId, user)
-      await controller.redeemBatch(user, [token], [amount])
+      if (user !== account) return toast('Connected account is not the owner.')
+
+      await redeemBatch(user, [token], [amount])
     },
-    [web3, networkId, user, account, toast],
+    [user, account, toast, redeemBatch],
   )
 
   const entries = useMemo(() => (balances ? balances : []), [balances])

@@ -1,25 +1,22 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { Button, DataView, TextInput, Header, useToast, Tag } from '@aragon/ui'
 import { useParams } from 'react-router-dom'
 
 import { useConnectedWallet } from '../../../contexts/wallet'
-import { Controller } from '../../../utils/contracts/controller'
-
 import { getAccount } from '../../../utils/graph'
 import useAsyncMemo from '../../../hooks/useAsyncMemo'
-
 import SectionTitle from '../../../components/SectionHeader'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
-
 import { knownOperators } from '../../../constants/addresses'
 import { OPERATORS } from '../../../constants/dataviewContents'
 import { isEOA } from '../../../utils/others'
+import { useController } from '../../../hooks/useController'
 
 export default function OperatorSection() {
   const { account } = useParams()
 
   const [isLoading, setIsLoading] = useState(true)
-  const { web3, networkId, user } = useConnectedWallet()
+  const { networkId, user } = useConnectedWallet()
 
   const toast = useToast()
 
@@ -47,7 +44,7 @@ export default function OperatorSection() {
 
   const [newOperatorAddr, setNewOperatorAddr] = useState('')
 
-  const controller = useMemo(() => new Controller(web3, networkId, user), [networkId, user, web3])
+  const controller = useController()
 
   async function revokeOperator(operator) {
     await controller.updateOperator(operator, false)
