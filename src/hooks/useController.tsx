@@ -8,7 +8,7 @@ import { actionArg, ActionType } from '../types'
 import { getPreference } from '../utils/storage'
 import { MAX_UINT } from '../constants/others'
 
-import * as util from '../utils/contracts/controller'
+import * as util from '../utils/controller'
 import { useNotify } from './useNotify'
 
 const abi = require('../constants/abis/controller.json')
