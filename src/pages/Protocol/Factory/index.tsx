@@ -11,16 +11,16 @@ import {
   Help,
   SyncIndicator,
 } from '@aragon/ui'
-import LabelText from '../../components/LabelText'
-import Warning from '../../components/Warning'
-import { useConnectedWallet } from '../../contexts/wallet'
-import { OTokenFactory } from '../../utils/contracts/factory'
-import { getNextFriday, fromTokenAmount } from '../../utils/math'
-import SectionTitle from '../../components/SectionHeader'
-import TokenAddress from '../../components/TokenAddress'
-import { ZERO_ADDR } from '../../constants/addresses'
-import WarningText from '../../components/Warning'
-import { useAllProducts } from '../../hooks/useAllProducts'
+import LabelText from '../../../components/LabelText'
+import Warning from '../../../components/Warning'
+import { useConnectedWallet } from '../../../contexts/wallet'
+import { OTokenFactory } from '../../../utils/contracts/factory'
+import { getNextFriday, fromTokenAmount } from '../../../utils/math'
+import SectionTitle from '../../../components/SectionHeader'
+import TokenAddress from '../../../components/TokenAddress'
+import { ZERO_ADDR } from '../../../constants/addresses'
+import WarningText from '../../../components/Warning'
+import { useAllProducts } from '../../../hooks/useAllProducts'
 
 export default function CreateOption() {
   const { networkId, web3, user } = useConnectedWallet()

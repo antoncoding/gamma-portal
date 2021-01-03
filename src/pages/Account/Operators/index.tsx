@@ -2,18 +2,18 @@ import React, { useMemo, useState } from 'react'
 import { Button, DataView, TextInput, Header, useToast, Tag } from '@aragon/ui'
 import { useParams } from 'react-router-dom'
 
-import { useConnectedWallet } from '../../contexts/wallet'
-import { Controller } from '../../utils/contracts/controller'
+import { useConnectedWallet } from '../../../contexts/wallet'
+import { Controller } from '../../../utils/contracts/controller'
 
-import { getAccount } from '../../utils/graph'
-import useAsyncMemo from '../../hooks/useAsyncMemo'
+import { getAccount } from '../../../utils/graph'
+import useAsyncMemo from '../../../hooks/useAsyncMemo'
 
-import SectionTitle from '../../components/SectionHeader'
-import CustomIdentityBadge from '../../components/CustomIdentityBadge'
+import SectionTitle from '../../../components/SectionHeader'
+import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 
-import { knownOperators } from '../../constants/addresses'
-import { OPERATORS } from '../../constants/dataviewContents'
-import { isEOA } from '../../utils/others'
+import { knownOperators } from '../../../constants/addresses'
+import { OPERATORS } from '../../../constants/dataviewContents'
+import { isEOA } from '../../../utils/others'
 
 export default function OperatorSection() {
   const { account } = useParams()

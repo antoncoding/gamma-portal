@@ -3,11 +3,11 @@ import { Header, _AutoComplete as AutoComplete, SyncIndicator } from '@aragon/ui
 import TradePanel from '../OrderBookTrade/TradePanel'
 
 // import Header from '../OrderBookTrade/Header'
-import { TradeAction } from '../../constants'
-import { useLiveOTokens } from '../../hooks'
-import { SubgraphOToken } from '../../types'
-import { simplifyOTokenSymbol } from '../../utils/others'
-import { useOrderbook } from '../../contexts/orderbook'
+import { TradeAction } from '../../../constants'
+import { useLiveOTokens } from '../../../hooks'
+import { SubgraphOToken } from '../../../types'
+import { simplifyOTokenSymbol } from '../../../utils/others'
+import { useOrderbook } from '../../../contexts/orderbook'
 
 export default function Swap() {
   const [searchTerm, setSearchTerm] = useState('')

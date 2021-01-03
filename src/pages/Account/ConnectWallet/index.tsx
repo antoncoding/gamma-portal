@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useHistory } from 'react-router-dom'
 import { TextInput, DataView, Button, LinkBase, EthIdenticon, useToast, Header } from '@aragon/ui'
-import { getPreference, checkAddressAndAddToStorage } from '../../utils/storage'
+import { getPreference, checkAddressAndAddToStorage } from '../../../utils/storage'
 
-import Comment from '../../components/Comment'
-import { useConnectedWallet } from '../../contexts/wallet'
-import { isAddress } from '../../utils/math'
-import { resolveENS } from '../../utils/others'
+import Comment from '../../../components/Comment'
+import { useConnectedWallet } from '../../../contexts/wallet'
+import { isAddress } from '../../../utils/math'
+import { resolveENS } from '../../../utils/others'
 
 function Login() {
   const { user, networkId } = useConnectedWallet()

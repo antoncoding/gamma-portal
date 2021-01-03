@@ -1,11 +1,11 @@
 import React, { useMemo, useCallback } from 'react'
 
 import { DataView, Radio, SyncIndicator } from '@aragon/ui'
-import { SubgraphOToken } from '../../types'
-import { OTOKENS_BOARD } from '../../constants/dataviewContents'
-import { toTokenAmount } from '../../utils/math'
-import { useOrderbook } from '../../contexts/orderbook'
-import { getOrderBookDetail } from '../../utils/0x-utils'
+import { SubgraphOToken } from '../../../types'
+import { OTOKENS_BOARD } from '../../../constants/dataviewContents'
+import { toTokenAmount } from '../../../utils/math'
+import { useOrderbook } from '../../../contexts/orderbook'
+import { getOrderBookDetail } from '../../../utils/0x-utils'
 
 import { green, red, onclickWrapper, bold, secondary } from './StyleDiv'
 import BigNumber from 'bignumber.js'

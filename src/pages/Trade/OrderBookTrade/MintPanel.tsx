@@ -2,7 +2,7 @@ import React from 'react'
 
 import { SidePanel } from '@aragon/ui'
 
-import { SubgraphOToken } from '../../types'
+import { SubgraphOToken } from '../../../types'
 
 type PanelProps = {
   oToken: SubgraphOToken | null

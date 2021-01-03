@@ -5,12 +5,12 @@ import { Box, Button, Split, useTheme } from '@aragon/ui'
 import MarketTicket from './MarketTicket'
 import LimitTicket from './LimitTicket'
 
-import { SubgraphOToken } from '../../types'
-import { simplifyOTokenSymbol } from '../../utils/others'
+import { SubgraphOToken } from '../../../types'
+import { simplifyOTokenSymbol } from '../../../utils/others'
 
-import { TradeAction, MarketTypes, getUSDC } from '../../constants'
-import { useOTokenBalances, useTokenBalance } from '../../hooks'
-import { useConnectedWallet } from '../../contexts/wallet'
+import { TradeAction, MarketTypes, getUSDC } from '../../../constants'
+import { useOTokenBalances, useTokenBalance } from '../../../hooks'
+import { useConnectedWallet } from '../../../contexts/wallet'
 
 type TradeDetailProps = {
   selectedOToken: SubgraphOToken | null

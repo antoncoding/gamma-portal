@@ -1,21 +1,21 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import { Button, TextInput, IconArrowRight, IconUnlock } from '@aragon/ui'
-import { SubgraphOToken, OTokenBalance } from '../../types'
+import { SubgraphOToken, OTokenBalance } from '../../../types'
 
-import { toTokenAmount, fromTokenAmount } from '../../utils/math'
+import { toTokenAmount, fromTokenAmount } from '../../../utils/math'
 
-import { TradeAction, Errors } from '../../constants'
-import { useConnectedWallet } from '../../contexts/wallet'
-import { getUSDC, addresses } from '../../constants/addresses'
+import { TradeAction, Errors } from '../../../constants'
+import { useConnectedWallet } from '../../../contexts/wallet'
+import { getUSDC, addresses } from '../../../constants/addresses'
 
-import oETHIcon from '../../imgs/oETH.svg'
-import USDCIcon from '../../imgs/USDC.png'
-import { use0xExchange } from '../../hooks/use0xExchange'
-import { useUserAllowance } from '../../hooks/useAllowance'
-import { simplifyOTokenSymbol } from '../../utils/others'
-import WarningText from '../../components/Warning'
-import TokenBalanceEntry from '../../components/TokenBalanceEntry'
+import oETHIcon from '../../../imgs/oETH.svg'
+import USDCIcon from '../../../imgs/USDC.png'
+import { use0xExchange } from '../../../hooks/use0xExchange'
+import { useUserAllowance } from '../../../hooks/useAllowance'
+import { simplifyOTokenSymbol } from '../../../utils/others'
+import WarningText from '../../../components/Warning'
+import TokenBalanceEntry from '../../../components/TokenBalanceEntry'
 
 type MarketTicketProps = {
   action: TradeAction

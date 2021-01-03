@@ -15,21 +15,21 @@ import {
 } from '@aragon/ui'
 import History from './history'
 
-import { useConnectedWallet } from '../../contexts/wallet'
-import { Controller } from '../../utils/contracts/controller'
-import CustomIdentityBadge from '../../components/CustomIdentityBadge'
+import { useConnectedWallet } from '../../../contexts/wallet'
+import { Controller } from '../../../utils/contracts/controller'
+import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 
-import useAsyncMemo from '../../hooks/useAsyncMemo'
-import { useTokenByAddress } from '../../hooks/useToken'
-import { useOTokenBalances } from '../../hooks/useOTokenBalances'
-import { useTokenBalance } from '../../hooks/useTokenBalance'
-import { useLiveOTokens } from '../../hooks/useOTokens'
+import useAsyncMemo from '../../../hooks/useAsyncMemo'
+import { useTokenByAddress } from '../../../hooks/useToken'
+import { useOTokenBalances } from '../../../hooks/useOTokenBalances'
+import { useTokenBalance } from '../../../hooks/useTokenBalance'
+import { useLiveOTokens } from '../../../hooks/useOTokens'
 
-import { getVault } from '../../utils/graph'
-import { toTokenAmount, fromTokenAmount } from '../../utils/math'
-import { isExpired } from '../../utils/others'
-import { ZERO_ADDR, tokens } from '../../constants/addresses'
-import { SubgraphOToken } from '../../types'
+import { getVault } from '../../../utils/graph'
+import { toTokenAmount, fromTokenAmount } from '../../../utils/math'
+import { isExpired } from '../../../utils/others'
+import { ZERO_ADDR, tokens } from '../../../constants/addresses'
+import { SubgraphOToken } from '../../../types'
 
 export default function VaultDetail() {
   const [vaultExpiry, setVaultExpiry] = useState<string>('0')

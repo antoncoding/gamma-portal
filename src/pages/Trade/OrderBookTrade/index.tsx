@@ -5,10 +5,10 @@ import MintPanel from './MintPanel'
 import Orderbook from './Orderbook'
 import TradePanel from './TradePanel'
 
-import { SubgraphOToken } from '../../types'
-import { TradeAction } from '../../constants'
-import { useTokenPrice } from '../../hooks'
-import { emptyToken } from '../../constants/addresses'
+import { SubgraphOToken } from '../../../types'
+import { TradeAction } from '../../../constants'
+import { useTokenPrice } from '../../../hooks'
+import { emptyToken } from '../../../constants/addresses'
 
 export default function TradePage() {
   const [selectedUnderlying, setSelectedUnderlying] = useState(emptyToken)

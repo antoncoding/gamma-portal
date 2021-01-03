@@ -2,10 +2,10 @@ import React, { useState, useMemo, useEffect } from 'react'
 
 import { Header, DropDown, LoadingRing } from '@aragon/ui'
 
-import { useOTokenInSeries } from '../../hooks/useOTokens'
-import { useAllSeries } from '../../hooks/useAllProducts'
-import { toUTCDateString } from '../../utils/others'
-import { Token } from '../../types'
+import { useOTokenInSeries } from '../../../hooks/useOTokens'
+import { useAllSeries } from '../../../hooks/useAllProducts'
+import { toUTCDateString } from '../../../utils/others'
+import { Token } from '../../../types'
 
 type HeaderProps = {
   setOTokens: any
