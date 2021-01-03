@@ -1,7 +1,7 @@
 import React from 'react'
 import { useHistory } from 'react-router-dom'
 
-import { Header, Box, LinkBase, Tag, Help, IconUser, IconConfiguration, IconSwap } from '@aragon/ui'
+import { Header, Box, LinkBase, Tag, Help, IconUser, IconConfiguration } from '@aragon/ui'
 
 import Comment from '../../components/Comment'
 
@@ -34,7 +34,7 @@ function HomePage() {
           />
         </div>
 
-        <div style={{ width: '30%', marginRight: '3%' }}>
+        {/* <div style={{ width: '30%', marginRight: '3%' }}>
           <MainButton
             title="Trade"
             description="Coming Soon"
@@ -43,7 +43,7 @@ function HomePage() {
               history.push('/trade/')
             }}
           />
-        </div>
+        </div> */}
 
         <div style={{ width: '30%' }}>
           <MainButton
