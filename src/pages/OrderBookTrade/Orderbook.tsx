@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useState } from 'react'
 
-import { DataView, Timer } from '@aragon/ui'
+import { DataView, Timer, Checkbox } from '@aragon/ui'
 import { SubgraphOToken, OrderWithMetaData } from '../../types'
 import { useOrderbook } from '../../contexts/orderbook'
 import { getAskPrice, getBidPrice, getRemainingAmounts } from '../../utils/0x-utils'
@@ -9,21 +9,21 @@ import { toTokenAmount } from '../../utils/math'
 import { generateNoOrderContent, NO_TOKEN_SELECTED } from '../../constants/dataviewContents'
 import { TradeAction } from '../../constants'
 import { simplifyOTokenSymbol } from '../../utils/others'
+import { getPreference, storePreference } from '../../utils/storage'
+
+const SHOW_BOTH_KEY = 'orderbook-show-all'
 
 type OrderbookProps = {
   selectedOToken: SubgraphOToken | null
   action: TradeAction
   setAction: any
-  // setSelectedOrders: React.Dispatch<React.SetStateAction<OrderWithMetaData[]>>
 }
 
-export default function Orderbook({ selectedOToken, action, setAction }: OrderbookProps) {
+export default function Orderbook({ selectedOToken, action }: OrderbookProps) {
   const [askPage, setAskPage] = useState(0)
   const [bidPage, setBidPage] = useState(0)
 
-  // const [selectedAskIdxs, setSelectedAskIdxs] = useState<number[]>([])
-
-  // const [selectedBidIdxs, setSelectedBidIdxs] = useState<number[]>([])
+  const [showBoth, setShowBoth] = useState(getPreference(SHOW_BOTH_KEY, 'false') === 'true')
 
   const { orderbooks } = useOrderbook()
 
@@ -53,35 +53,9 @@ export default function Orderbook({ selectedOToken, action, setAction }: Orderbo
     [],
   )
 
-  // user wants to buy will click on asks
-  // const onSelectAskEntry = useCallback(
-  //   (entries, indexes) => {
-  //     setSelectedOrders(entries)
-  //     setSelectedAskIdxs(indexes)
-  //     setSelectedBidIdxs([])
-  //     if (action === TradeAction.Sell) {
-  //       setAction(TradeAction.Buy)
-  //     }
-  //   },
-  //   [action, setAction, setSelectedOrders],
-  // )
-
-  // user wants to sell will click on bids
-  // const onSelectBidEntry = useCallback(
-  //   (entries, indexes) => {
-  //     setSelectedOrders(entries)
-  //     setSelectedBidIdxs(indexes)
-  //     setSelectedAskIdxs([])
-  //     if (action === TradeAction.Buy) {
-  //       setAction(TradeAction.Sell)
-  //     }
-  //   },
-  //   [action, setAction, setSelectedOrders],
-  // )
-
   return (
     <div>
-      {action === TradeAction.Buy ? (
+      {(action === TradeAction.Buy || showBoth) && (
         <DataView
           emptyState={
             selectedOToken
@@ -100,7 +74,8 @@ export default function Orderbook({ selectedOToken, action, setAction }: Orderbo
           fields={['ask price', 'amount', 'expiration']}
           renderEntry={renderAskRow}
         />
-      ) : (
+      )}
+      {(action === TradeAction.Sell || showBoth) && (
         <DataView
           emptyState={
             selectedOToken
@@ -120,6 +95,20 @@ export default function Orderbook({ selectedOToken, action, setAction }: Orderbo
           renderEntry={renderBidRow}
         />
       )}
+      {
+        <div style={{ display: 'flex', fontSize: 12, opacity: 0.7 }}>
+          <div style={{ paddingTop: '5px' }}>
+            <Checkbox
+              checked={showBoth}
+              onChange={(checked: boolean) => {
+                setShowBoth(checked)
+                storePreference(SHOW_BOTH_KEY, String(checked))
+              }}
+            />
+          </div>
+          <div style={{ padding: '8px' }}>Show {action === TradeAction.Buy ? 'bids' : 'asks'}</div>
+        </div>
+      }
     </div>
   )
 }
