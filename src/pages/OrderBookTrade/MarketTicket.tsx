@@ -29,9 +29,22 @@ type MarketTicketProps = {
   selectedOToken: SubgraphOToken
   oTokenBalances: OTokenBalance[] | null
   usdcBalance: BigNumber
+  inputTokenAmount: BigNumber
+  setInputTokenAmount: React.Dispatch<React.SetStateAction<BigNumber>>
+  outputTokenAmount: BigNumber
+  setOutputTokenAmount: React.Dispatch<React.SetStateAction<BigNumber>>
 }
 
-export default function MarketTicket({ action, selectedOToken, oTokenBalances, usdcBalance }: MarketTicketProps) {
+export default function MarketTicket({
+  action,
+  selectedOToken,
+  oTokenBalances,
+  usdcBalance,
+  inputTokenAmount,
+  setInputTokenAmount,
+  outputTokenAmount,
+  setOutputTokenAmount,
+}: MarketTicketProps) {
   const { networkId } = useConnectedWallet()
 
   const paymentToken = useMemo(() => getUSDC(networkId), [networkId])
@@ -45,9 +58,6 @@ export default function MarketTicket({ action, selectedOToken, oTokenBalances, u
 
   const [ordersToFill, setOrdersToFill] = useState<SignedOrder[]>([])
   const [amountsToFill, setAmountsToFill] = useState<BigNumber[]>([])
-
-  const [inputTokenAmount, setInputTokenAmount] = useState(new BigNumber(0))
-  const [outputTokenAmount, setOutputTokenAmount] = useState(new BigNumber(0))
 
   const { orderbooks } = useOrderbook()
 
@@ -104,26 +114,29 @@ export default function MarketTicket({ action, selectedOToken, oTokenBalances, u
   useEffect(() => {
     setOrdersToFill([])
     setAmountsToFill([])
-    setError(Errors.NO_ERROR)
-    setInputTokenAmount(new BigNumber(0))
-    setOutputTokenAmount(new BigNumber(0))
   }, [action])
 
-  const handleInputChange = useCallback(event => {
-    try {
-      const newAmount = new BigNumber(event.target.value)
-      setInputTokenAmount(newAmount)
-      setLastUpdate(Updates.Input)
-    } catch {}
-  }, [])
+  const handleInputChange = useCallback(
+    event => {
+      try {
+        const newAmount = new BigNumber(event.target.value)
+        setInputTokenAmount(newAmount)
+        setLastUpdate(Updates.Input)
+      } catch {}
+    },
+    [setInputTokenAmount],
+  )
 
-  const handleOuputChange = useCallback(event => {
-    try {
-      const newAmount = new BigNumber(event.target.value)
-      setOutputTokenAmount(newAmount)
-      setLastUpdate(Updates.Output)
-    } catch {}
-  }, [])
+  const handleOuputChange = useCallback(
+    event => {
+      try {
+        const newAmount = new BigNumber(event.target.value)
+        setOutputTokenAmount(newAmount)
+        setLastUpdate(Updates.Output)
+      } catch {}
+    },
+    [setOutputTokenAmount],
+  )
 
   // update numbers accordingly when 1. orderbook change, 2. user update either intput or output
   useEffect(() => {
@@ -138,7 +151,7 @@ export default function MarketTicket({ action, selectedOToken, oTokenBalances, u
     setError(error)
     setAmountsToFill(amounts)
     setOrdersToFill(ordersToFill)
-  }, [asks, bids, inputTokenAmount, inputToken, outputToken, action, lastUpdate, id])
+  }, [asks, bids, inputTokenAmount, inputToken, outputToken, action, lastUpdate, id, setOutputTokenAmount])
 
   // triggered when output token amount is updaed
   useEffect(() => {
@@ -153,7 +166,17 @@ export default function MarketTicket({ action, selectedOToken, oTokenBalances, u
     setError(error)
     setAmountsToFill(amounts)
     setOrdersToFill(ordersToFill)
-  }, [id, action, inputToken.decimals, lastUpdate, asks, bids, outputToken.decimals, outputTokenAmount])
+  }, [
+    id,
+    action,
+    inputToken.decimals,
+    lastUpdate,
+    asks,
+    bids,
+    outputToken.decimals,
+    outputTokenAmount,
+    setInputTokenAmount,
+  ])
 
   useEffect(() => {
     if (error !== Errors.NO_ERROR) return
@@ -216,9 +239,9 @@ export default function MarketTicket({ action, selectedOToken, oTokenBalances, u
         symbol={paymentToken.symbol}
       />
 
-      <div style={{ display: 'flex', paddingTop: '10px' }}>
+      <div style={{ display: 'flex', paddingTop: '20px' }}>
         <Button
-          disabled={needApprove || error !== Errors.NO_ERROR || inputTokenAmount.isZero()}
+          disabled={needApprove || error !== Errors.NO_ERROR || inputTokenAmount.isZero() || inputTokenAmount.isNaN()}
           label={action === TradeAction.Buy ? 'Confirm Buy' : 'Confirm Sell'}
           mode={action === TradeAction.Buy ? 'positive' : 'negative'}
           onClick={fill}

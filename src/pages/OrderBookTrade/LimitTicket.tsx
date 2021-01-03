@@ -22,9 +22,22 @@ type MarketTicketProps = {
   selectedOToken: SubgraphOToken
   oTokenBalances: OTokenBalance[] | null
   usdcBalance: BigNumber
+  inputTokenAmount: BigNumber
+  setInputTokenAmount: React.Dispatch<React.SetStateAction<BigNumber>>
+  outputTokenAmount: BigNumber
+  setOutputTokenAmount: React.Dispatch<React.SetStateAction<BigNumber>>
 }
 
-export default function LimitTicket({ action, selectedOToken, oTokenBalances, usdcBalance }: MarketTicketProps) {
+export default function LimitTicket({
+  action,
+  selectedOToken,
+  oTokenBalances,
+  usdcBalance,
+  inputTokenAmount,
+  setInputTokenAmount,
+  outputTokenAmount,
+  setOutputTokenAmount,
+}: MarketTicketProps) {
   const { networkId } = useConnectedWallet()
 
   const paymentToken = useMemo(() => getUSDC(networkId), [networkId])
@@ -36,8 +49,8 @@ export default function LimitTicket({ action, selectedOToken, oTokenBalances, us
 
   const [error, setError] = useState(Errors.NO_ERROR)
 
-  const [inputTokenAmount, setInputTokenAmount] = useState(new BigNumber(0))
-  const [outputTokenAmount, setOutputTokenAmount] = useState(new BigNumber(0))
+  // const [inputTokenAmount, setInputTokenAmount] = useState(new BigNumber(0))
+  // const [outputTokenAmount, setOutputTokenAmount] = useState(new BigNumber(0))
 
   const oTokenBalance = oTokenBalances?.find(b => b.token.id === selectedOToken.id)?.balance ?? new BigNumber(0)
 
@@ -79,32 +92,35 @@ export default function LimitTicket({ action, selectedOToken, oTokenBalances, us
     [action],
   )
 
-  // when buy/sell is click, reset a few things
-  useEffect(() => {
-    setError(Errors.NO_ERROR)
-    setInputTokenAmount(new BigNumber(0))
-    setOutputTokenAmount(new BigNumber(0))
-  }, [action])
+  const handleInputChange = useCallback(
+    event => {
+      try {
+        const newAmount = new BigNumber(event.target.value)
+        setInputTokenAmount(newAmount)
+      } catch {}
+    },
+    [setInputTokenAmount],
+  )
 
-  const handleInputChange = useCallback(event => {
-    try {
-      const newAmount = new BigNumber(event.target.value)
-      setInputTokenAmount(newAmount)
-    } catch {}
-  }, [])
-
-  const handleOuputChange = useCallback(event => {
-    try {
-      const newAmount = new BigNumber(event.target.value)
-      setOutputTokenAmount(newAmount)
-    } catch {}
-  }, [])
+  const handleOuputChange = useCallback(
+    event => {
+      try {
+        const newAmount = new BigNumber(event.target.value)
+        setOutputTokenAmount(newAmount)
+      } catch {}
+    },
+    [setOutputTokenAmount],
+  )
 
   const price = useMemo(() => {
     if (action === TradeAction.Sell) {
-      return inputTokenAmount.isZero() ? new BigNumber(0) : outputTokenAmount.div(inputTokenAmount)
+      return inputTokenAmount.isZero() || inputTokenAmount.isNaN()
+        ? new BigNumber(0)
+        : outputTokenAmount.div(inputTokenAmount)
     } else {
-      return outputTokenAmount.isZero() ? new BigNumber(0) : inputTokenAmount.div(outputTokenAmount)
+      return outputTokenAmount.isZero() || outputTokenAmount.isNaN()
+        ? new BigNumber(0)
+        : inputTokenAmount.div(outputTokenAmount)
     }
   }, [inputTokenAmount, action, outputTokenAmount])
 
@@ -211,10 +227,10 @@ export default function LimitTicket({ action, selectedOToken, oTokenBalances, us
         symbol={paymentToken.symbol}
       />
 
-      <div style={{ display: 'flex', paddingTop: '10px' }}>
+      <div style={{ display: 'flex', paddingTop: '20px' }}>
         <Button
-          disabled={needApprove || error !== Errors.NO_ERROR || inputTokenAmount.isZero()}
-          label={action === TradeAction.Buy ? 'Create Bid' : 'Create Ask'}
+          disabled={needApprove || error !== Errors.NO_ERROR || inputTokenAmount.isZero() || inputTokenAmount.isNaN()}
+          label={action === TradeAction.Buy ? 'Create Bid Order' : 'Create Ask Order'}
           mode={action === TradeAction.Buy ? 'positive' : 'negative'}
           onClick={createAndPost}
         />

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react'
-import { Box, Button, Split } from '@aragon/ui'
+import BigNumber from 'bignumber.js'
+import { Box, Button, Split, useTheme } from '@aragon/ui'
 
 import MarketTicket from './MarketTicket'
 import LimitTicket from './LimitTicket'
@@ -18,9 +19,13 @@ type TradeDetailProps = {
 }
 
 export default function TradePanel({ selectedOToken, action, setAction }: TradeDetailProps) {
+  const theme = useTheme()
   const [marketType, setMarketType] = useState(MarketTypes.Market)
 
   const { user, networkId } = useConnectedWallet()
+
+  const [inputTokenAmount, setInputTokenAmount] = useState(new BigNumber(1))
+  const [outputTokenAmount, setOutputTokenAmount] = useState(new BigNumber(0))
 
   const { balances: oTokenBalances } = useOTokenBalances(user, networkId)
   const usdcBalance = useTokenBalance(getUSDC(networkId).id, user, 15)
@@ -38,9 +43,13 @@ export default function TradePanel({ selectedOToken, action, setAction }: TradeD
       <Split
         primary={
           selectedOToken === null ? (
-            <> </>
+            <div style={{ color: theme.contentSecondary }}> Select an oToken to proceed </div>
           ) : marketType === MarketTypes.Market ? (
             <MarketTicket
+              inputTokenAmount={inputTokenAmount}
+              setInputTokenAmount={setInputTokenAmount}
+              outputTokenAmount={outputTokenAmount}
+              setOutputTokenAmount={setOutputTokenAmount}
               action={action}
               selectedOToken={selectedOToken}
               oTokenBalances={oTokenBalances}
@@ -48,6 +57,10 @@ export default function TradePanel({ selectedOToken, action, setAction }: TradeD
             />
           ) : (
             <LimitTicket
+              inputTokenAmount={inputTokenAmount}
+              setInputTokenAmount={setInputTokenAmount}
+              outputTokenAmount={outputTokenAmount}
+              setOutputTokenAmount={setOutputTokenAmount}
               action={action}
               selectedOToken={selectedOToken}
               oTokenBalances={oTokenBalances}

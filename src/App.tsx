@@ -20,6 +20,7 @@ import Operators from './pages/Operators'
 import HomePage from './pages/HomePage'
 import Settings from './pages/Settings'
 import Trade from './pages/OrderBookTrade'
+import Swap from './pages/Swap'
 import { useConnection } from './hooks/useConnection'
 
 import { getPreference } from './utils/storage'
@@ -43,11 +44,15 @@ function App() {
               <div style={{ width: '80%', marginRight: '2%' }}>
                 <Switch>
                   {/* without layout */}
-                  <Route path="/trade/0x">
+                  <Route path="/trade/orderbook">
                     <Trade />
                   </Route>
 
                   {/* pages with layout */}
+                  <Route path="/trade/swap">
+                    <Swap />
+                  </Route>
+
                   <Route path="/account/:account/operators">
                     <Layout>
                       <Operators />
