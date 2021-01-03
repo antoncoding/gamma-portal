@@ -19,7 +19,9 @@ import Oracle from './pages/Oracle'
 import Operators from './pages/Operators'
 import HomePage from './pages/HomePage'
 import Settings from './pages/Settings'
-import Trade from './pages/OrderBookTrade'
+import Trade from './pages/Trade'
+
+import Orderbook from './pages/OrderBookTrade'
 import Swap from './pages/Swap'
 import { useConnection } from './hooks/useConnection'
 
@@ -45,12 +47,19 @@ function App() {
                 <Switch>
                   {/* without layout */}
                   <Route path="/trade/orderbook">
-                    <Trade />
+                    <Orderbook />
                   </Route>
 
                   {/* pages with layout */}
                   <Route path="/trade/swap">
-                    <Swap />
+                    <Layout>
+                      <Swap />
+                    </Layout>
+                  </Route>
+                  <Route path="/trade/">
+                    <Layout>
+                      <Trade />
+                    </Layout>
                   </Route>
 
                   <Route path="/account/:account/operators">

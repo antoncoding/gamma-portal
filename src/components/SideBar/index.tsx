@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { useTheme, IconHome, IconUser, IconConfiguration, LinkBase } from '@aragon/ui'
+import { useTheme, IconHome, IconUser, IconConfiguration, LinkBase, IconSwap } from '@aragon/ui'
 import SidebarTitle from './SidebarTitle'
 import SubButton from './SubButton'
 
@@ -95,6 +95,30 @@ export default function SideBar() {
           isSelected={selectedTab === 3 && subSelected === 'oracle'}
           shown={selectedTab === 3}
         />
+        <SidebarTitle
+          title="Trade"
+          icon={<IconSwap />}
+          onClick={() => {
+            history.push('/trade/')
+          }}
+          isSelected={selectedTab === 4}
+        />
+        <SubButton
+          title="Swap"
+          onClick={() => {
+            history.push(`/trade/swap/`)
+          }}
+          isSelected={selectedTab === 4 && subSelected === 'swap'}
+          shown={selectedTab === 4}
+        />
+        <SubButton
+          title="Orderbook"
+          onClick={() => {
+            history.push(`/trade/orderbook/`)
+          }}
+          isSelected={selectedTab === 4 && subSelected === 'orderbook'}
+          shown={selectedTab === 4}
+        />
       </div>
       <div
         style={{
@@ -121,6 +145,8 @@ function locationToTabId(location) {
     ? 2
     : location.pathname.includes('/system/')
     ? 3
+    : location.pathname.includes('/trade/')
+    ? 4
     : -1
 }
 
@@ -133,5 +159,9 @@ function locationToSubButtomId(location) {
     ? 'factory'
     : location.pathname.includes('/oracle/')
     ? 'oracle'
+    : location.pathname.includes('/swap/')
+    ? 'swap'
+    : location.pathname.includes('/orderbook/')
+    ? 'orderbook'
     : ''
 }
