@@ -5,15 +5,15 @@ import useAsyncMemo from '../../../hooks/useAsyncMemo'
 import { getAccount } from '../../../utils/graph'
 
 import { useConnectedWallet } from '../../../contexts/wallet'
-import { Controller } from '../../../utils/contracts/controller'
 import { SubgraphVault } from '../../../types'
 import SectionTitle from '../../../components/SectionHeader'
 import OpynTokenAmount from '../../../components/OpynTokenAmount'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 import { VAULTS } from '../../../constants/dataviewContents'
+import { useController } from '../../../hooks/useController'
 
 export default function AccountVaults() {
-  const { web3, networkId, user } = useConnectedWallet()
+  const { networkId, user } = useConnectedWallet()
   const { account } = useParams()
 
   const [isLoading, setIsLoading] = useState(true)
@@ -43,7 +43,7 @@ export default function AccountVaults() {
     })
   }, [vaults])
 
-  const controller = useMemo(() => new Controller(web3, networkId, user), [networkId, user, web3])
+  const controller = useController()
 
   const batchSettle = useCallback(async () => {
     const vaultIds = vaultsToSettle.map(vault => Number(vault.vaultId))

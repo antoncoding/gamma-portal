@@ -16,7 +16,6 @@ import {
 import History from './history'
 
 import { useConnectedWallet } from '../../../contexts/wallet'
-import { Controller } from '../../../utils/contracts/controller'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 
 import useAsyncMemo from '../../../hooks/useAsyncMemo'
@@ -30,6 +29,7 @@ import { toTokenAmount, fromTokenAmount } from '../../../utils/math'
 import { isExpired } from '../../../utils/others'
 import { ZERO_ADDR, tokens } from '../../../constants/addresses'
 import { SubgraphOToken } from '../../../types'
+import { useController } from '../../../hooks/useController'
 
 export default function VaultDetail() {
   const [vaultExpiry, setVaultExpiry] = useState<string>('0')
@@ -50,7 +50,7 @@ export default function VaultDetail() {
   const [selectedLong, setLongOToken] = useState<SubgraphOToken | null>(null)
   const [selectedShort, setShortOToken] = useState<SubgraphOToken | null>(null)
 
-  const { web3, networkId, user } = useConnectedWallet()
+  const { networkId, user } = useConnectedWallet()
   const { owner, vaultId } = useParams()
   const toast = useToast()
 
@@ -67,15 +67,17 @@ export default function VaultDetail() {
   const { allOtokens } = useLiveOTokens()
   const { balances } = useOTokenBalances(user, networkId)
 
+  const controller = useController()
+
   /**
    * Use asyncMemo to trigger a rerender when isSendingTx changes.
    */
-  const controller = useAsyncMemo(async () => new Controller(web3, networkId, user), new Controller(null, 42, ''), [
-    networkId,
-    user,
-    web3,
-    isSendingTx,
-  ])
+  // const controller = useAsyncMemo(async () => new Controller(web3, networkId, user), new Controller(null, 42, ''), [
+  //   networkId,
+  //   user,
+  //   web3,
+  //   isSendingTx,
+  // ])
 
   const isAuthorized = useMemo(() => {
     if (vaultDetail === null) return false
@@ -240,7 +242,7 @@ export default function VaultDetail() {
   }, [vaultDetail])
 
   const simpleSettle = useCallback(async () => {
-    await controller.simpleSettle(user, vaultId, user)
+    await controller.settleBatch(user, [vaultId], user)
   }, [controller, user, vaultId])
 
   const renderRow = useCallback(
