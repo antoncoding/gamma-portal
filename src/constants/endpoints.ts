@@ -6,7 +6,7 @@ type graphEndPointType = {
 
 export const subgraph: graphEndPointType = {
   '1': 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-mainnet',
-  '42': 'https://api.thegraph.com/subgraphs/name/antoncoding/gamma-kovan-new',
+  '42': 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-kovan',
 }
 
 export const ZeroXEndpoint: { [key in SupportedNetworks]: { http: string; ws: string } } = {
