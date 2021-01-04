@@ -68,10 +68,10 @@ export const addresses: SystemAddresses = {
     zeroxERCProxy: '0x95e6f48254609a6ee006f7d493c8e5fb97094cef',
   },
   '42': {
-    controller: '0x37adb373e5f986a31a3441a24453bc047f26c46c',
-    factory: '0x6fb1a6809961b0611c4296b16d8F14eF17FfAacF',
-    addressBook: '0x16124C5d58F58Fe3fce36C36C5c5Df67548',
-    pool: '0xe477d1FFC1e5eA6a577846a4699617997315B4ee',
+    controller: '0xdee7d0f8ccc0f7ac7e45af454e5e7ec1552e8e4e',
+    factory: '0xb9d17ab06e27f63d0fd75099d5874a194ee623e2',
+    addressBook: '0x8812f219f507e8cfe9d2f1e790164714c5e06a73',
+    pool: '0x8c7c60d766951c5c570bbb7065c993070061b795',
     zeroxExchange: '0x4eacd0af335451709e1e7b570b8ea68edec8bc97',
     zeroxERCProxy: '0xf1ec01d6236d3cd881a0bf0130ea25fe4234003e',
   },
@@ -94,7 +94,7 @@ export const knownOperators: {
   ],
   '42': [
     {
-      address: '0x3bee6b613b3e52020fa958ebd9ca691c11a55995',
+      address: '0x5957a413f5ac4bcf2ba7c5c461a944b548adb1a',
       name: 'PayableProxy',
       audited: true,
     },
