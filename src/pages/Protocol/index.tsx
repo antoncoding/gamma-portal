@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactGA from 'react-ga'
 import { useHistory } from 'react-router-dom'
 
 import { Header, Box, LinkBase, Tag, IconCoin, useTheme } from '@aragon/ui'
@@ -10,7 +11,7 @@ import factoryWhite from '../../imgs/icons/factory-white.png'
 function ProtocolPage() {
   const theme = useTheme()
   const history = useHistory()
-
+  ReactGA.pageview('/protocol/')
   return (
     <>
       <Header primary="Protocol" />
@@ -22,7 +23,7 @@ function ProtocolPage() {
             description="Submit Price / See oracle config"
             icon={<IconCoin size="large" />}
             onClick={() => {
-              history.push('/system/oracle/')
+              history.push('/portocol/oracle/')
             }}
           />
         </div>
@@ -35,7 +36,7 @@ function ProtocolPage() {
               <img style={{ height: 55 }} src={theme._name === 'dark' ? factoryWhite : factoryBlack} alt="factory" />
             }
             onClick={() => {
-              history.push('/system/factory/')
+              history.push('/portocol/factory/')
             }}
           />
         </div>

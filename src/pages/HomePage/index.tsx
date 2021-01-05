@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactGA from 'react-ga'
 import { useHistory } from 'react-router-dom'
 
 import { Header, Box, LinkBase, Tag, Help, IconUser, IconConfiguration } from '@aragon/ui'
@@ -7,7 +8,7 @@ import Comment from '../../components/Comment'
 
 function HomePage() {
   const history = useHistory()
-
+  ReactGA.pageview('/')
   return (
     <>
       <Header primary="Welcome to Gamma Portal" />
