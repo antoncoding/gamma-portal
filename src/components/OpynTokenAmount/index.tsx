@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useState, useMemo } from 'react'
 
 import { SubgraphToken, SubgraphOToken } from '../../types'
 import { EmptyToken } from '../TokenDisplay'
 
-import { TokenAmount } from '@aragon/ui'
+import { TokenAmount, LinkBase, Modal, AddressField } from '@aragon/ui'
 
 import ETH from '../../imgs/ETH.png'
 import WBTC from '../../imgs/WBTC.png'
@@ -17,26 +17,42 @@ type TokenAmountProps = {
 }
 
 export default function OpynTokenAmount({ token, amount, chainId }: TokenAmountProps) {
-  if (!token) return <EmptyToken />
-  let imgUrl: null | string = null
+  const [open, setOpen] = useState(false)
 
-  if (token.symbol === 'USDC') imgUrl = USDC
-  if (token.symbol === 'WETH') imgUrl = ETH
-  if (token.symbol === 'WBTC') imgUrl = WBTC
+  const imgUrl = useMemo(() => {
+    return token === null
+      ? null
+      : token.symbol === 'USDC'
+      ? USDC
+      : token.symbol === 'WETH'
+      ? ETH
+      : token.symbol === 'WBTC'
+      ? WBTC
+      : (token as SubgraphOToken).underlyingAsset
+      ? (token as SubgraphOToken).underlyingAsset.symbol === 'WETH'
+        ? oETH
+        : null
+      : null
+  }, [token])
 
-  if ((token as SubgraphOToken).underlyingAsset) {
-    const symbol = (token as SubgraphOToken).underlyingAsset.symbol
-    if (symbol === 'WETH') imgUrl = oETH
-  }
-  return (
-    <TokenAmount
-      address={token.id}
-      amount={amount}
-      chainId={chainId}
-      symbol={token.symbol}
-      decimals={token.decimals}
-      iconUrl={imgUrl}
-      digits={8}
-    />
+  return token ? (
+    <>
+      <LinkBase onClick={() => setOpen(true)}>
+        <TokenAmount
+          address={token.id}
+          amount={amount}
+          chainId={chainId}
+          symbol={token.symbol}
+          decimals={token.decimals}
+          iconUrl={imgUrl}
+          digits={8}
+        />
+      </LinkBase>
+      <Modal visible={open} onClose={() => setOpen(false)}>
+        <AddressField address={token.id} />
+      </Modal>
+    </>
+  ) : (
+    <EmptyToken />
   )
 }
