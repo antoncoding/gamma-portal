@@ -108,7 +108,7 @@ export default function MarketTicket({
   )
 
   const protocolFee = useMemo(() => {
-    return getProtocolFee(ordersToFill.length)
+    return getProtocolFee(ordersToFill)
   }, [getProtocolFee, ordersToFill])
 
   // when buy/sell is click, reset a few things
