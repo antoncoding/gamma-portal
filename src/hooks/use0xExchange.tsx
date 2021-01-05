@@ -1,8 +1,9 @@
 import { useCallback, useMemo } from 'react'
+import ReactGA from 'react-ga'
 import BigNumber from 'bignumber.js'
 import { useToast } from '@aragon/ui'
 import { useConnectedWallet } from '../contexts/wallet'
-import { addresses, ZeroXEndpoint } from '../constants'
+import { addresses, ZeroXEndpoint, SupportedNetworks } from '../constants'
 import { useNotify } from './useNotify'
 import { SignedOrder } from '../types'
 import { useGasPrice } from './useGasPrice'
@@ -17,6 +18,15 @@ const abi = require('../constants/abis/0xExchange.json')
 export function use0xExchange() {
   const toast = useToast()
   const { networkId, web3, user } = useConnectedWallet()
+
+  const track = useCallback(
+    (action: string) => {
+      const label = networkId === SupportedNetworks.Mainnet ? 'mainnet' : 'kovan'
+      ReactGA.event({ category: 'trading', action, label })
+    },
+    [networkId],
+  )
+
   const { notifyCallback } = useNotify()
 
   const httpEndpoint = useMemo(() => ZeroXEndpoint[networkId].http, [networkId])
@@ -63,11 +73,12 @@ export function use0xExchange() {
         chainId: 1,
         takerFeeAssetData: '0x',
       }
+      track('create-order')
       const provider = new MetamaskSubprovider(web3.currentProvider as SupportedProvider)
       return signatureUtils.ecSignOrderAsync(provider, order, user)
       // return order;
     },
-    [networkId, user, web3, toast],
+    [networkId, user, web3, toast, track],
   )
 
   const fillOrders = useCallback(
@@ -89,8 +100,10 @@ export function use0xExchange() {
           gasPrice: web3.utils.toWei(fast.toString(), 'gwei'),
         })
         .on('transactionHash', notifyCallback)
+
+      track('fill-order')
     },
-    [networkId, getProtocolFee, fast, notifyCallback, toast, user, web3],
+    [networkId, getProtocolFee, fast, notifyCallback, toast, user, web3, track],
   )
 
   const broadcastOrder = useCallback(
