@@ -70,7 +70,7 @@ export function use0xExchange() {
         feeRecipientAddress: FEE_RECIPIENT,
         expirationTimeSeconds: new BigNumber(expiry).integerValue(),
         makerFeeAssetData: makerFeeAsset ? assetDataUtils.encodeERC20AssetData(makerFeeAsset) : '0x',
-        chainId: 1,
+        chainId: networkId,
         takerFeeAssetData: '0x',
       }
       track('create-order')
