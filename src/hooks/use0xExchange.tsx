@@ -52,13 +52,6 @@ export function use0xExchange() {
     [getGasPriceForOrders],
   )
 
-  // const getProtocolFee = useCallback(
-  //   (numOfOrders: number) => {
-  //     return fast.times(new BigNumber(numOfOrders)).times(FEE_PERORDER_PER_GWEI)
-  //   },
-  //   [fast],
-  // )
-
   const createOrder = useCallback(
     async (
       makerAsset: string,
@@ -108,6 +101,7 @@ export function use0xExchange() {
 
       const signatures = orders.map(order => order.signature)
 
+      const gasPrice = getGasPriceForOrders(orders)
       const feeInEth = getProtocolFee(orders).toString()
       const amountsStr = amounts.map(amount => amount.toString())
 
@@ -116,13 +110,13 @@ export function use0xExchange() {
         .send({
           from: user,
           value: web3.utils.toWei(feeInEth, 'ether'),
-          gasPrice: web3.utils.toWei(fast.toString(), 'gwei'),
+          gasPrice: web3.utils.toWei(gasPrice.toString(), 'gwei'),
         })
         .on('transactionHash', notifyCallback)
 
       track('fill-order')
     },
-    [networkId, getProtocolFee, fast, notifyCallback, toast, user, web3, track],
+    [networkId, getProtocolFee, getGasPriceForOrders, notifyCallback, toast, user, web3, track],
   )
 
   const broadcastOrder = useCallback(
