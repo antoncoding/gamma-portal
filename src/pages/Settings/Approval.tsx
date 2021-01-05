@@ -6,7 +6,7 @@ import { Switch, useToast, Help } from '@aragon/ui'
 import { storePreference, getPreference } from '../../utils/storage'
 
 function ApproveSwitch() {
-  const mode = getPreference('approval', 'normal')
+  const mode = getPreference('approval', 'unlimited')
   const toast = useToast()
 
   const [isUnlimited, setLimited] = useState(mode === 'unlimited')
