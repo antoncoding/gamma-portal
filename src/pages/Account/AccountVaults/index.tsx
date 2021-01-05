@@ -23,21 +23,15 @@ export default function AccountVaults() {
 
   const toast = useToast()
 
-  const [fetchCount, setFetchCount] = useState(0)
-  const refetch = useCallback(() => {
-    setFetchCount(c => c + 1)
-  }, [setFetchCount])
-
   const vaults = useAsyncMemo(
     async () => {
       if (!account) return
-      console.log(`refetch triggered`)
       const result = await getAccount(networkId, account, toast)
       setIsLoading(false)
       return result ? result.vaults.sort((v1, v2) => (Number(v1.vaultId) > Number(v2.vaultId) ? 1 : -1)) : []
     },
     [],
-    [networkId, account, fetchCount],
+    [networkId, account],
   )
 
   // for batch settle
