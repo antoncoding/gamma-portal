@@ -94,7 +94,7 @@ export const knownOperators: {
   ],
   '42': [
     {
-      address: '0x5957a413f5ac4bcf2ba7c5c461a944b548adb1a',
+      address: '0x5957a413f5ac4bcf2ba7c5c461a944b548adb1a5',
       name: 'PayableProxy',
       audited: true,
     },
