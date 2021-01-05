@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import ReactGA from 'react-ga'
 import { Header, DataView, DropDown, useToast, Tag, Help } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
 import LabelText from '../../../components/LabelText'
@@ -16,6 +17,11 @@ import { PRICE_SUBMISSION } from '../../../constants/dataviewContents'
 
 export default function Oracle() {
   const { networkId } = useConnectedWallet()
+
+  useEffect(() => {
+    ReactGA.pageview('/protocol/oracle/')
+  }, [])
+
   const toast = useToast()
   const [isLoadingHistory, setIsLoadingHistory] = useState(true)
   const [selectedAssetIndex, setSelectedAssetIndex] = useState(-1)

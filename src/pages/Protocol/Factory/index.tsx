@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import ReactGA from 'react-ga'
 import BigNumber from 'bignumber.js'
 import {
   Header,
@@ -23,6 +24,10 @@ import { useAllProducts } from '../../../hooks/useAllProducts'
 
 export default function CreateOption() {
   const factory = useFactory()
+
+  useEffect(() => {
+    ReactGA.pageview('/protocol/factory/')
+  }, [])
 
   const toast = useToast()
   const [selectedProductIndex, setSelectedProductIndex] = useState(-1)

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import ReactGA from 'react-ga'
 import { useHistory } from 'react-router-dom'
 import { TextInput, DataView, Button, LinkBase, EthIdenticon, useToast, Header } from '@aragon/ui'
 import { getPreference, checkAddressAndAddToStorage } from '../../../utils/storage'
@@ -14,6 +15,10 @@ function Login() {
   const toast = useToast()
   const [InAddress, setAddress] = useState('')
   const [addrs, setAddrLisrt] = useState([])
+
+  useEffect(() => {
+    ReactGA.modalview('watch-address')
+  }, [])
 
   const goToAccount = useMemo(
     () => account => {

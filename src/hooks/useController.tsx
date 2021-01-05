@@ -1,4 +1,5 @@
 import { useCallback, useState, useMemo } from 'react'
+import ReactGA from 'react-ga'
 import BigNumber from 'bignumber.js'
 import { useConnectedWallet } from '../contexts/wallet'
 import { useToast } from '@aragon/ui'
@@ -10,6 +11,7 @@ import { MAX_UINT } from '../constants/others'
 
 import * as util from '../utils/controller'
 import { useNotify } from './useNotify'
+import { SupportedNetworks } from '../constants'
 
 const abi = require('../constants/abis/controller.json')
 const erc20Abi = require('../constants/abis/erc20.json')
@@ -18,6 +20,15 @@ export function useController() {
   const toast = useToast()
 
   const { networkId, user, web3 } = useConnectedWallet()
+
+  const track = useCallback(
+    (action: string) => {
+      const label = networkId === SupportedNetworks.Mainnet ? 'mainnet' : 'kovan'
+      ReactGA.event({ category: 'controller', action, label })
+    },
+    [networkId],
+  )
+
   const { notifyCallback } = useNotify()
 
   const controller = useMemo(() => {
@@ -51,49 +62,55 @@ export function useController() {
       const counter = await controller.methods.getAccountVaultCounter(account).call()
       const newVulatId = new BigNumber(counter).plus(1)
       const openArg = util.createOpenVaultArg(account, newVulatId)
+      track('open-vault')
       await operate([openArg])
     },
-    [operate, controller, toast],
+    [operate, controller, toast, track],
   )
 
   const pushAddCollateralArg = useCallback(
     (account: string, vaultId: BigNumber, from: string, asset: string, amount: BigNumber) => {
       const arg = util.createDepositCollateralArg(account, from, vaultId, asset, amount)
       pushAction(arg)
+      track('add-collateral')
     },
-    [pushAction],
+    [pushAction, track],
   )
 
   const pushRemoveCollateralArg = useCallback(
     (account: string, vaultId: BigNumber, to: string, asset: string, amount: BigNumber) => {
       const arg = util.createWithdrawCollateralArg(account, to, vaultId, asset, amount)
       pushAction(arg)
+      track('remove-collateral')
     },
-    [pushAction],
+    [pushAction, track],
   )
 
   const pushAddLongArg = useCallback(
     (account: string, vaultId: BigNumber, from: string, asset: string, amount: BigNumber) => {
       const arg = util.createDepositLongArg(account, from, vaultId, asset, amount)
       pushAction(arg)
+      track('add-long')
     },
-    [pushAction],
+    [pushAction, track],
   )
 
   const pushRemoveLongArg = useCallback(
     (account: string, vaultId: BigNumber, to: string, asset: string, amount: BigNumber) => {
       const arg = util.createWithdrawLongArg(account, to, vaultId, asset, amount)
       pushAction(arg)
+      track('remove-long')
     },
-    [pushAction],
+    [pushAction, track],
   )
 
   const pushMintArg = useCallback(
     (account: string, vaultId: BigNumber, to: string, asset: string, amount: BigNumber) => {
       const arg = util.createMintShortArg(account, to, vaultId, asset, amount)
       pushAction(arg)
+      track('mint-short')
     },
-    [pushAction],
+    [pushAction, track],
   )
 
   const pushBurnArg = useCallback(
@@ -101,17 +118,19 @@ export function useController() {
       if (!web3) return
       const arg = util.createBurnShortArg(account, from, vaultId, asset, amount)
       pushAction(arg)
+      track('burn-short')
     },
-    [pushAction, web3],
+    [pushAction, web3, track],
   )
 
   const settleBatch = useCallback(
     async (account: string, vaultIds: number[], to: string) => {
       if (!web3) return toast('No wallet connected')
       const args = vaultIds.map(id => util.createSettleArg(account, to, new BigNumber(id)))
+      track('settle-batch')
       await operate(args)
     },
-    [operate, web3, toast],
+    [operate, web3, toast, track],
   )
 
   const redeemBatch = useCallback(
@@ -121,9 +140,10 @@ export function useController() {
         args.push(util.createRedeemArg(tokens[i], amounts[i].toString(), to))
       }
       if (args.length === 0) return toast('No tokens to redeem.')
+      track('redeem-batch')
       await operate(args)
     },
-    [operate, toast],
+    [operate, toast, track],
   )
 
   const refreshConfig = useCallback(async () => {
@@ -174,12 +194,13 @@ export function useController() {
   const updateOperator = useCallback(
     async (operator: string, isOperator: boolean) => {
       if (!controller) return toast('No wallet connected')
+      track('update-operator')
       await controller.methods
         .setOperator(operator, isOperator)
         .send({ from: user })
         .on('transactionHash', notifyCallback)
     },
-    [toast, controller, notifyCallback, user],
+    [toast, controller, notifyCallback, user, track],
   )
 
   return {

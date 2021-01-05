@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-// import Moment from 'react-moment';
+import ReactGA from 'react-ga'
 import 'moment-timezone'
 
 import { Main, Layout } from '@aragon/ui'
@@ -28,6 +28,9 @@ import { useConnection } from './hooks/useConnection'
 import { getPreference } from './utils/storage'
 
 import { HashRouter as Router, Switch, Route } from 'react-router-dom'
+
+ReactGA.initialize(process.env.REACT_APP_GA_TRACKINK_ID || '')
+
 function App() {
   const wallet = useConnection()
   const defaultTheme = getPreference('theme', 'light')
@@ -87,17 +90,17 @@ function App() {
                       <Vault />
                     </Layout>
                   </Route>
-                  <Route path="/system/oracle">
+                  <Route path="/portocol/oracle">
                     <Layout>
                       <Oracle />
                     </Layout>
                   </Route>
-                  <Route path="/system/factory/">
+                  <Route path="/portocol/factory/">
                     <Layout>
                       <Factory />
                     </Layout>
                   </Route>
-                  <Route path="/system/">
+                  <Route path="/portocol/">
                     <Layout>
                       <ProtocolHome />
                     </Layout>

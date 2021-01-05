@@ -1,4 +1,5 @@
-import React, { useMemo, useCallback, useState } from 'react'
+import React, { useMemo, useCallback, useState, useEffect } from 'react'
+import ReactGA from 'react-ga'
 import { useHistory, useParams } from 'react-router-dom'
 import { Button, DataView, useToast, Header, Tag, Help } from '@aragon/ui'
 import useAsyncMemo from '../../../hooks/useAsyncMemo'
@@ -15,7 +16,9 @@ import { useController } from '../../../hooks/useController'
 export default function AccountVaults() {
   const { networkId, user } = useConnectedWallet()
   const { account } = useParams()
-
+  useEffect(() => {
+    ReactGA.pageview('/account/vaults')
+  }, [])
   const [isLoading, setIsLoading] = useState(true)
 
   const toast = useToast()
