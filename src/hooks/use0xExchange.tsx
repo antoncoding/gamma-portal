@@ -31,13 +31,25 @@ export function use0xExchange() {
 
   const httpEndpoint = useMemo(() => ZeroXEndpoint[networkId].http, [networkId])
 
-  const { fast } = useGasPrice(5)
+  const { fast, fastest } = useGasPrice(5)
 
-  const getProtocolFee = useCallback(
-    (numOfOrders: number) => {
-      return fast.times(new BigNumber(numOfOrders)).times(FEE_PERORDER_PER_GWEI)
+  const getGasPriceForOrders = useCallback(
+    (orders: SignedOrder[]) => {
+      const closestExpiry = Math.min(...orders.map(o => Number(o.expirationTimeSeconds) - Date.now() / 1000))
+      return closestExpiry < 120 ? fastest : fast
     },
-    [fast],
+    [fast, fastest],
+  )
+
+  /**
+   * If any order is expiring within 2 mins, use fastest
+   */
+  const getProtocolFee = useCallback(
+    (orderInfos: SignedOrder[]) => {
+      const gasPrice = getGasPriceForOrders(orderInfos)
+      return gasPrice.times(new BigNumber(orderInfos.length)).times(FEE_PERORDER_PER_GWEI)
+    },
+    [getGasPriceForOrders],
   )
 
   const createOrder = useCallback(
@@ -89,7 +101,8 @@ export function use0xExchange() {
 
       const signatures = orders.map(order => order.signature)
 
-      const feeInEth = getProtocolFee(orders.length).toString()
+      const gasPrice = getGasPriceForOrders(orders)
+      const feeInEth = getProtocolFee(orders).toString()
       const amountsStr = amounts.map(amount => amount.toString())
 
       await exchange.methods
@@ -97,13 +110,13 @@ export function use0xExchange() {
         .send({
           from: user,
           value: web3.utils.toWei(feeInEth, 'ether'),
-          gasPrice: web3.utils.toWei(fast.toString(), 'gwei'),
+          gasPrice: web3.utils.toWei(gasPrice.toString(), 'gwei'),
         })
         .on('transactionHash', notifyCallback)
 
       track('fill-order')
     },
-    [networkId, getProtocolFee, fast, notifyCallback, toast, user, web3, track],
+    [networkId, getProtocolFee, getGasPriceForOrders, notifyCallback, toast, user, web3, track],
   )
 
   const broadcastOrder = useCallback(

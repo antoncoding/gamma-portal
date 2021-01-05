@@ -59,30 +59,26 @@ export default function VaultDetail() {
   const { owner, vaultId } = useParams()
   const toast = useToast()
 
+  const [fetchCount, setFetchCount] = useState(0)
+  const refetch = useCallback(() => {
+    setFetchCount(c => c + 1)
+  }, [setFetchCount])
+
   const vaultDetail = useAsyncMemo(
     async () => {
+      console.log(`triggered`)
       const result = await getVault(networkId, owner, vaultId, toast)
       setIsLoading(false)
       return result
     },
     null,
-    [networkId, owner, toast, vaultId],
+    [networkId, owner, toast, vaultId, fetchCount],
   )
 
   const { allOtokens } = useLiveOTokens()
   const { balances } = useOTokenBalances(user, networkId)
 
   const controller = useController()
-
-  /**
-   * Use asyncMemo to trigger a rerender when isSendingTx changes.
-   */
-  // const controller = useAsyncMemo(async () => new Controller(web3, networkId, user), new Controller(null, 42, ''), [
-  //   networkId,
-  //   user,
-  //   web3,
-  //   isSendingTx,
-  // ])
 
   const isAuthorized = useMemo(() => {
     if (vaultDetail === null) return false
@@ -275,7 +271,6 @@ export default function VaultDetail() {
         </div>
       ) : (
         <div>
-          {' '}
           0 <span style={{ opacity: 0.5 }}> {pendingAmount} </span>{' '}
         </div>
       )
@@ -336,6 +331,10 @@ export default function VaultDetail() {
                 setIsSendingTx(true)
                 controller.operateCache(() => {
                   setIsSendingTx(false)
+                  refetch()
+                  setPendingCollateralAmount('')
+                  setPendingLongAmount('')
+                  setPendingShortAmount('')
                 })
               }}
             >
