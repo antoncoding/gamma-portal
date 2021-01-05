@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ReactGA from 'react-ga'
 import { useHistory } from 'react-router-dom'
 
@@ -8,7 +8,7 @@ import Comment from '../../components/Comment'
 
 function HomePage() {
   const history = useHistory()
-  ReactGA.pageview('/')
+  useEffect(() => ReactGA.pageview('/'), [])
   return (
     <>
       <Header primary="Welcome to Gamma Portal" />

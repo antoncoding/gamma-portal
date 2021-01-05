@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ReactGA from 'react-ga'
 import { useHistory } from 'react-router-dom'
 
@@ -11,7 +11,7 @@ import factoryWhite from '../../imgs/icons/factory-white.png'
 function ProtocolPage() {
   const theme = useTheme()
   const history = useHistory()
-  ReactGA.pageview('/protocol/')
+  useEffect(() => ReactGA.pageview('/protocol/'), [])
   return (
     <>
       <Header primary="Protocol" />

@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
+import ReactGA from 'react-ga'
 import { Header, _AutoComplete as AutoComplete, SyncIndicator } from '@aragon/ui'
 import TradePanel from '../OrderBookTrade/TradePanel'
 
@@ -10,6 +11,10 @@ import { simplifyOTokenSymbol } from '../../../utils/others'
 import { useOrderbook } from '../../../contexts/orderbook'
 
 export default function Swap() {
+  useEffect(() => {
+    ReactGA.pageview('trade/swap/')
+  })
+
   const [searchTerm, setSearchTerm] = useState('')
 
   const [selectedOToken, setSelectedOToken] = useState<null | SubgraphOToken>(null)

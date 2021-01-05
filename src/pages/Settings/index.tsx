@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ReactGA from 'react-ga'
 import { Header } from '@aragon/ui'
 
@@ -9,7 +9,7 @@ import Network from './Network'
 import Refresh from './Refresh'
 
 function Settings({ setTheme }: { setTheme: any }) {
-  ReactGA.pageview('/settings/')
+  useEffect(() => ReactGA.pageview('/settings/'), [])
   return (
     <>
       <Header primary="Settings" />

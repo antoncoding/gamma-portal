@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import ReactGA from 'react-ga'
 import { Button, DataView, TextInput, Header, useToast, Tag } from '@aragon/ui'
 import { useParams } from 'react-router-dom'
 
@@ -14,6 +15,10 @@ import { useController } from '../../../hooks/useController'
 
 export default function OperatorSection() {
   const { account } = useParams()
+
+  useEffect(() => {
+    ReactGA.pageview('/account/operators/')
+  }, [])
 
   const [isLoading, setIsLoading] = useState(true)
   const { networkId, user } = useConnectedWallet()

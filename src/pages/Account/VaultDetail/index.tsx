@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
+import ReactGA from 'react-ga'
 import BigNumber from 'bignumber.js'
 import { useParams } from 'react-router-dom'
 import {
@@ -32,6 +33,10 @@ import { SubgraphOToken } from '../../../types'
 import { useController } from '../../../hooks/useController'
 
 export default function VaultDetail() {
+  useEffect(() => {
+    ReactGA.pageview('account/vault/')
+  }, [])
+
   const [vaultExpiry, setVaultExpiry] = useState<string>('0')
   const [isLoading, setIsLoading] = useState(true)
 

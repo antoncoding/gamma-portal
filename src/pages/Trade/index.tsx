@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ReactGA from 'react-ga'
 
 import { useHistory } from 'react-router-dom'
@@ -10,7 +10,9 @@ import Comment from '../../components/Comment'
 function TradePage() {
   // const theme = useTheme()
   const history = useHistory()
-  ReactGA.pageview('/trade/')
+  useEffect(() => {
+    ReactGA.pageview('/trade/')
+  }, [])
   return (
     <>
       <Header primary="Trade" />

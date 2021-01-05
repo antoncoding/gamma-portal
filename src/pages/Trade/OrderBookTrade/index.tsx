@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import ReactGA from 'react-ga'
 import TradeHeader from './Header'
 import Board from './Board'
 import MintPanel from './MintPanel'
@@ -11,6 +12,9 @@ import { useTokenPrice } from '../../../hooks'
 import { emptyToken } from '../../../constants/addresses'
 
 export default function TradePage() {
+  useEffect(() => {
+    ReactGA.pageview('trade/swap/')
+  })
   const [selectedUnderlying, setSelectedUnderlying] = useState(emptyToken)
   const [selectedOToken, setSelectedOToken] = useState<SubgraphOToken | null>(null)
   const [oTokens, setOTokens] = useState<SubgraphOToken[]>([])
