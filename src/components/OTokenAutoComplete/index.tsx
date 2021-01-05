@@ -11,7 +11,7 @@ type AutoCompleteProps = {
 }
 
 export default function OTokenAutoComplete({ selectedOToken, setSelectedOToken, oTokens }: AutoCompleteProps) {
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState<undefined | string>('')
 
   return (
     <AutoComplete
@@ -24,7 +24,7 @@ export default function OTokenAutoComplete({ selectedOToken, setSelectedOToken, 
       renderItem={(o: SubgraphOToken) => simplifyOTokenSymbol(o.symbol)}
       onChange={setSearchTerm}
       onSelect={(o: SubgraphOToken) => {
-        setSearchTerm(simplifyOTokenSymbol(o.symbol))
+        setSearchTerm('')
         setSelectedOToken(o)
       }}
       wide

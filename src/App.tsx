@@ -54,7 +54,12 @@ function App() {
                   </Route>
 
                   {/* pages with layout */}
-                  <Route path="/trade/swap">
+                  <Route path="/trade/swap/:otoken">
+                    <Layout>
+                      <Swap />
+                    </Layout>
+                  </Route>
+                  <Route path="/trade/swap/">
                     <Layout>
                       <Swap />
                     </Layout>
