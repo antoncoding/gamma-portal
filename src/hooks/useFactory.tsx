@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react'
+import ReactGA from 'react-ga'
 import BigNumber from 'bignumber.js'
 import { useConnectedWallet } from '../contexts/wallet'
 import { useToast } from '@aragon/ui'
@@ -31,6 +32,7 @@ export function useFactory() {
       isPut: boolean,
     ) => {
       if (!factory) return toast('No wallet connected')
+      ReactGA.event({ category: 'factory', action: 'createOtoken' })
       await factory.methods
         .createOtoken(underlying, strike, collateral, strikePrice.toString(), expiry.toString(), isPut)
         .send({ from: user })
