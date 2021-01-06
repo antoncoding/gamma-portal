@@ -52,7 +52,7 @@ function HomePage() {
             description="Protocol configs"
             icon={<IconConfiguration size="large" />}
             onClick={() => {
-              history.push('/system/')
+              history.push('/protocol/')
             }}
           />
         </div>

@@ -95,17 +95,17 @@ function App() {
                       <Vault />
                     </Layout>
                   </Route>
-                  <Route path="/portocol/oracle">
+                  <Route path="/protocol/oracle">
                     <Layout>
                       <Oracle />
                     </Layout>
                   </Route>
-                  <Route path="/portocol/factory/">
+                  <Route path="/protocol/factory/">
                     <Layout>
                       <Factory />
                     </Layout>
                   </Route>
-                  <Route path="/portocol/">
+                  <Route path="/protocol/">
                     <Layout>
                       <ProtocolHome />
                     </Layout>

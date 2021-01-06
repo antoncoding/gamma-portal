@@ -23,7 +23,7 @@ function ProtocolPage() {
             description="Submit Price / See oracle config"
             icon={<IconCoin size="large" />}
             onClick={() => {
-              history.push('/portocol/oracle/')
+              history.push('/protocol/oracle/')
             }}
           />
         </div>
@@ -36,7 +36,7 @@ function ProtocolPage() {
               <img style={{ height: 55 }} src={theme._name === 'dark' ? factoryWhite : factoryBlack} alt="factory" />
             }
             onClick={() => {
-              history.push('/portocol/factory/')
+              history.push('/protocol/factory/')
             }}
           />
         </div>

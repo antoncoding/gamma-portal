@@ -75,14 +75,14 @@ export default function SideBar() {
           title="Protocol"
           icon={<IconConfiguration />}
           onClick={() => {
-            history.push('/portocol/')
+            history.push('/protocol/')
           }}
           isSelected={selectedTab === 3}
         />
         <SubButton
           title="Factory"
           onClick={() => {
-            history.push(`/portocol/factory/`)
+            history.push(`/protocol/factory/`)
           }}
           isSelected={selectedTab === 3 && subSelected === 'factory'}
           shown={selectedTab === 3}
@@ -90,7 +90,7 @@ export default function SideBar() {
         <SubButton
           title="Oracle"
           onClick={() => {
-            history.push(`/portocol/oracle/`)
+            history.push(`/protocol/oracle/`)
           }}
           isSelected={selectedTab === 3 && subSelected === 'oracle'}
           shown={selectedTab === 3}
@@ -143,7 +143,7 @@ function locationToTabId(location) {
     ? 1
     : location.pathname.includes('/account/')
     ? 2
-    : location.pathname.includes('/portocol/')
+    : location.pathname.includes('/protocol/')
     ? 3
     : location.pathname.includes('/trade/')
     ? 4
