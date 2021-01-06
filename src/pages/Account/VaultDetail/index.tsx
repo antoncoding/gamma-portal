@@ -328,17 +328,13 @@ export default function VaultDetail() {
               disabled={controller.actions.length === 0 || isSendingTx}
               onClick={() => {
                 setIsSendingTx(true)
-                controller
-                  .operateCache(() => {
-                    setIsSendingTx(false)
-                    refetch()
-                    setPendingCollateralAmount('')
-                    setPendingLongAmount('')
-                    setPendingShortAmount('')
-                  })
-                  .catch(() => {
-                    setIsLoading(false)
-                  })
+                controller.operateCache(() => {
+                  setIsSendingTx(false)
+                  refetch()
+                  setPendingCollateralAmount('')
+                  setPendingLongAmount('')
+                  setPendingShortAmount('')
+                })
               }}
             >
               {' '}

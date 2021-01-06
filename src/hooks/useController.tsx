@@ -201,7 +201,7 @@ export function useController() {
         if (actionVaultId === latestVaultId + 1) {
           // open new vault
           actions.unshift(util.createOpenVaultArg(user, new BigNumber(actionVaultId)))
-        } else {
+        } else if (actionVaultId > latestVaultId + 1) {
           return toast(`Cannot operate on vault id > ${latestVaultId + 1} `)
         }
       }
