@@ -46,17 +46,18 @@ export default function AccountVaults() {
     })
   }, [vaults])
 
-  const controller = useController()
+  const { settleBatch, latestVaultId } = useController()
 
   const batchSettle = useCallback(async () => {
     const vaultIds = vaultsToSettle.map(vault => Number(vault.vaultId))
-    await controller.settleBatch(user, vaultIds, user)
-  }, [controller, user, vaultsToSettle])
+    await settleBatch(user, vaultIds, user)
+  }, [settleBatch, user, vaultsToSettle])
 
   const history = useHistory()
-  const openVault = useCallback(async () => {
-    await controller.openVault(account)
-  }, [account, controller])
+  const goToEmptyVault = useCallback(() => {
+    const newVaultId = latestVaultId + 1
+    history.push(`/vault/${account}/${newVaultId}`)
+  }, [account, latestVaultId, history])
 
   const renderRow = useCallback(
     (vault: SubgraphVault, index) => {
@@ -127,7 +128,7 @@ export default function AccountVaults() {
       />
       <br />
       <SectionTitle title="Open New" />
-      <Button label={'Open Empty Vault'} onClick={() => openVault()} />
+      <Button label={'Open Empty Vault'} onClick={goToEmptyVault} />
     </>
   )
 }

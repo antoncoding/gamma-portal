@@ -66,7 +66,6 @@ export default function VaultDetail() {
 
   const vaultDetail = useAsyncMemo(
     async () => {
-      console.log(`triggered`)
       const result = await getVault(networkId, owner, vaultId, toast)
       setIsLoading(false)
       return result
@@ -329,13 +328,17 @@ export default function VaultDetail() {
               disabled={controller.actions.length === 0 || isSendingTx}
               onClick={() => {
                 setIsSendingTx(true)
-                controller.operateCache(() => {
-                  setIsSendingTx(false)
-                  refetch()
-                  setPendingCollateralAmount('')
-                  setPendingLongAmount('')
-                  setPendingShortAmount('')
-                })
+                controller
+                  .operateCache(() => {
+                    setIsSendingTx(false)
+                    refetch()
+                    setPendingCollateralAmount('')
+                    setPendingLongAmount('')
+                    setPendingShortAmount('')
+                  })
+                  .catch(() => {
+                    setIsLoading(false)
+                  })
               }}
             >
               {' '}
