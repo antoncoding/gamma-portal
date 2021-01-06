@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo } from 'react'
+import { useCallback, useState, useMemo, useEffect } from 'react'
 import ReactGA from 'react-ga'
 import BigNumber from 'bignumber.js'
 import { useConnectedWallet } from '../contexts/wallet'
@@ -21,6 +21,8 @@ export function useController() {
 
   const { networkId, user, web3 } = useConnectedWallet()
 
+  const [latestVaultId, setLatestVaultId] = useState(0)
+
   const track = useCallback(
     (action: string) => {
       const label = networkId === SupportedNetworks.Mainnet ? 'mainnet' : 'kovan'
@@ -36,6 +38,20 @@ export function useController() {
     const address = addresses[networkId].controller
     return new web3.eth.Contract(abi, address)
   }, [networkId, web3])
+
+  const updateVaultId = useCallback(() => {
+    if (!controller || !user) return
+    controller.methods
+      .getAccountVaultCounter(user)
+      .call()
+      .then(counter => {
+        setLatestVaultId(Number(counter))
+      })
+  }, [controller, user])
+
+  useEffect(() => {
+    updateVaultId()
+  }, [updateVaultId])
 
   const operate = useCallback(
     async (args: actionArg[]) => {
@@ -166,9 +182,12 @@ export function useController() {
   )
 
   const operateCache = useCallback(
-    async (callback: Function) => {
+    async (callback: Function, onError: Function) => {
       // check allowance to add long
-      if (!controller) return toast('No wallet connected')
+      if (!controller) {
+        onError()
+        return toast('No wallet connected')
+      }
       const addLongAction = actions.find(action => action.actionType === ActionType.DepositLongOption)
       if (addLongAction !== undefined) {
         await checkAndIncreaseAllowance(addLongAction.asset, user, addLongAction.amount)
@@ -180,16 +199,38 @@ export function useController() {
         await checkAndIncreaseAllowance(addCollateralAction.asset, user, addCollateralAction.amount)
       }
 
-      await controller.methods
-        .operate(actions)
-        .send({ from: user })
-        .on('transactionHash', notifyCallback)
-        .on('receipt', callback)
+      const actionVaultId = Number(actions.find(action => action.vaultId !== '0')?.vaultId)
+      if (actionVaultId) {
+        if (actionVaultId === latestVaultId + 1) {
+          // open new vault
+          actions.unshift(util.createOpenVaultArg(user, new BigNumber(actionVaultId)))
+        } else if (actionVaultId > latestVaultId + 1) {
+          onError()
+          return toast(`Cannot operate on vault id > ${latestVaultId + 1} `)
+        }
+      }
 
-      setActions([])
+      try {
+        await controller.methods
+          .operate(actions)
+          .send({ from: user })
+          .on('transactionHash', notifyCallback)
+          .on('receipt', callback)
+          .on('error', onError)
+        setActions([])
+      } catch (error) {
+        toast(error.message)
+        onError()
+      }
+
+      updateVaultId()
     },
-    [controller, toast, actions, checkAndIncreaseAllowance, notifyCallback, user],
+    [controller, toast, actions, checkAndIncreaseAllowance, notifyCallback, user, updateVaultId, latestVaultId],
   )
+
+  const cleanActionCache = useCallback(() => {
+    setActions([])
+  }, [])
 
   const updateOperator = useCallback(
     async (operator: string, isOperator: boolean) => {
@@ -217,5 +258,7 @@ export function useController() {
     refreshConfig,
     operateCache,
     updateOperator,
+    latestVaultId,
+    cleanActionCache,
   }
 }

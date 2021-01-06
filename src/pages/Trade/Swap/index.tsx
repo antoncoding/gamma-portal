@@ -13,7 +13,7 @@ import OTokenAutoComplete from '../../../components/OTokenAutoComplete'
 export default function Swap() {
   useEffect(() => {
     ReactGA.pageview('trade/swap/')
-  })
+  }, [])
 
   const history = useHistory()
 
