@@ -11,6 +11,7 @@ import {
   Header,
   IconCirclePlus,
   IconCircleMinus,
+  IconTrash,
   DropDown,
   LoadingRing,
 } from '@aragon/ui'
@@ -306,6 +307,23 @@ export default function VaultDetail() {
     [expired],
   )
 
+  const onClickOperate = useCallback(() => {
+    setIsSendingTx(true)
+    controller.operateCache(
+      () => {
+        setIsSendingTx(false)
+        refetch()
+        setPendingCollateralAmount('')
+        setPendingLongAmount('')
+        setPendingShortAmount('')
+      },
+      () => {
+        setIsSendingTx(false)
+        refetch()
+      },
+    )
+  }, [refetch, controller])
+
   return (
     <>
       <Header
@@ -323,30 +341,25 @@ export default function VaultDetail() {
           expired ? (
             <Button label="Settle" onClick={simpleSettle} />
           ) : (
-            <Button
-              mode="strong"
-              disabled={controller.actions.length === 0 || isSendingTx}
-              onClick={() => {
-                setIsSendingTx(true)
-                controller.operateCache(() => {
-                  setIsSendingTx(false)
-                  refetch()
-                  setPendingCollateralAmount('')
-                  setPendingLongAmount('')
-                  setPendingShortAmount('')
-                })
-              }}
-            >
-              {' '}
-              Operate{' '}
-              {isSendingTx ? (
-                <LoadingRing />
-              ) : (
-                <span style={{ paddingLeft: '7px' }}>
-                  <Tag>{controller.actions.length}</Tag>
-                </span>
-              )}
-            </Button>
+            <div style={{ display: 'flex' }}>
+              <Button mode="strong" disabled={controller.actions.length === 0 || isSendingTx} onClick={onClickOperate}>
+                {' '}
+                Operate{' '}
+                {isSendingTx ? (
+                  <LoadingRing />
+                ) : (
+                  <span style={{ paddingLeft: '7px' }}>
+                    <Tag>{controller.actions.length}</Tag>
+                  </span>
+                )}
+              </Button>
+              <Button
+                disabled={controller.actions.length === 0}
+                display="icon"
+                icon={<IconTrash />}
+                onClick={controller.cleanActionCache}
+              />
+            </div>
           )
         }
       />
