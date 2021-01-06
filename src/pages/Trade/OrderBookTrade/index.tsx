@@ -13,8 +13,8 @@ import { emptyToken } from '../../../constants/addresses'
 
 export default function TradePage() {
   useEffect(() => {
-    ReactGA.pageview('trade/swap/')
-  })
+    ReactGA.pageview('trade/orderbook/')
+  }, [])
   const [selectedUnderlying, setSelectedUnderlying] = useState(emptyToken)
   const [selectedOToken, setSelectedOToken] = useState<SubgraphOToken | null>(null)
   const [oTokens, setOTokens] = useState<SubgraphOToken[]>([])
