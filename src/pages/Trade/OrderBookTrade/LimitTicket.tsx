@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
-import { Button, TextInput, IconArrowRight, IconUnlock } from '@aragon/ui'
+import { Button, TextInput, IconArrowRight, IconUnlock, Modal, IconEdit, DropDown } from '@aragon/ui'
 import { SubgraphOToken, OTokenBalance } from '../../../types'
 
 import { toTokenAmount, fromTokenAmount } from '../../../utils/math'
@@ -16,6 +16,8 @@ import { useUserAllowance } from '../../../hooks/useAllowance'
 import { simplifyOTokenSymbol } from '../../../utils/others'
 import WarningText from '../../../components/Warning'
 import TokenBalanceEntry from '../../../components/TokenBalanceEntry'
+import LabelText from '../../../components/LabelText'
+import SectionHeader from '../../../components/SectionHeader'
 
 type MarketTicketProps = {
   action: TradeAction
@@ -27,6 +29,15 @@ type MarketTicketProps = {
   outputTokenAmount: BigNumber
   setOutputTokenAmount: React.Dispatch<React.SetStateAction<BigNumber>>
 }
+
+enum DeadlineUnit {
+  Seconds = 'seconds',
+  Minutes = 'minutes',
+  Hours = 'hours',
+  Days = 'days',
+}
+
+const items = [DeadlineUnit.Seconds, DeadlineUnit.Minutes, DeadlineUnit.Hours, DeadlineUnit.Days]
 
 export default function LimitTicket({
   action,
@@ -44,13 +55,16 @@ export default function LimitTicket({
 
   const { createOrder, broadcastOrder } = use0xExchange()
 
-  // const [duration, setDuration] = useState<number>(600)
-  const duration = 600
+  const [deadline, setDeadline] = useState<number>(20)
+  const [deadlineModalOpened, setDeadlineModalOpened] = useState(false)
+
+  // deadline input is set to deadline when the uer click on confirm
+  const [deadlineInput, setDeadlineInput] = useState(20)
+  const [modalDeadlineIdx, setModalDeadlineIdx] = useState<number>(0)
+
+  const [finalDeadlineUnit, setFinalDeadlineUnit] = useState<DeadlineUnit>(DeadlineUnit.Minutes)
 
   const [error, setError] = useState(Errors.NO_ERROR)
-
-  // const [inputTokenAmount, setInputTokenAmount] = useState(new BigNumber(0))
-  // const [outputTokenAmount, setOutputTokenAmount] = useState(new BigNumber(0))
 
   const oTokenBalance = oTokenBalances?.find(b => b.token.id === selectedOToken.id)?.balance ?? new BigNumber(0)
 
@@ -153,9 +167,10 @@ export default function LimitTicket({
   }, [action, oTokenAllowance, usdcAllowance, inputTokenAmount, inputToken])
 
   const createAndPost = useCallback(async () => {
+    const deadlineInSec = getDeadlineInSec(deadline, finalDeadlineUnit)
     const makerAssetAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals).integerValue()
     const takerAssetAmount = fromTokenAmount(outputTokenAmount, outputToken.decimals).integerValue()
-    const expiry = Date.now() / 1000 + duration
+    const expiry = Date.now() / 1000 + deadlineInSec
     const order = await createOrder(
       inputToken.id,
       outputToken.id,
@@ -168,8 +183,9 @@ export default function LimitTicket({
 
     await broadcastOrder(order)
   }, [
+    finalDeadlineUnit,
     createOrder,
-    duration,
+    deadline,
     makerFee,
     inputToken.decimals,
     inputToken.id,
@@ -214,7 +230,19 @@ export default function LimitTicket({
         symbol={inputToken.symbol}
       />
 
-      <TokenBalanceEntry label="Expires in" amount={duration.toString()} symbol="sec" />
+      <div style={{ display: 'flex', paddingTop: '5px' }}>
+        <LabelText label={'Deadline'} minWidth={'150px'} />
+        <div style={{ paddingRight: '5px' }}>{deadline.toString()}</div>
+        <div style={{ opacity: 0.7, paddingRight: '15px' }}> {finalDeadlineUnit.toString()} </div>
+        <Button
+          label={'edit time'}
+          size="mini"
+          display="icon"
+          icon={<IconEdit />}
+          onClick={() => setDeadlineModalOpened(true)}
+        />
+      </div>
+
       <br />
       <TokenBalanceEntry
         label="oToken Balance"
@@ -236,6 +264,50 @@ export default function LimitTicket({
         />
         {needApprove && <Button label="approve" icon={<IconUnlock />} display="icon" onClick={approve} />}
       </div>
+
+      <Modal
+        padding={30}
+        visible={deadlineModalOpened}
+        closeButton={true}
+        onClose={() => setDeadlineModalOpened(false)}
+      >
+        <SectionHeader title="Set deadline" paddingTop={0} />
+        Order will automatically become invalid after
+        <br />
+        <div style={{ display: 'flex' }}>
+          <TextInput type="number" value={deadlineInput} onChange={e => setDeadlineInput(e.target.value)} />
+          <DropDown
+            items={items}
+            selected={modalDeadlineIdx}
+            onChange={idx => {
+              setModalDeadlineIdx(idx)
+              setDeadlineModalOpened(true)
+            }}
+          />
+        </div>
+        <br />
+        <Button
+          label="Confirm"
+          onClick={() => {
+            setDeadlineModalOpened(false)
+            setFinalDeadlineUnit(items[modalDeadlineIdx])
+            setDeadline(deadlineInput)
+          }}
+        />
+      </Modal>
     </>
   )
+}
+
+function getDeadlineInSec(deadline: number, type: DeadlineUnit) {
+  switch (type) {
+    case DeadlineUnit.Seconds:
+      return deadline
+    case DeadlineUnit.Minutes:
+      return deadline * 60
+    case DeadlineUnit.Hours:
+      return deadline * 3600
+    case DeadlineUnit.Days:
+      return deadline * 86400
+  }
 }
