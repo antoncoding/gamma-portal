@@ -57,22 +57,24 @@ export default function SideBar() {
           }}
           isSelected={selectedTab === 2}
         />
-        <SubButton
-          title="Operators"
-          onClick={() => {
-            history.push(`/account/${user ? user : readOnlyUser}/operators/`)
-          }}
-          isSelected={selectedTab === 2 && subSelected === 'operators'}
-          shown={selectedTab === 2}
-        />
-        <SubButton
-          title="Vaults"
-          onClick={() => {
-            history.push(`/account/${user ? user : readOnlyUser}/vaults/`)
-          }}
-          isSelected={selectedTab === 2 && subSelected === 'vaults'}
-          shown={selectedTab === 2}
-        />
+        <Visible lg md xl>
+          <SubButton
+            title="Operators"
+            onClick={() => {
+              history.push(`/account/${user ? user : readOnlyUser}/operators/`)
+            }}
+            isSelected={selectedTab === 2 && subSelected === 'operators'}
+            shown={selectedTab === 2}
+          />
+          <SubButton
+            title="Vaults"
+            onClick={() => {
+              history.push(`/account/${user ? user : readOnlyUser}/vaults/`)
+            }}
+            isSelected={selectedTab === 2 && subSelected === 'vaults'}
+            shown={selectedTab === 2}
+          />
+        </Visible>
         <SidebarTitle
           title="Protocol"
           icon={<IconConfiguration />}
@@ -81,22 +83,24 @@ export default function SideBar() {
           }}
           isSelected={selectedTab === 3}
         />
-        <SubButton
-          title="Factory"
-          onClick={() => {
-            history.push(`/protocol/factory/`)
-          }}
-          isSelected={selectedTab === 3 && subSelected === 'factory'}
-          shown={selectedTab === 3}
-        />
-        <SubButton
-          title="Oracle"
-          onClick={() => {
-            history.push(`/protocol/oracle/`)
-          }}
-          isSelected={selectedTab === 3 && subSelected === 'oracle'}
-          shown={selectedTab === 3}
-        />
+        <Visible lg md xl>
+          <SubButton
+            title="Factory"
+            onClick={() => {
+              history.push(`/protocol/factory/`)
+            }}
+            isSelected={selectedTab === 3 && subSelected === 'factory'}
+            shown={selectedTab === 3}
+          />
+          <SubButton
+            title="Oracle"
+            onClick={() => {
+              history.push(`/protocol/oracle/`)
+            }}
+            isSelected={selectedTab === 3 && subSelected === 'oracle'}
+            shown={selectedTab === 3}
+          />
+        </Visible>
         {/* <SidebarTitle
           title="Trade"
           icon={<IconSwap />}
@@ -105,22 +109,24 @@ export default function SideBar() {
           }}
           isSelected={selectedTab === 4}
         /> */}
-        <SubButton
-          title="Swap"
-          onClick={() => {
-            history.push(`/trade/swap/`)
-          }}
-          isSelected={selectedTab === 4 && subSelected === 'swap'}
-          shown={selectedTab === 4}
-        />
-        <SubButton
-          title="Orderbook"
-          onClick={() => {
-            history.push(`/trade/orderbook/`)
-          }}
-          isSelected={selectedTab === 4 && subSelected === 'orderbook'}
-          shown={selectedTab === 4}
-        />
+        <Visible lg md xl>
+          <SubButton
+            title="Swap"
+            onClick={() => {
+              history.push(`/trade/swap/`)
+            }}
+            isSelected={selectedTab === 4 && subSelected === 'swap'}
+            shown={selectedTab === 4}
+          />
+          <SubButton
+            title="Orderbook"
+            onClick={() => {
+              history.push(`/trade/orderbook/`)
+            }}
+            isSelected={selectedTab === 4 && subSelected === 'orderbook'}
+            shown={selectedTab === 4}
+          />
+        </Visible>
       </div>
       <Visible xl lg xxl md>
         <div

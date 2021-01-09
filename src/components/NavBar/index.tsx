@@ -1,13 +1,21 @@
 import React from 'react'
 
-import { Bar } from '@aragon/ui'
+import { Bar, LinkBase, IconMenu } from '@aragon/ui'
 import ConnectButton from './ConnectButton'
 import Settings from './SettingsButton'
 
-function MyBar() {
+function MyBar({ isSideBarOpen, setSideBarOpen }: { isSideBarOpen: boolean; setSideBarOpen: any }) {
   return (
     <Bar
-      style={{ margin: 0 }}
+      primary={
+        <LinkBase
+          onClick={() => {
+            setSideBarOpen(!isSideBarOpen)
+          }}
+        >
+          <IconMenu />
+        </LinkBase>
+      }
       secondary={
         <>
           <ConnectButton />

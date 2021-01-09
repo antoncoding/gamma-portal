@@ -37,17 +37,23 @@ function App() {
   const defaultTheme = getPreference('theme', 'light')
   const [theme, setTheme] = useState(defaultTheme)
 
+  const [isSideBarOpen, setSideBarOpen] = useState(true)
+
+  const maincontentOffset = isSideBarOpen ? {} : { md: 3, xl: 2 }
+
   return (
     <Router>
       <Main layout={false} theme={theme}>
         <walletContext.Provider value={wallet}>
           <OrderbookProvider>
-            <NavBar />
+            <NavBar isSideBarOpen={isSideBarOpen} setSideBarOpen={setSideBarOpen} />
             <Row style={{ height: '100%' }}>
-              <Col sm={12} md={3} xl={2}>
-                <SideBar />
-              </Col>
-              <Col sm={12} md={9} xl={10}>
+              {isSideBarOpen && (
+                <Col sm={12} md={3} xl={2}>
+                  <SideBar />
+                </Col>
+              )}
+              <Col sm={12} md={9} xl={10} offset={maincontentOffset}>
                 <Switch>
                   {/* without layout */}
                   <Route path="/trade/orderbook">
