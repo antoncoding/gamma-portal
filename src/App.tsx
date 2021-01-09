@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import ReactGA from 'react-ga'
+import { Col, Row } from 'react-grid-system'
 import 'moment-timezone'
 
 import { Main, Layout } from '@aragon/ui'
@@ -36,17 +37,23 @@ function App() {
   const defaultTheme = getPreference('theme', 'light')
   const [theme, setTheme] = useState(defaultTheme)
 
+  const [isSideBarOpen, setSideBarOpen] = useState(true)
+
+  const maincontentOffset = isSideBarOpen ? {} : { md: 3, xl: 2 }
+
   return (
     <Router>
       <Main layout={false} theme={theme}>
         <walletContext.Provider value={wallet}>
           <OrderbookProvider>
-            <NavBar />
-            <div style={{ display: 'flex', height: '100%' }}>
-              <div style={{ width: '15%', marginRight: '3%' }}>
-                <SideBar />
-              </div>
-              <div style={{ width: '80%', marginRight: '2%' }}>
+            <NavBar isSideBarOpen={isSideBarOpen} setSideBarOpen={setSideBarOpen} />
+            <Row style={{ height: '100%' }}>
+              {isSideBarOpen && (
+                <Col sm={12} md={3} xl={2}>
+                  <SideBar />
+                </Col>
+              )}
+              <Col sm={12} md={9} xl={10} offset={maincontentOffset}>
                 <Switch>
                   {/* without layout */}
                   <Route path="/trade/orderbook">
@@ -121,8 +128,8 @@ function App() {
                     </Layout>
                   </Route>
                 </Switch>
-              </div>
-            </div>
+              </Col>
+            </Row>
           </OrderbookProvider>
         </walletContext.Provider>
       </Main>

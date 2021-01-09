@@ -2,24 +2,27 @@ import React, { useEffect } from 'react'
 import ReactGA from 'react-ga'
 
 import { useHistory } from 'react-router-dom'
+import { Container, Row, Col } from 'react-grid-system'
+import BoxButton from '../../components/BoxButton'
 
-import { Header, Box, LinkBase, Tag, IconCopy, IconSwap } from '@aragon/ui'
+import { Header, IconCopy, IconSwap } from '@aragon/ui'
 
 import Comment from '../../components/Comment'
 
 function TradePage() {
-  // const theme = useTheme()
   const history = useHistory()
   useEffect(() => {
     ReactGA.pageview('/trade/')
   }, [])
   return (
-    <>
+    <Container>
       <Header primary="Trade" />
-      <Comment text="Buy / Sell oTokens" />
-      <div style={{ padding: 5, display: 'flex', alignItems: 'center' }}>
-        <div style={{ width: '30%', marginRight: '3%' }}>
-          <MainButton
+      <Comment padding={0} text="Buy / Sell oTokens" />
+      <br />
+      <br />
+      <Row>
+        <Col sm={12} md={6} lg={4}>
+          <BoxButton
             title="Swap"
             description="Simple swap between oToken and USDC"
             icon={<IconSwap size="large" />}
@@ -27,10 +30,10 @@ function TradePage() {
               history.push('/trade/swap/')
             }}
           />
-        </div>
+        </Col>
 
-        <div style={{ width: '30%' }}>
-          <MainButton
+        <Col sm={12} md={6} lg={4}>
+          <BoxButton
             title="Orderbook"
             description="Advanced trading venue"
             icon={<IconCopy size="large" />}
@@ -38,33 +41,10 @@ function TradePage() {
               history.push('/trade/orderbook/')
             }}
           />
-        </div>
+        </Col>
         <div style={{ width: '30%', marginLeft: '3%' }}></div>
-      </div>
-    </>
-  )
-}
-
-type MainButtonPropx = {
-  title: string
-  description: string
-  icon: any
-  onClick: Function
-  tag?: string
-}
-
-function MainButton({ title, description, icon, onClick, tag }: MainButtonPropx) {
-  return (
-    <LinkBase onClick={onClick} style={{ width: '100%', paddingBottom: 20 }}>
-      <Box>
-        <div style={{ padding: 10, fontSize: 18 }}>
-          {title}
-          {tag ? <Tag>{tag}</Tag> : <></>}
-        </div>
-        {icon}
-        <div style={{ paddingTop: 5, opacity: 0.5 }}> {description} </div>
-      </Box>
-    </LinkBase>
+      </Row>
+    </Container>
   )
 }
 

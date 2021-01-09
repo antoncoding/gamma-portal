@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
+import { Col, Row } from 'react-grid-system'
 import ReactGA from 'react-ga'
 import { Header, SyncIndicator } from '@aragon/ui'
 import TradePanel from '../OrderBookTrade/TradePanel'
@@ -39,13 +40,15 @@ export default function Swap() {
   return (
     <>
       <Header primary={'Swap'} />
-      <div style={{ width: '20%', minWidth: '200', paddingBottom: '10px' }}>
-        <OTokenAutoComplete
-          oTokens={allOtokens}
-          selectedOToken={selectedOToken}
-          setSelectedOToken={setSelectedOToken}
-        />
-      </div>
+      <Row>
+        <Col lg={4} md={6} sm={12}>
+          <OTokenAutoComplete
+            oTokens={allOtokens}
+            selectedOToken={selectedOToken}
+            setSelectedOToken={setSelectedOToken}
+          />
+        </Col>
+      </Row>
       <TradePanel selectedOToken={selectedOToken} action={action} setAction={setAction} />
       <SyncIndicator visible={isLoading || loadingOrderbook} children={'Syncing order book... 🍕'} />
     </>
