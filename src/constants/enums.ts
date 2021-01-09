@@ -19,3 +19,9 @@ export enum Errors {
   INSUFFICIENT_LIQUIDITY = 'Insufficient Liquidity',
   INSUFFICIENT_BALANCE = 'Insufficient Balance',
 }
+
+export enum Spenders {
+  MarginPool,
+  ZeroXERC20Proxy,
+  ZeroXStaking,
+}

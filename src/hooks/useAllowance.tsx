@@ -1,13 +1,23 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useConnectedWallet } from '../contexts/wallet'
 import BigNumber from 'bignumber.js'
 import { getPreference } from '../utils/storage'
-import { MAX_UINT } from '../constants'
+import { MAX_UINT, Spenders, addresses } from '../constants'
 import { useNotify } from './useNotify'
 const abi = require('../constants/abis/erc20.json')
 
-export function useUserAllowance(token: string, spender: string) {
-  const { web3, user } = useConnectedWallet()
+export function useUserAllowance(token: string, spender: Spenders) {
+  const { web3, user, networkId } = useConnectedWallet()
+
+  const spenderAddess = useMemo(() => {
+    return spender === Spenders.MarginPool
+      ? addresses[networkId].pool
+      : spender === Spenders.ZeroXERC20Proxy
+      ? addresses[networkId].zeroxERCProxy
+      : spender === Spenders.ZeroXStaking
+      ? addresses[networkId].zeroxStaking
+      : ''
+  }, [spender, networkId])
 
   const [allowance, setAllowance] = useState(new BigNumber(0))
   const [isLoadingAllowance, setIsLoadingAllowance] = useState(true)
@@ -20,16 +30,22 @@ export function useUserAllowance(token: string, spender: string) {
       const approveMode = getPreference('approval', 'normal')
       const erc = new web3.eth.Contract(abi, token)
       const approveAmount = approveMode === 'normal' ? amount : MAX_UINT
-      await erc.methods.approve(spender, approveAmount).send({ from: user }).on('transactionHash', notifyCallback)
+
+      if (spenderAddess === '') throw new Error('Unkown Spender')
+
+      await erc.methods.approve(spenderAddess, approveAmount).send({ from: user }).on('transactionHash', notifyCallback)
+      const newAllowance = erc.methods.allowance(user, spenderAddess).call()
+      setAllowance(newAllowance)
     },
-    [web3, spender, token, user, notifyCallback],
+    [web3, token, user, notifyCallback, spenderAddess],
   )
 
   useEffect(() => {
     if (!web3) return
+    if (user === '') return
     const erc = new web3.eth.Contract(abi, token)
     erc.methods
-      .allowance(user, spender)
+      .allowance(user, spenderAddess)
       .call()
       .then(allowance => {
         setAllowance(new BigNumber(allowance.toString()))
@@ -38,7 +54,7 @@ export function useUserAllowance(token: string, spender: string) {
       .catch(err => {
         setIsLoadingAllowance(false)
       })
-  }, [web3, spender, token, user])
+  }, [web3, spenderAddess, token, user])
 
   return { allowance, isLoadingAllowance, approve }
 }

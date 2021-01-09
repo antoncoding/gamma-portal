@@ -8,7 +8,7 @@ import LimitTicket from './LimitTicket'
 import { SubgraphOToken } from '../../../types'
 import { simplifyOTokenSymbol } from '../../../utils/others'
 
-import { TradeAction, MarketTypes, getUSDC } from '../../../constants'
+import { TradeAction, MarketTypes, getUSDC, getWeth } from '../../../constants'
 import { useOTokenBalances, useTokenBalance } from '../../../hooks'
 import { useConnectedWallet } from '../../../contexts/wallet'
 
@@ -29,6 +29,7 @@ export default function TradePanel({ selectedOToken, action, setAction }: TradeD
 
   const { balances: oTokenBalances } = useOTokenBalances(user, networkId)
   const usdcBalance = useTokenBalance(getUSDC(networkId).id, user, 15)
+  const wethBalance = useTokenBalance(getWeth(networkId).id, user, 15)
 
   const titleText = useMemo(
     () =>
@@ -54,6 +55,7 @@ export default function TradePanel({ selectedOToken, action, setAction }: TradeD
               selectedOToken={selectedOToken}
               oTokenBalances={oTokenBalances}
               usdcBalance={usdcBalance}
+              wethBalance={wethBalance}
             />
           ) : (
             <LimitTicket

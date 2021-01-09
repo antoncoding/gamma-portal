@@ -5,9 +5,9 @@ import { SubgraphOToken, OTokenBalance } from '../../../types'
 
 import { toTokenAmount, fromTokenAmount } from '../../../utils/math'
 
-import { TradeAction, Errors } from '../../../constants'
+import { TradeAction, Errors, Spenders } from '../../../constants'
 import { useConnectedWallet } from '../../../contexts/wallet'
-import { getUSDC, addresses } from '../../../constants/addresses'
+import { getUSDC } from '../../../constants/addresses'
 
 import oETHIcon from '../../../imgs/oETH.svg'
 import USDCIcon from '../../../imgs/USDC.png'
@@ -67,13 +67,10 @@ export default function LimitTicket({
   ])
 
   const [needApprove, setNeedApprove] = useState(true)
-  const { allowance: usdcAllowance, approve: approveUSDC } = useUserAllowance(
-    paymentToken.id,
-    addresses[networkId].zeroxERCProxy,
-  )
+  const { allowance: usdcAllowance, approve: approveUSDC } = useUserAllowance(paymentToken.id, Spenders.ZeroXERC20Proxy)
   const { allowance: oTokenAllowance, approve: approveOToken } = useUserAllowance(
     selectedOToken.id,
-    addresses[networkId].zeroxERCProxy,
+    Spenders.ZeroXERC20Proxy,
   )
 
   const approve = useCallback(() => {

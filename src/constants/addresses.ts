@@ -55,6 +55,7 @@ type SystemAddresses = {
     pool: string
     zeroxExchange: string
     zeroxERCProxy: string
+    zeroxStaking: string
   }
 }
 
@@ -66,6 +67,7 @@ export const addresses: SystemAddresses = {
     pool: '0x5934807cC0654d46755eBd2848840b616256C6Ef',
     zeroxExchange: '0x61935cbdd02287b511119ddb11aeb42f1593b7ef',
     zeroxERCProxy: '0x95e6f48254609a6ee006f7d493c8e5fb97094cef',
+    zeroxStaking: '0xa26e80e7dea86279c6d778d702cc413e6cffa777',
   },
   '42': {
     controller: '0xdee7d0f8ccc0f7ac7e45af454e5e7ec1552e8e4e',
@@ -74,6 +76,7 @@ export const addresses: SystemAddresses = {
     pool: '0x8c7c60d766951c5c570bbb7065c993070061b795',
     zeroxExchange: '0x4eacd0af335451709e1e7b570b8ea68edec8bc97',
     zeroxERCProxy: '0xf1ec01d6236d3cd881a0bf0130ea25fe4234003e',
+    zeroxStaking: '0xbab9145f1d57cd4bb0c9aa2d1ece0a5b6e734d34',
   },
 }
 
@@ -108,4 +111,8 @@ export const zx_exchange = {
 
 export const getUSDC = (networkId: SupportedNetworks) => {
   return tokens[networkId].find(t => t.symbol === 'USDC') || emptyToken
+}
+
+export const getWeth = (networkId: SupportedNetworks) => {
+  return tokens[networkId].find(t => t.symbol === 'WETH') as Token
 }
