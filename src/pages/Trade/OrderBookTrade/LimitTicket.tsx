@@ -1,11 +1,12 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
-import { Button, TextInput, IconArrowRight, IconUnlock, Modal, IconEdit, DropDown } from '@aragon/ui'
+import { Button, TextInput, IconArrowRight, IconUnlock } from '@aragon/ui'
+import EditOrderDeadlineModal from './EditOrderDeadlineModal'
 import { SubgraphOToken, OTokenBalance } from '../../../types'
 
 import { toTokenAmount, fromTokenAmount } from '../../../utils/math'
 
-import { TradeAction, Errors } from '../../../constants'
+import { TradeAction, Errors, DeadlineUnit } from '../../../constants'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { getUSDC, addresses } from '../../../constants/addresses'
 
@@ -17,7 +18,6 @@ import { simplifyOTokenSymbol } from '../../../utils/others'
 import WarningText from '../../../components/Warning'
 import TokenBalanceEntry from '../../../components/TokenBalanceEntry'
 import LabelText from '../../../components/LabelText'
-import SectionHeader from '../../../components/SectionHeader'
 
 type MarketTicketProps = {
   action: TradeAction
@@ -29,15 +29,6 @@ type MarketTicketProps = {
   outputTokenAmount: BigNumber
   setOutputTokenAmount: React.Dispatch<React.SetStateAction<BigNumber>>
 }
-
-enum DeadlineUnit {
-  Seconds = 'seconds',
-  Minutes = 'minutes',
-  Hours = 'hours',
-  Days = 'days',
-}
-
-const items = [DeadlineUnit.Seconds, DeadlineUnit.Minutes, DeadlineUnit.Hours, DeadlineUnit.Days]
 
 export default function LimitTicket({
   action,
@@ -56,11 +47,6 @@ export default function LimitTicket({
   const { createOrder, broadcastOrder } = use0xExchange()
 
   const [deadline, setDeadline] = useState<number>(20)
-  const [deadlineModalOpened, setDeadlineModalOpened] = useState(false)
-
-  // deadline input is set to deadline when the uer click on confirm
-  const [deadlineInput, setDeadlineInput] = useState(20)
-  const [modalDeadlineIdx, setModalDeadlineIdx] = useState<number>(0)
 
   const [finalDeadlineUnit, setFinalDeadlineUnit] = useState<DeadlineUnit>(DeadlineUnit.Minutes)
 
@@ -234,13 +220,7 @@ export default function LimitTicket({
         <LabelText label={'Deadline'} minWidth={'150px'} />
         <div style={{ paddingRight: '5px' }}>{deadline.toString()}</div>
         <div style={{ opacity: 0.7, paddingRight: '15px' }}> {finalDeadlineUnit.toString()} </div>
-        <Button
-          label={'edit time'}
-          size="mini"
-          display="icon"
-          icon={<IconEdit />}
-          onClick={() => setDeadlineModalOpened(true)}
-        />
+        <EditOrderDeadlineModal setDeadline={setDeadline} setFinalDeadlineUnit={setFinalDeadlineUnit} />
       </div>
 
       <br />
@@ -264,37 +244,6 @@ export default function LimitTicket({
         />
         {needApprove && <Button label="approve" icon={<IconUnlock />} display="icon" onClick={approve} />}
       </div>
-
-      <Modal
-        padding={30}
-        visible={deadlineModalOpened}
-        closeButton={true}
-        onClose={() => setDeadlineModalOpened(false)}
-      >
-        <SectionHeader title="Set deadline" paddingTop={0} />
-        Order will automatically become invalid after
-        <br />
-        <div style={{ display: 'flex' }}>
-          <TextInput type="number" value={deadlineInput} onChange={e => setDeadlineInput(e.target.value)} />
-          <DropDown
-            items={items}
-            selected={modalDeadlineIdx}
-            onChange={idx => {
-              setModalDeadlineIdx(idx)
-              setDeadlineModalOpened(true)
-            }}
-          />
-        </div>
-        <br />
-        <Button
-          label="Confirm"
-          onClick={() => {
-            setDeadlineModalOpened(false)
-            setFinalDeadlineUnit(items[modalDeadlineIdx])
-            setDeadline(deadlineInput)
-          }}
-        />
-      </Modal>
     </>
   )
 }

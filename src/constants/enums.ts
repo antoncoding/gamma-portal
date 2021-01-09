@@ -4,6 +4,13 @@ export enum OrderType {
   ASK,
 }
 
+export enum DeadlineUnit {
+  Seconds = 'seconds',
+  Minutes = 'minutes',
+  Hours = 'hours',
+  Days = 'days',
+}
+
 export enum TradeAction {
   Buy = 'buy',
   Sell = 'sell',
