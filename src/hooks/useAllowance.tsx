@@ -14,6 +14,8 @@ export function useUserAllowance(token: string, spender: Spenders) {
       ? addresses[networkId].pool
       : spender === Spenders.ZeroXERC20Proxy
       ? addresses[networkId].zeroxERCProxy
+      : spender === Spenders.ZeroXStaking
+      ? addresses[networkId].zeroxStaking
       : ''
   }, [spender, networkId])
 
@@ -32,6 +34,8 @@ export function useUserAllowance(token: string, spender: Spenders) {
       if (spenderAddess === '') throw new Error('Unkown Spender')
 
       await erc.methods.approve(spenderAddess, approveAmount).send({ from: user }).on('transactionHash', notifyCallback)
+      const newAllowance = erc.methods.allowance(user, spenderAddess).call()
+      setAllowance(newAllowance)
     },
     [web3, token, user, notifyCallback, spenderAddess],
   )
