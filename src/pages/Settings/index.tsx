@@ -4,6 +4,7 @@ import { Header } from '@aragon/ui'
 
 import ThemeSwitch from './Theme'
 import ApproveSwitch from './Approval'
+import ZeroXFee from './ZeroXFee'
 import ClearCache from './ClearCache'
 import Network from './Network'
 import Refresh from './Refresh'
@@ -16,6 +17,8 @@ function Settings({ setTheme }: { setTheme: any }) {
       <ThemeSwitch setTheme={setTheme} />
       <br />
       <ApproveSwitch />
+      <br />
+      <ZeroXFee />
       <br />
       <ClearCache />
       <br />

@@ -7,15 +7,19 @@ import { addresses, ZeroXEndpoint, SupportedNetworks } from '../constants'
 import { useNotify } from './useNotify'
 import { SignedOrder } from '../types'
 import { useGasPrice } from './useGasPrice'
-import { zx_exchange } from '../constants/addresses'
+import { zx_exchange, ZEROX_PROTOCOL_FEE_KEY, FeeTypes } from '../constants'
 import { assetDataUtils, signatureUtils, SupportedProvider } from '@0x/order-utils'
 import { MetamaskSubprovider } from '@0x/subproviders'
+import { getPreference } from '../utils/storage'
+
 const FEE_PERORDER_PER_GWEI = 0.00007
 const FEE_RECIPIENT = '0x200aabfDB21BEb86250fFE93Cac78dc9B9fa3e7d'
 
 const abi = require('../constants/abis/0xExchange.json')
 
 export function use0xExchange() {
+  const payWithWeth = useMemo(() => getPreference(ZEROX_PROTOCOL_FEE_KEY, FeeTypes.ETH) === FeeTypes.WETH, [])
+
   const toast = useToast()
   const { networkId, web3, user } = useConnectedWallet()
 
@@ -109,14 +113,14 @@ export function use0xExchange() {
         .batchFillOrders(orders, amountsStr, signatures)
         .send({
           from: user,
-          value: web3.utils.toWei(feeInEth, 'ether'),
+          value: payWithWeth ? '0' : web3.utils.toWei(feeInEth, 'ether'),
           gasPrice: web3.utils.toWei(gasPrice.toString(), 'gwei'),
         })
         .on('transactionHash', notifyCallback)
 
       track('fill-order')
     },
-    [networkId, getProtocolFee, getGasPriceForOrders, notifyCallback, toast, user, web3, track],
+    [networkId, getProtocolFee, getGasPriceForOrders, notifyCallback, toast, user, web3, track, payWithWeth],
   )
 
   const broadcastOrder = useCallback(
