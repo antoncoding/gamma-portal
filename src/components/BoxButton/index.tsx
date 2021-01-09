@@ -14,12 +14,12 @@ export function BoxButton({ title, description, icon, onClick, tag }: BoxButtonP
   return (
     <LinkBase onClick={onClick} style={{ width: '100%', paddingBottom: 20 }}>
       <Box>
-        <div style={{ fontSize: 18 }}>
+        <div style={{ fontSize: 18, paddingTop: 10, paddingBottom: 10 }}>
           {title}
           {tag ? <Tag>{tag}</Tag> : <></>}
         </div>
         {icon}
-        <div style={{ paddingTop: 5, opacity: 0.5 }}> {description} </div>
+        <div style={{ paddingTop: 10, opacity: 0.5 }}> {description} </div>
       </Box>
     </LinkBase>
   )
