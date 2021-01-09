@@ -43,7 +43,7 @@ function App() {
         <walletContext.Provider value={wallet}>
           <OrderbookProvider>
             <NavBar />
-            <Row>
+            <Row style={{ height: '100%' }}>
               <Col sm={12} md={3} xl={2}>
                 <SideBar />
               </Col>
