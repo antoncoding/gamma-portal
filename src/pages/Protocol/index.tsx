@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react'
 import ReactGA from 'react-ga'
+import { Container, Row, Col } from 'react-grid-system'
 import { useHistory } from 'react-router-dom'
-
-import { Header, Box, LinkBase, Tag, IconCoin, useTheme } from '@aragon/ui'
+import { BoxButton } from '../../components/BoxButton'
+import { Header, IconCoin, useTheme } from '@aragon/ui'
 
 import Comment from '../../components/Comment'
 import factoryBlack from '../../imgs/icons/factory-black.png'
@@ -13,23 +14,25 @@ function ProtocolPage() {
   const history = useHistory()
   useEffect(() => ReactGA.pageview('/protocol/'), [])
   return (
-    <>
+    <Container>
       <Header primary="Protocol" />
-      <Comment text="Advanced Settings of Opyn v2" />
-      <div style={{ padding: 5, display: 'flex', alignItems: 'center' }}>
-        <div style={{ width: '30%', marginRight: '3%' }}>
-          <MainButton
+      <Comment padding={0} text="Advanced Settings of Opyn v2" />
+      <br />
+      <br />
+      <Row>
+        <Col sm={12} md={6} lg={4}>
+          <BoxButton
             title="Oracle"
-            description="Submit Price / See oracle config"
+            description="Oracle status"
             icon={<IconCoin size="large" />}
             onClick={() => {
               history.push('/protocol/oracle/')
             }}
           />
-        </div>
+        </Col>
 
-        <div style={{ width: '30%' }}>
-          <MainButton
+        <Col sm={12} md={6} lg={4}>
+          <BoxButton
             title="Factory"
             description="Create new options"
             icon={
@@ -39,33 +42,10 @@ function ProtocolPage() {
               history.push('/protocol/factory/')
             }}
           />
-        </div>
+        </Col>
         <div style={{ width: '30%', marginLeft: '3%' }}></div>
-      </div>
-    </>
-  )
-}
-
-type MainButtonPropx = {
-  title: string
-  description: string
-  icon: any
-  onClick: Function
-  tag?: string
-}
-
-function MainButton({ title, description, icon, onClick, tag }: MainButtonPropx) {
-  return (
-    <LinkBase onClick={onClick} style={{ width: '100%', paddingBottom: 20 }}>
-      <Box>
-        <div style={{ padding: 10, fontSize: 18 }}>
-          {title}
-          {tag ? <Tag>{tag}</Tag> : <></>}
-        </div>
-        {icon}
-        <div style={{ paddingTop: 5, opacity: 0.5 }}> {description} </div>
-      </Box>
-    </LinkBase>
+      </Row>
+    </Container>
   )
 }
 

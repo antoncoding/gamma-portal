@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react'
 import ReactGA from 'react-ga'
 import { useHistory } from 'react-router-dom'
-
-import { Header, Box, LinkBase, Tag, Help, IconUser, IconConfiguration } from '@aragon/ui'
+import { Container, Row, Col } from 'react-grid-system'
+import BoxButton from '../../components/BoxButton'
+import { Header, IconUser, IconConfiguration, IconSwap } from '@aragon/ui'
 
 import Comment from '../../components/Comment'
 
@@ -10,44 +11,38 @@ function HomePage() {
   const history = useHistory()
   useEffect(() => ReactGA.pageview('/'), [])
   return (
-    <>
+    <Container>
       <Header primary="Welcome to Gamma Portal" />
-      <div style={{ display: 'flex' }}>
-        <Comment text="Create, manage and trade decentralized options" />
-        <Help hint={'What is Opyn V2'}>
-          To learn about Opyn V2, visit{' '}
-          <LinkBase external href="https://opyn.gitbook.io/opyn-v2/">
-            {' '}
-            GitBook{' '}
-          </LinkBase>
-        </Help>
-      </div>
+
+      <Comment padding={0} text="Create, manage and trade decentralized options" />
+
       <br />
-      <div style={{ padding: 5, display: 'flex', alignItems: 'center' }}>
-        <div style={{ width: '30%', marginRight: '3%' }}>
-          <MainButton
+      <br />
+      <Row>
+        <Col sm={12} md={6} lg={4}>
+          <BoxButton
             title="Account"
-            description="Manage vaults, open / close positions"
+            description="Manage vaults and positions"
             icon={<IconUser size="large" />}
             onClick={() => {
               history.push('/account/')
             }}
           />
-        </div>
+        </Col>
 
-        {/* <div style={{ width: '30%', marginRight: '3%' }}>
-          <MainButton
+        <Col sm={12} md={6} lg={4}>
+          <BoxButton
             title="Trade"
-            description="Coming Soon"
+            description="Trade with 0x"
             icon={<IconSwap size="large" />}
             onClick={() => {
               history.push('/trade/')
             }}
           />
-        </div> */}
+        </Col>
 
-        <div style={{ width: '30%' }}>
-          <MainButton
+        <Col sm={12} md={6} lg={4}>
+          <BoxButton
             title="Protocol"
             description="Protocol configs"
             icon={<IconConfiguration size="large" />}
@@ -55,32 +50,9 @@ function HomePage() {
               history.push('/protocol/')
             }}
           />
-        </div>
-      </div>
-    </>
-  )
-}
-
-type MainButtonPropx = {
-  title: string
-  description: string
-  icon: any
-  onClick: Function
-  tag?: string
-}
-
-function MainButton({ title, description, icon, onClick, tag }: MainButtonPropx) {
-  return (
-    <LinkBase onClick={onClick} style={{ width: '100%', paddingBottom: 20 }}>
-      <Box>
-        <div style={{ padding: 10, fontSize: 18 }}>
-          {title}
-          {tag ? <Tag>{tag}</Tag> : <></>}
-        </div>
-        {icon}
-        <div style={{ paddingTop: 5, opacity: 0.5 }}> {description} </div>
-      </Box>
-    </LinkBase>
+        </Col>
+      </Row>
+    </Container>
   )
 }
 
