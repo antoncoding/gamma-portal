@@ -34,7 +34,7 @@ export function useUserAllowance(token: string, spender: Spenders) {
       if (spenderAddess === '') throw new Error('Unkown Spender')
 
       await erc.methods.approve(spenderAddess, approveAmount).send({ from: user }).on('transactionHash', notifyCallback)
-      const newAllowance = erc.methods.allowance(user, spenderAddess).call()
+      const newAllowance = await erc.methods.allowance(user, spenderAddess).call()
       setAllowance(newAllowance)
     },
     [web3, token, user, notifyCallback, spenderAddess],
