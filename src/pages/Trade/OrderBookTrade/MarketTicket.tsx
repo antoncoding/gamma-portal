@@ -6,7 +6,7 @@ import { SubgraphOToken, SignedOrder, OTokenBalance } from '../../../types'
 import { calculateOrderInput, calculateOrderOutput } from '../../../utils/0x-utils'
 import { toTokenAmount, fromTokenAmount } from '../../../utils/math'
 
-import { TradeAction, Errors, Spenders } from '../../../constants'
+import { TradeAction, Errors, Spenders, getWeth, ZEROX_PROTOCOL_FEE_KEY, FeeTypes } from '../../../constants'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { getUSDC } from '../../../constants/addresses'
 
@@ -19,6 +19,7 @@ import { simplifyOTokenSymbol } from '../../../utils/others'
 import WarningText from '../../../components/Warning'
 import LabelText from '../../../components/LabelText'
 import TokenBalanceEntry from '../../../components/TokenBalanceEntry'
+import { getPreference } from '../../../utils/storage'
 
 enum Updates {
   Input,
@@ -30,6 +31,7 @@ type MarketTicketProps = {
   selectedOToken: SubgraphOToken
   oTokenBalances: OTokenBalance[] | null
   usdcBalance: BigNumber
+  wethBalance: BigNumber
   inputTokenAmount: BigNumber
   setInputTokenAmount: React.Dispatch<React.SetStateAction<BigNumber>>
   outputTokenAmount: BigNumber
@@ -41,12 +43,16 @@ export default function MarketTicket({
   selectedOToken,
   oTokenBalances,
   usdcBalance,
+  wethBalance,
   inputTokenAmount,
   setInputTokenAmount,
   outputTokenAmount,
   setOutputTokenAmount,
 }: MarketTicketProps) {
   const { networkId } = useConnectedWallet()
+
+  const payFeeWithWeth = useMemo(() => getPreference(ZEROX_PROTOCOL_FEE_KEY, FeeTypes.ETH) === FeeTypes.WETH, [])
+  const weth = useMemo(() => getWeth(networkId), [networkId])
 
   const paymentToken = useMemo(() => getUSDC(networkId), [networkId])
 
@@ -107,6 +113,15 @@ export default function MarketTicket({
   const protocolFee = useMemo(() => {
     return getProtocolFee(ordersToFill)
   }, [getProtocolFee, ordersToFill])
+
+  const { allowance: wethAllowance, approve: approveWeth } = useUserAllowance(weth.id, Spenders.ZeroXStaking)
+  const needApproveWeth = useMemo(() => payFeeWithWeth && toTokenAmount(wethAllowance, 18).lt(protocolFee), [
+    protocolFee,
+    wethAllowance,
+    payFeeWithWeth,
+  ])
+
+  const hasEnoughWeth = useMemo(() => protocolFee.lte(toTokenAmount(wethBalance, 18)), [protocolFee, wethBalance])
 
   // when buy/sell is click, reset a few things
   useEffect(() => {
@@ -228,7 +243,12 @@ export default function MarketTicket({
         </div>
       </div>
       <br />
-      <TokenBalanceEntry label="Protocol Fee" amount={protocolFee.toString()} symbol="ETH" />
+      <TokenBalanceEntry
+        label="Protocol Fee"
+        amount={protocolFee.toString()}
+        symbol={payFeeWithWeth ? 'WETH' : 'ETH'}
+      />
+      <WarningText show={payFeeWithWeth && !hasEnoughWeth} text="Insufficient WETH balance" />
       <br />
       <TokenBalanceEntry
         label="oToken Balance"
@@ -240,6 +260,7 @@ export default function MarketTicket({
         amount={toTokenAmount(usdcBalance, paymentToken.decimals).toString()}
         symbol={paymentToken.symbol}
       />
+      <br />
 
       <div style={{ display: 'flex', paddingTop: '5px' }}>
         <LabelText label={'Expires in'} minWidth={'150px'} />
@@ -248,12 +269,19 @@ export default function MarketTicket({
 
       <div style={{ display: 'flex', paddingTop: '20px' }}>
         <Button
-          disabled={needApprove || error !== Errors.NO_ERROR || inputTokenAmount.isZero() || inputTokenAmount.isNaN()}
+          disabled={
+            (payFeeWithWeth && (!hasEnoughWeth || needApproveWeth)) ||
+            needApprove ||
+            error !== Errors.NO_ERROR ||
+            inputTokenAmount.isZero() ||
+            inputTokenAmount.isNaN()
+          }
           label={action === TradeAction.Buy ? 'Confirm Buy' : 'Confirm Sell'}
           mode={action === TradeAction.Buy ? 'positive' : 'negative'}
           onClick={fill}
         />
         {needApprove && <Button label="approve" icon={<IconUnlock />} display="icon" onClick={approve} />}
+        {needApproveWeth && <Button label="approve" icon={<IconUnlock />} display="icon" onClick={approveWeth} />}
       </div>
     </>
   )

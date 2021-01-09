@@ -3,7 +3,7 @@ import { useTheme } from '@aragon/ui'
 
 function WarningText({ text, show = false }: { text: string; show: boolean }) {
   const theme = useTheme()
-  return show ? <div style={{ color: theme.warning, fontSize: 12, padding: '3px' }}>{text}</div> : <></>
+  return show ? <div style={{ color: theme.warning, fontSize: 12, paddingTop: '3px' }}>{text}</div> : <></>
 }
 
 export default WarningText
