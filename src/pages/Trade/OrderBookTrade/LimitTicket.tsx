@@ -1,11 +1,12 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import { Button, TextInput, IconArrowRight, IconUnlock } from '@aragon/ui'
+import EditOrderDeadlineModal from './EditOrderDeadlineModal'
 import { SubgraphOToken, OTokenBalance } from '../../../types'
 
 import { toTokenAmount, fromTokenAmount } from '../../../utils/math'
 
-import { TradeAction, Errors, Spenders } from '../../../constants'
+import { TradeAction, Errors, DeadlineUnit, Spenders } from '../../../constants'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { getUSDC } from '../../../constants/addresses'
 
@@ -16,6 +17,7 @@ import { useUserAllowance } from '../../../hooks/useAllowance'
 import { simplifyOTokenSymbol } from '../../../utils/others'
 import WarningText from '../../../components/Warning'
 import TokenBalanceEntry from '../../../components/TokenBalanceEntry'
+import LabelText from '../../../components/LabelText'
 
 type MarketTicketProps = {
   action: TradeAction
@@ -44,13 +46,11 @@ export default function LimitTicket({
 
   const { createOrder, broadcastOrder } = use0xExchange()
 
-  // const [duration, setDuration] = useState<number>(600)
-  const duration = 600
+  const [deadline, setDeadline] = useState<number>(20)
+
+  const [finalDeadlineUnit, setFinalDeadlineUnit] = useState<DeadlineUnit>(DeadlineUnit.Minutes)
 
   const [error, setError] = useState(Errors.NO_ERROR)
-
-  // const [inputTokenAmount, setInputTokenAmount] = useState(new BigNumber(0))
-  // const [outputTokenAmount, setOutputTokenAmount] = useState(new BigNumber(0))
 
   const oTokenBalance = oTokenBalances?.find(b => b.token.id === selectedOToken.id)?.balance ?? new BigNumber(0)
 
@@ -150,9 +150,10 @@ export default function LimitTicket({
   }, [action, oTokenAllowance, usdcAllowance, inputTokenAmount, inputToken])
 
   const createAndPost = useCallback(async () => {
+    const deadlineInSec = getDeadlineInSec(deadline, finalDeadlineUnit)
     const makerAssetAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals).integerValue()
     const takerAssetAmount = fromTokenAmount(outputTokenAmount, outputToken.decimals).integerValue()
-    const expiry = Date.now() / 1000 + duration
+    const expiry = Date.now() / 1000 + deadlineInSec
     const order = await createOrder(
       inputToken.id,
       outputToken.id,
@@ -165,8 +166,9 @@ export default function LimitTicket({
 
     await broadcastOrder(order)
   }, [
+    finalDeadlineUnit,
     createOrder,
-    duration,
+    deadline,
     makerFee,
     inputToken.decimals,
     inputToken.id,
@@ -211,7 +213,13 @@ export default function LimitTicket({
         symbol={inputToken.symbol}
       />
 
-      <TokenBalanceEntry label="Expires in" amount={duration.toString()} symbol="sec" />
+      <div style={{ display: 'flex', paddingTop: '5px' }}>
+        <LabelText label={'Deadline'} minWidth={'150px'} />
+        <div style={{ paddingRight: '5px' }}>{deadline.toString()}</div>
+        <div style={{ opacity: 0.7, paddingRight: '15px' }}> {finalDeadlineUnit.toString()} </div>
+        <EditOrderDeadlineModal setDeadline={setDeadline} setFinalDeadlineUnit={setFinalDeadlineUnit} />
+      </div>
+
       <br />
       <TokenBalanceEntry
         label="oToken Balance"
@@ -235,4 +243,17 @@ export default function LimitTicket({
       </div>
     </>
   )
+}
+
+function getDeadlineInSec(deadline: number, type: DeadlineUnit) {
+  switch (type) {
+    case DeadlineUnit.Seconds:
+      return deadline
+    case DeadlineUnit.Minutes:
+      return deadline * 60
+    case DeadlineUnit.Hours:
+      return deadline * 3600
+    case DeadlineUnit.Days:
+      return deadline * 86400
+  }
 }
