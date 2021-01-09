@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
+import { Visible } from 'react-grid-system'
+
 import { useTheme, IconHome, IconUser, IconConfiguration, LinkBase } from '@aragon/ui'
 import SidebarTitle from './SidebarTitle'
 import SubButton from './SubButton'
@@ -120,20 +122,22 @@ export default function SideBar() {
           shown={selectedTab === 4}
         />
       </div>
-      <div
-        style={{
-          color: theme.contentSecondary,
-          padding: '10px',
-          position: 'fixed',
-          bottom: '0px',
-        }}
-      >
-        Commit Hash{' '}
-        <LinkBase external href={`https://github.com/antoncoding/opyn-v2-portal/commit/${hash}`}>
-          {' '}
-          {hash}{' '}
-        </LinkBase>
-      </div>
+      <Visible xl lg xxl md>
+        <div
+          style={{
+            color: theme.contentSecondary,
+            padding: '10px',
+            position: 'fixed',
+            bottom: '0px',
+          }}
+        >
+          Commit Hash{' '}
+          <LinkBase external href={`https://github.com/antoncoding/opyn-v2-portal/commit/${hash}`}>
+            {' '}
+            {hash}{' '}
+          </LinkBase>
+        </div>
+      </Visible>
     </div>
   )
 }

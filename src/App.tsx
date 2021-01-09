@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import ReactGA from 'react-ga'
+import { Col, Row } from 'react-grid-system'
 import 'moment-timezone'
 
 import { Main, Layout } from '@aragon/ui'
@@ -42,11 +43,11 @@ function App() {
         <walletContext.Provider value={wallet}>
           <OrderbookProvider>
             <NavBar />
-            <div style={{ display: 'flex', height: '100%' }}>
-              <div style={{ width: '15%', marginRight: '3%' }}>
+            <Row>
+              <Col sm={12} md={3} xl={2}>
                 <SideBar />
-              </div>
-              <div style={{ width: '80%', marginRight: '2%' }}>
+              </Col>
+              <Col sm={12} md={9} xl={10}>
                 <Switch>
                   {/* without layout */}
                   <Route path="/trade/orderbook">
@@ -121,8 +122,8 @@ function App() {
                     </Layout>
                   </Route>
                 </Switch>
-              </div>
-            </div>
+              </Col>
+            </Row>
           </OrderbookProvider>
         </walletContext.Provider>
       </Main>
