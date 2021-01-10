@@ -65,6 +65,7 @@ export function use0xExchange() {
       takerAssetAmount: BigNumber,
       makerFee: BigNumber,
       expiry: number,
+      takerAddress?: string,
     ) => {
       if (!web3) return toast('No Wallet Connected')
       const exchangeAddress = zx_exchange[networkId]
@@ -74,7 +75,7 @@ export function use0xExchange() {
       const order = {
         senderAddress: '0x0000000000000000000000000000000000000000',
         makerAddress: user,
-        takerAddress: '0x0000000000000000000000000000000000000000',
+        takerAddress: takerAddress ? takerAddress : '0x0000000000000000000000000000000000000000',
         makerFee: makerFee,
         takerFee: new BigNumber(0),
         makerAssetAmount: makerAssetAmount,

@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { Row, Col } from 'react-grid-system'
 import BigNumber from 'bignumber.js'
-import { Button, TextInput, IconArrowRight, IconUnlock, LinkBase, TextCopy } from '@aragon/ui'
+import { Button, TextInput, IconArrowRight, IconUnlock, LinkBase, TextCopy, EthIdenticon, useToast } from '@aragon/ui'
 import { SubgraphOToken } from '../../../types'
 
 import { toTokenAmount, fromTokenAmount } from '../../../utils/math'
 
 import { TradeAction, Errors, DeadlineUnit, Spenders } from '../../../constants'
 import { useConnectedWallet } from '../../../contexts/wallet'
-import { getUSDC } from '../../../constants/addresses'
+import { getUSDC, ZERO_ADDR } from '../../../constants/addresses'
 
 import oETHIcon from '../../../imgs/oETH.svg'
 import USDCIcon from '../../../imgs/USDC.png'
@@ -31,11 +31,13 @@ type TradeDetailProps = {
 
 export default function MakeOrderDetail({ selectedOToken, usdcBalance, oTokenBalance }: TradeDetailProps) {
   const { networkId } = useConnectedWallet()
-
+  const toast = useToast()
   const [action, setAction] = useState<TradeAction>(TradeAction.Buy)
 
   const [inputTokenAmount, setInputTokenAmount] = useState<BigNumber>(new BigNumber(0))
   const [outputTokenAmount, setOutputTokenAmount] = useState<BigNumber>(new BigNumber(0))
+
+  const [takerAddress, setTakerAddress] = useState<string>(ZERO_ADDR)
 
   const paymentToken = useMemo(() => getUSDC(networkId), [networkId])
 
@@ -168,12 +170,14 @@ export default function MakeOrderDetail({ selectedOToken, usdcBalance, oTokenBal
       takerAssetAmount,
       makerFee,
       expiry,
+      takerAddress,
     )
     const objJsonStr = JSON.stringify(order)
     const encodedOrder = Buffer.from(objJsonStr).toString('base64')
-    console.log(`encodedOrder`, encodedOrder)
     setSignedOrder(encodedOrder)
+    toast('Success 🎉')
   }, [
+    toast,
     finalDeadlineUnit,
     createOrder,
     deadline,
@@ -184,11 +188,12 @@ export default function MakeOrderDetail({ selectedOToken, usdcBalance, oTokenBal
     outputToken.decimals,
     outputToken.id,
     outputTokenAmount,
+    takerAddress,
   ])
 
   return (
     <>
-      <SectionHeader title="Side" />
+      <Comment text="Side" padding={15} />
       <Row>
         <Col>
           <Button
@@ -205,7 +210,7 @@ export default function MakeOrderDetail({ selectedOToken, usdcBalance, oTokenBal
       </Row>
 
       {/* Input Output Amount Row */}
-      <SectionHeader title="Amount" />
+      <Comment text="Amount" padding={15} />
       <Row>
         <Col xl={3} lg={4} md={4} sm={5}>
           <TextInput
@@ -244,6 +249,20 @@ export default function MakeOrderDetail({ selectedOToken, usdcBalance, oTokenBal
         </Col>
       </Row>
 
+      <Comment text="Taker Address" padding={15} />
+      <Row>
+        <Col xl={4} lg={4} md={5} sm={6}>
+          <TextInput
+            type="string"
+            value={takerAddress}
+            adornment={<EthIdenticon address={takerAddress} scale={1} radius={3} soften={0.7} />}
+            adornmentPosition="end"
+            onChange={event => setTakerAddress(event.target.value)}
+            wide
+          />
+        </Col>
+      </Row>
+
       <SectionHeader title="Detail" />
       <TokenBalanceEntry label="Price" amount={price.toFixed(4)} symbol="USDC / oToken" />
       <TokenBalanceEntry
@@ -263,7 +282,7 @@ export default function MakeOrderDetail({ selectedOToken, usdcBalance, oTokenBal
       <Button
         disabled={needApprove || error !== Errors.NO_ERROR || inputTokenAmount.isZero() || inputTokenAmount.isNaN()}
         label={'Generate Order'}
-        mode={action === TradeAction.Buy ? 'positive' : 'negative'}
+        mode="strong"
         onClick={createOrderAndPost}
       />
       {needApprove && <Button label="approve" icon={<IconUnlock />} display="icon" onClick={approve} />}

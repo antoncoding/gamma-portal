@@ -119,6 +119,14 @@ export default function SideBar() {
           shown={selectedTab === 4}
         />
         <SubButton
+          title="OTC"
+          onClick={() => {
+            history.push(`/trade/otc/`)
+          }}
+          isSelected={selectedTab === 4 && subSelected === 'otc'}
+          shown={selectedTab === 4}
+        />
+        <SubButton
           title="Orderbook"
           onClick={() => {
             history.push(`/trade/orderbook/`)
@@ -172,5 +180,7 @@ function locationToSubButtomId(location) {
     ? 'swap'
     : location.pathname.includes('/orderbook/')
     ? 'orderbook'
+    : location.pathname.includes('/otc/')
+    ? 'otc'
     : ''
 }

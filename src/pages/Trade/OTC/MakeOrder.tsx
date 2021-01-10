@@ -4,7 +4,6 @@ import BigNumber from 'bignumber.js'
 import { OTokenBalance, SubgraphOToken } from '../../../types'
 
 import SectionHeader from '../../../components/SectionHeader'
-import { useLiveOTokens } from '../../../hooks/useOTokens'
 
 import OTokenAutoComplete from '../../../components/OTokenAutoComplete'
 import MakeOrderDetail from './MakeOrderDetail'

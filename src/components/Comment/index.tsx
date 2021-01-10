@@ -6,7 +6,7 @@ type commentProps = {
 }
 
 function Comment({ text, padding = 10 }: commentProps) {
-  return <div style={{ padding, opacity: 0.7 }}>{text}</div>
+  return <div style={{ paddingTop: padding, opacity: 0.7 }}>{text}</div>
 }
 
 export default Comment

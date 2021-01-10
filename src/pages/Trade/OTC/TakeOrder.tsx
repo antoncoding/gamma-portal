@@ -1,10 +1,9 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react'
-import { Col, Row } from 'react-grid-system'
 import { TextInput, useToast, Button, Timer, IconUnlock } from '@aragon/ui'
 import { assetDataUtils, ERC20AssetData } from '@0x/order-utils'
 import BigNumber from 'bignumber.js'
 import { OTokenBalance, SignedOrder, SubgraphOToken, Token } from '../../../types'
-import { getUSDC, ZEROX_PROTOCOL_FEE_KEY, FeeTypes, Errors, Spenders } from '../../../constants'
+import { getUSDC, ZEROX_PROTOCOL_FEE_KEY, FeeTypes, Errors, Spenders, ZERO_ADDR } from '../../../constants'
 
 import SectionHeader from '../../../components/SectionHeader'
 import LabelText from '../../../components/LabelText'
@@ -27,7 +26,7 @@ type TakerOrderProps = {
 export default function TakerOrder({ oTokenBalances, wethBalance, usdcBalance, allOtokens }: TakerOrderProps) {
   const { getProtocolFee, fillOrder } = use0xExchange()
 
-  const { networkId } = useConnectedWallet()
+  const { networkId, user } = useConnectedWallet()
 
   const usdc = useMemo(() => getUSDC(networkId), [networkId])
 
@@ -98,10 +97,17 @@ export default function TakerOrder({ oTokenBalances, wethBalance, usdcBalance, a
     await fillOrder(order, new BigNumber(order.takerAssetAmount))
   }, [fillOrder, order, toast])
 
+  const takable = useMemo(
+    () => (order ? order.takerAddress === ZERO_ADDR || order.takerAddress.toLowerCase() === user : true),
+    [order, user],
+  )
+
   return (
     <>
       <SectionHeader title="Order" />
+      <span style={{ opacity: 0.9, fontSize: 15 }}> Paste the order string you get from the order maker. </span>
       <TextInput wide onChange={event => setEncodedOrder(event.target.value)} />
+      <WarningText show={!takable} text="You cannot take this order" />
 
       {order && (
         <>
@@ -125,11 +131,13 @@ export default function TakerOrder({ oTokenBalances, wethBalance, usdcBalance, a
             <Timer end={new Date(Number(order.expirationTimeSeconds) * 1000)} />
           </div>
 
-          <TokenBalanceEntry
-            label="Taker Fee"
-            amount={toTokenAmount(order.takerFee, takerAsset?.decimals || 8).toString()}
-            symbol={order.takerFee === '0' ? '😋' : takerAsset?.symbol || ''}
-          />
+          {order.takerFee !== '0' && (
+            <TokenBalanceEntry
+              label="Taker Fee"
+              amount={toTokenAmount(order.takerFee, takerAsset?.decimals || 8).toString()}
+              symbol={takerAsset?.symbol || ''}
+            />
+          )}
 
           <TokenBalanceEntry
             label="Protocol Fee"
@@ -141,7 +149,9 @@ export default function TakerOrder({ oTokenBalances, wethBalance, usdcBalance, a
           <br />
           <div style={{ display: 'flex' }}>
             <Button
-              disabled={(payFeeWithWeth && !hasEnoughWeth) || balanceError !== Errors.NO_ERROR || needApprove}
+              disabled={
+                (payFeeWithWeth && !hasEnoughWeth) || balanceError !== Errors.NO_ERROR || needApprove || !takable
+              }
               mode="strong"
               label="Fill order"
               onClick={handleFillOrder}
