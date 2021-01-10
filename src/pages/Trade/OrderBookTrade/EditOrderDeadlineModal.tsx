@@ -17,7 +17,7 @@ export default function EditOrderDeadlineModal({ setDeadline, setFinalDeadlineUn
 
   // deadline input is set to deadline when the user click on confirm
   const [deadlineInput, setDeadlineInput] = useState(20)
-  const [modalDeadlineIdx, setModalDeadlineIdx] = useState<number>(0)
+  const [modalDeadlineIdx, setModalDeadlineIdx] = useState<number>(1)
 
   // const [finalDeadlineUnit, setFinalDeadlineUnit] = useState<DeadlineUnit>(DeadlineUnit.Minutes)
 

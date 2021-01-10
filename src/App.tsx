@@ -24,6 +24,8 @@ import Trade from './pages/Trade'
 
 import Orderbook from './pages/Trade/OrderBookTrade'
 import Swap from './pages/Trade/Swap'
+import OTC from './pages/Trade/OTC'
+
 import { useConnection } from './hooks/useConnection'
 
 import { getPreference } from './utils/storage'
@@ -69,6 +71,11 @@ function App() {
                   <Route path="/trade/swap/">
                     <Layout>
                       <Swap />
+                    </Layout>
+                  </Route>
+                  <Route path="/trade/otc/">
+                    <Layout>
+                      <OTC />
                     </Layout>
                   </Route>
                   <Route path="/trade/">
