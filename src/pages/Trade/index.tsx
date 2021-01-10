@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom'
 import { Container, Row, Col } from 'react-grid-system'
 import BoxButton from '../../components/BoxButton'
 
-import { Header, IconCopy, IconSwap } from '@aragon/ui'
+import { Header, IconCopy, IconSwap, IconGroup } from '@aragon/ui'
 
 import Comment from '../../components/Comment'
 
@@ -28,6 +28,17 @@ function TradePage() {
             icon={<IconSwap size="large" />}
             onClick={() => {
               history.push('/trade/swap/')
+            }}
+          />
+        </Col>
+
+        <Col sm={12} md={6} lg={4}>
+          <BoxButton
+            title="OTC"
+            description="Private OTC Trade"
+            icon={<IconGroup size="large" />}
+            onClick={() => {
+              history.push('/trade/otc/')
             }}
           />
         </Col>

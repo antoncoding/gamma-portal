@@ -3,7 +3,7 @@ import ReactGA from 'react-ga'
 import { useHistory } from 'react-router-dom'
 import { Container, Row, Col } from 'react-grid-system'
 import BoxButton from '../../components/BoxButton'
-import { Header, IconUser, IconConfiguration } from '@aragon/ui'
+import { Header, IconUser, IconConfiguration, IconSwap } from '@aragon/ui'
 
 import Comment from '../../components/Comment'
 
@@ -30,17 +30,6 @@ function HomePage() {
           />
         </Col>
 
-        {/* <Col sm={12} md={6} lg={4}>
-          <BoxButton
-            title="Trade"
-            description="Trade with 0x"
-            icon={<IconSwap size="large" />}
-            onClick={() => {
-              history.push('/trade/')
-            }}
-          />
-        </Col> */}
-
         <Col sm={12} md={6} lg={4}>
           <BoxButton
             title="Protocol"
@@ -48,6 +37,17 @@ function HomePage() {
             icon={<IconConfiguration size="large" />}
             onClick={() => {
               history.push('/protocol/')
+            }}
+          />
+        </Col>
+
+        <Col sm={12} md={6} lg={4}>
+          <BoxButton
+            title="Trade"
+            description="Trade with 0x"
+            icon={<IconSwap size="large" />}
+            onClick={() => {
+              history.push('/trade/')
             }}
           />
         </Col>

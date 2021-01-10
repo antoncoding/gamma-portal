@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { Visible } from 'react-grid-system'
 
-import { useTheme, IconHome, IconUser, IconConfiguration, LinkBase } from '@aragon/ui'
+import { useTheme, IconHome, IconUser, IconConfiguration, LinkBase, IconSwap } from '@aragon/ui'
 import SidebarTitle from './SidebarTitle'
 import SubButton from './SubButton'
 
@@ -101,14 +101,15 @@ export default function SideBar() {
           shown={selectedTab === 3}
         />
 
-        {/* <SidebarTitle
+        <SidebarTitle
           title="Trade"
           icon={<IconSwap />}
           onClick={() => {
             history.push('/trade/')
           }}
           isSelected={selectedTab === 4}
-        /> */}
+          tag="new"
+        />
 
         <SubButton
           title="Swap"
