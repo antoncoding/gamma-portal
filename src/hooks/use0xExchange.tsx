@@ -65,6 +65,7 @@ export function use0xExchange() {
       takerAssetAmount: BigNumber,
       makerFee: BigNumber,
       expiry: number,
+      takerAddress?: string,
     ) => {
       if (!web3) return toast('No Wallet Connected')
       const exchangeAddress = zx_exchange[networkId]
@@ -74,7 +75,7 @@ export function use0xExchange() {
       const order = {
         senderAddress: '0x0000000000000000000000000000000000000000',
         makerAddress: user,
-        takerAddress: '0x0000000000000000000000000000000000000000',
+        takerAddress: takerAddress ? takerAddress : '0x0000000000000000000000000000000000000000',
         makerFee: makerFee,
         takerFee: new BigNumber(0),
         makerAssetAmount: makerAssetAmount,
@@ -123,6 +124,30 @@ export function use0xExchange() {
     [networkId, getProtocolFee, getGasPriceForOrders, notifyCallback, toast, user, web3, track, payWithWeth],
   )
 
+  const fillOrder = useCallback(
+    async (order: SignedOrder, amount: BigNumber) => {
+      if (!web3) return toast('No wallet detected')
+      const exchange = new web3.eth.Contract(abi, addresses[networkId].zeroxExchange)
+
+      const signature = order.signature
+
+      const gasPrice = getGasPriceForOrders([order])
+      const feeInEth = getProtocolFee([order]).toString()
+      const amountStr = amount.toString()
+
+      await exchange.methods
+        .fillOrder(order, amountStr, signature)
+        .send({
+          from: user,
+          value: payWithWeth ? '0' : web3.utils.toWei(feeInEth, 'ether'),
+          gasPrice: web3.utils.toWei(gasPrice.toString(), 'gwei'),
+        })
+        .on('transactionHash', notifyCallback)
+      track('fill-order')
+    },
+    [networkId, getProtocolFee, getGasPriceForOrders, notifyCallback, toast, user, web3, track, payWithWeth],
+  )
+
   const broadcastOrder = useCallback(
     async (order: SignedOrder) => {
       const url = `${httpEndpoint}sra/v3/orders`
@@ -140,5 +165,5 @@ export function use0xExchange() {
     [httpEndpoint, toast],
   )
 
-  return { getProtocolFee, fillOrders, createOrder, broadcastOrder }
+  return { getProtocolFee, fillOrders, fillOrder, createOrder, broadcastOrder }
 }

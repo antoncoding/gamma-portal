@@ -1,16 +1,18 @@
 import React from 'react'
-import { useTheme, LinkBase } from '@aragon/ui'
+import { useTheme, LinkBase, Tag } from '@aragon/ui'
 
 function SidebarTitle({
   title,
   icon,
   onClick,
   isSelected,
+  tag,
 }: {
   title: any
   icon: any
   isSelected: boolean
   onClick: any
+  tag?: any
 }) {
   const theme = useTheme()
 
@@ -25,6 +27,7 @@ function SidebarTitle({
             <div style={{ verticalAlign: 'middle', paddingLeft: 5, color: theme.contentSecondary, fontSize: 18 }}>
               {title}{' '}
             </div>
+            {tag && <Tag indicator="new"> {tag} </Tag>}
           </div>
         </LinkBase>
       </div>

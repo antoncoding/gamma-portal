@@ -35,7 +35,7 @@ export function useUserAllowance(token: string, spender: Spenders) {
 
       await erc.methods.approve(spenderAddess, approveAmount).send({ from: user }).on('transactionHash', notifyCallback)
       const newAllowance = await erc.methods.allowance(user, spenderAddess).call()
-      setAllowance(newAllowance)
+      setAllowance(new BigNumber(newAllowance.toString()))
     },
     [web3, token, user, notifyCallback, spenderAddess],
   )

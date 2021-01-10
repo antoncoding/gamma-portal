@@ -49,6 +49,7 @@ export default function Swap() {
           />
         </Col>
       </Row>
+      <br />
       <TradePanel selectedOToken={selectedOToken} action={action} setAction={setAction} />
       <SyncIndicator visible={isLoading || loadingOrderbook} children={'Syncing order book... 🍕'} />
     </>

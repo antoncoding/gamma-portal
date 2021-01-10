@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
+import { useHistory } from 'react-router-dom'
 import { DataView, Button, useToast } from '@aragon/ui'
 import SectionTitle from '../../components/SectionHeader'
 import OpynTokenAmount from '../../components/OpynTokenAmount'
@@ -17,6 +18,8 @@ export default function AccountBalances({ account }: { account: string }) {
   const { networkId, user } = useConnectedWallet()
 
   const toast = useToast()
+
+  const history = useHistory()
 
   const { balances, isLoading: isLoadingBalance } = useOTokenBalances(account, networkId)
 
@@ -39,7 +42,7 @@ export default function AccountBalances({ account }: { account: string }) {
       const button = expired ? (
         <Button label="Redeem" onClick={() => redeemToken(balance.token.id, balance.balance)} />
       ) : (
-        <Button label="Trade" onClick={() => toast('Coming soon')} />
+        <Button label="Trade" onClick={() => history.push(`/trade/swap/${balance.token.id}`)} />
       )
       return [
         <OpynTokenAmount chainId={networkId} token={balance.token} amount={balance.balance.toString()} />,
@@ -47,7 +50,7 @@ export default function AccountBalances({ account }: { account: string }) {
         button,
       ]
     },
-    [networkId, redeemToken, toast],
+    [networkId, redeemToken, history],
   )
 
   return (
