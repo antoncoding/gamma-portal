@@ -13,7 +13,7 @@ import { MetamaskSubprovider } from '@0x/subproviders'
 import { getPreference } from '../utils/storage'
 
 const FEE_PERORDER_PER_GWEI = 0.00007
-const FEE_RECIPIENT = '0x200aabfDB21BEb86250fFE93Cac78dc9B9fa3e7d'
+const FEE_RECIPIENT = '0xD325E15A52B780698C45CA3BdB6c49444fe5B588'
 
 const abi = require('../constants/abis/0xExchange.json')
 
