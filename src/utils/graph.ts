@@ -477,6 +477,7 @@ export const getVaultHistory = async (
           decimals
         }
       }
+      collateral
       amount
       timestamp
       transactionHash

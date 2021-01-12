@@ -58,6 +58,8 @@ export type SubgraphVaultAction = {
   oToken: null | { id: string; symbol: string; decimals: number; collateralAsset: SubgraphToken }
   asset: { id: string; symbol: string; decimals: number }
   amount: null | string
+  // for settlel vault action
+  collateral?: { id: string; symbol: string; decimals: number }
 }
 
 export type SubgraphToken = {
