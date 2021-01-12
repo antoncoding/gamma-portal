@@ -14,7 +14,7 @@ import { getVaultHistory } from '../../../utils/graph'
 import { timeSince } from '../../../utils/math'
 import { toTokenAmount } from '../../../utils/math'
 
-import { SubgraphVaultAction } from '../../../types'
+import { SubgraphVaultAction, SubgraphToken } from '../../../types'
 import useAsyncMemo from '../../../hooks/useAsyncMemo'
 
 import { VAULT_HISTORY } from '../../../constants/dataviewContents'
@@ -56,7 +56,7 @@ export default function VaultHistory() {
       const badge = <ActionBadgeFromId id={entry.id} />
       const assetToken = entry.oToken
         ? entry.id.includes('SETTLE')
-          ? entry.oToken.collateralAsset // if it's a settle action, show payout in collateral asset
+          ? (entry.collateral as SubgraphToken) // if it's a settle action, show payout in collateral asset
           : entry.oToken
         : entry.asset
         ? entry.asset

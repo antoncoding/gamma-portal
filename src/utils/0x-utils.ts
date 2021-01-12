@@ -33,7 +33,7 @@ export async function getBasePairAskAndBids(oTokens: OToken[], networkId: 1 | 42
   const filteredOTokens = oTokens // await filter0xAvailablePairs(networkId, oTokens);
   // 0x has rate limit of 6 request / 10 sec, will need to chuck array into 6 each
   const BATCH_REQUEST = 6
-  const COOLDOWN = 2
+  const COOLDOWN = networkId === 1 ? 0.5 : 2
 
   const batchOTokens = filteredOTokens.reduce(
     (prev: OToken[][], curr) => {

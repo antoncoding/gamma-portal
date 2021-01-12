@@ -468,7 +468,7 @@ export const getVaultHistory = async (
     }
     settleActions (where: {vault_contains: "${owner}-${vaultId}"}) {
       id
-      oToken {
+      short {
         symbol
         id
         collateralAsset {
@@ -477,6 +477,7 @@ export const getVaultHistory = async (
           decimals
         }
       }
+      collateral
       amount
       timestamp
       transactionHash
