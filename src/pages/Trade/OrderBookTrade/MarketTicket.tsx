@@ -68,7 +68,10 @@ export default function MarketTicket({
 
   const { orderbooks } = useOrderbook()
 
-  const oTokenBalance = oTokenBalances?.find(b => b.token.id === selectedOToken.id)?.balance ?? new BigNumber(0)
+  const oTokenBalance = useMemo(
+    () => oTokenBalances?.find(b => b.token.id === selectedOToken.id)?.balance ?? new BigNumber(0),
+    [oTokenBalances, selectedOToken],
+  )
 
   const { id, bids, asks } = useMemo(() => {
     const target = orderbooks.find(b => b.id === selectedOToken.id)

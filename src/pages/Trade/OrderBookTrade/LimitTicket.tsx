@@ -52,7 +52,10 @@ export default function LimitTicket({
 
   const [error, setError] = useState(Errors.NO_ERROR)
 
-  const oTokenBalance = oTokenBalances?.find(b => b.token.id === selectedOToken.id)?.balance ?? new BigNumber(0)
+  const oTokenBalance = useMemo(
+    () => oTokenBalances?.find(b => b.token.id === selectedOToken.id)?.balance ?? new BigNumber(0),
+    [oTokenBalances, selectedOToken],
+  )
 
   const inputToken = useMemo(() => (action === TradeAction.Buy ? paymentToken : selectedOToken), [
     paymentToken,
