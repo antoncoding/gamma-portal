@@ -19,8 +19,6 @@ function ZeroXFee() {
 
   const { allowance, approve } = useUserAllowance(weth.id, Spenders.ZeroXStaking)
 
-  console.log(`allowance`, allowance.toString())
-
   const [payWithWeth, SetPayWithWeth] = useState(mode === FeeTypes.WETH)
 
   return (
