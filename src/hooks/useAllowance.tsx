@@ -29,7 +29,7 @@ export function useUserAllowance(token: string, spender: Spenders) {
       if (!web3) return
       const approveMode = getPreference('approval', 'normal')
       const erc = new web3.eth.Contract(abi, token)
-      const approveAmount = approveMode === 'normal' ? amount : MAX_UINT
+      const approveAmount = approveMode === 'normal' ? amount.toString() : MAX_UINT
 
       if (spenderAddess === '') throw new Error('Unkown Spender')
 
