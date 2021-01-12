@@ -5,7 +5,7 @@ type graphEndPointType = {
 }
 
 export const subgraph: graphEndPointType = {
-  '1': 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-mainnet',
+  '1': 'https://api.thegraph.com/subgraphs/name/opynfinance/playground',
   '42': 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-kovan',
 }
 

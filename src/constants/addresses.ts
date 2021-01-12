@@ -61,10 +61,10 @@ type SystemAddresses = {
 
 export const addresses: SystemAddresses = {
   '1': {
-    controller: '0x4ccc2339F87F6c59c6893E1A678c2266cA58dC72',
-    factory: '0x7C06792Af1632E77cb27a558Dc0885338F4Bdf8E',
-    addressBook: '0x1E31F2DCBad4dc572004Eae6355fB18F9615cBe4',
-    pool: '0x5934807cC0654d46755eBd2848840b616256C6Ef',
+    controller: '0xde158Fa7022f11707d4a3570eec4621B35d83829',
+    factory: '0xE21127f47B365d3b1467746804f32BF8dCf47e26',
+    addressBook: '0x57ADe7D5E9D2F45A07f8039Da7228ACC305fbeaF',
+    pool: '0x0Cb5BDBf1726f7CC720B21EA910ACeda9FdDf680',
     zeroxExchange: '0x61935cbdd02287b511119ddb11aeb42f1593b7ef',
     zeroxERCProxy: '0x95e6f48254609a6ee006f7d493c8e5fb97094cef',
     zeroxStaking: '0xa26e80e7dea86279c6d778d702cc413e6cffa777',
