@@ -1,13 +1,13 @@
 import React, { useCallback, useMemo } from 'react'
 import { useHistory } from 'react-router-dom'
-import { DataView, Button, useToast } from '@aragon/ui'
+import { DataView, Button, useToast, Split, Tag } from '@aragon/ui'
 import SectionTitle from '../../components/SectionHeader'
 import OpynTokenAmount from '../../components/OpynTokenAmount'
 import { useOTokenBalances } from '../../hooks/useOTokenBalances'
 
 import { useConnectedWallet } from '../../contexts/wallet'
 import { OTokenBalance } from '../../types'
-import { sortByExpiryThanStrike, isExpired } from '../../utils/others'
+import { sortByExpiryThanStrike, isExpired, isSettlementAllowed } from '../../utils/others'
 
 import { OTOKENS } from '../../constants/dataviewContents'
 
@@ -36,11 +36,27 @@ export default function AccountBalances({ account }: { account: string }) {
 
   const entries = useMemo(() => (balances ? balances : []), [balances])
 
+  const hasExpiredToken = useMemo(() => entries.find(e => isExpired(e.token)), [entries])
+
+  const tokensExpired = useMemo(() => entries.filter(e => isExpired(e.token)), [entries])
+  const tokensToSettle = useMemo(() => entries.filter(e => isSettlementAllowed(e.token)), [entries])
+
+  const redeemAll = useCallback(async () => {
+    if (user !== account) return toast('Connected account is not the owner.')
+    const tokens = tokensToSettle.map(t => t.token.id)
+    const amounts = tokensToSettle.map(b => b.balance)
+    await redeemBatch(user, tokens, amounts)
+  }, [user, account, tokensToSettle, redeemBatch, toast])
+
   const renderRow = useCallback(
     (balance: OTokenBalance) => {
       const expired = isExpired(balance.token)
       const button = expired ? (
-        <Button label="Redeem" onClick={() => redeemToken(balance.token.id, balance.balance)} />
+        <Button
+          label="Redeem"
+          onClick={() => redeemToken(balance.token.id, balance.balance)}
+          disabled={!isSettlementAllowed(balance.token)}
+        />
       ) : (
         <Button label="Trade" onClick={() => history.push(`/trade/swap/${balance.token.id}`)} />
       )
@@ -55,7 +71,22 @@ export default function AccountBalances({ account }: { account: string }) {
 
   return (
     <>
-      <SectionTitle title="Balances" />
+      <Split
+        primary={<SectionTitle title="Balances" />}
+        secondary={
+          hasExpiredToken && (
+            <div style={{ float: 'right' }}>
+              <Button onClick={redeemAll} disabled={tokensToSettle.length === 0}>
+                Redeem Batch
+                <span style={{ paddingLeft: '7px' }}>
+                  <Tag>{tokensExpired.length}</Tag>
+                </span>
+              </Button>
+            </div>
+          )
+        }
+      />
+
       <DataView
         status={isLoadingBalance ? 'loading' : 'default'}
         fields={['balance', 'PnL', '']}

@@ -1,6 +1,7 @@
 import Web3 from 'web3'
 import ENS from 'ethereum-ens'
 import { SubgraphOToken } from '../types'
+import { WAITINT_PERIOD } from '../constants'
 
 const INFURA_KEY = process.env.REACT_APP_INFURA_KEY
 
@@ -33,6 +34,10 @@ export const sortByExpiryThanStrike = (a: SubgraphOToken, b: SubgraphOToken) => 
 
 export const isExpired = (token: SubgraphOToken) => {
   return Number(token.expiryTimestamp) < Date.now() / 1000
+}
+
+export const isSettlementAllowed = (token: SubgraphOToken) => {
+  return Number(token.expiryTimestamp) + WAITINT_PERIOD < Date.now() / 1000
 }
 
 export function toUTCDateString(expiry: number): string {

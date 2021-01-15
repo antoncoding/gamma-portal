@@ -12,6 +12,7 @@ import OpynTokenAmount from '../../../components/OpynTokenAmount'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 import { VAULTS } from '../../../constants/dataviewContents'
 import { useController } from '../../../hooks/useController'
+import { isSettlementAllowed } from '../../../utils/others'
 
 export default function AccountVaults() {
   const { networkId, user } = useConnectedWallet()
@@ -39,9 +40,9 @@ export default function AccountVaults() {
     if (!vaults) return []
     return vaults.filter(vault => {
       return vault.shortOToken
-        ? Number(vault.shortOToken.expiryTimestamp) * 1000 < Date.now()
+        ? isSettlementAllowed(vault.shortOToken)
         : vault.longOToken
-        ? Number(vault.longOToken.expiryTimestamp) * 1000 < Date.now()
+        ? isSettlementAllowed(vault.longOToken)
         : false
     })
   }, [vaults])
@@ -84,16 +85,11 @@ export default function AccountVaults() {
       <Header
         primary="Vaults"
         secondary={
-          <Button disabled={vaultsToSettle.length === 0} onClick={batchSettle}>
-            {vaultsToSettle.length === 0 ? (
-              'No expired vaults'
-            ) : (
-              <>
-                {' '}
-                Settle Vaults <Tag> {vaultsToSettle.length} </Tag>{' '}
-              </>
-            )}
-          </Button>
+          vaultsToSettle.length > 0 && (
+            <Button disabled={vaultsToSettle.length === 0} onClick={batchSettle}>
+              Settle Vaults <Tag> {vaultsToSettle.length} </Tag>{' '}
+            </Button>
+          )
         }
       />
       <>

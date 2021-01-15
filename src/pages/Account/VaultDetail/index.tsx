@@ -28,7 +28,7 @@ import { useLiveOTokens } from '../../../hooks/useOTokens'
 
 import { getVault } from '../../../utils/graph'
 import { toTokenAmount, fromTokenAmount } from '../../../utils/math'
-import { isExpired } from '../../../utils/others'
+import { isExpired, isSettlementAllowed } from '../../../utils/others'
 import { ZERO_ADDR, tokens } from '../../../constants/addresses'
 import { SubgraphOToken } from '../../../types'
 import { useController } from '../../../hooks/useController'
@@ -242,6 +242,16 @@ export default function VaultDetail() {
     return false
   }, [vaultDetail])
 
+  const settleAllowed = useMemo(() => {
+    if (!vaultDetail) return false
+
+    if (vaultDetail.shortOToken && isSettlementAllowed(vaultDetail.shortOToken)) return true
+
+    if (vaultDetail.longOToken && isSettlementAllowed(vaultDetail.longOToken)) return true
+
+    return false
+  }, [vaultDetail])
+
   const simpleSettle = useCallback(async () => {
     await controller.settleBatch(user, [vaultId], user)
   }, [controller, user, vaultId])
@@ -339,7 +349,7 @@ export default function VaultDetail() {
         }
         secondary={
           expired ? (
-            <Button label="Settle" onClick={simpleSettle} />
+            <Button disabled={!settleAllowed} label="Settle" onClick={simpleSettle} />
           ) : (
             <div style={{ display: 'flex' }}>
               <Button mode="strong" disabled={controller.actions.length === 0 || isSendingTx} onClick={onClickOperate}>

@@ -5,3 +5,5 @@ export enum VaultTypes {
   PUT = 'put',
   CALL = 'call',
 }
+
+export const WAITINT_PERIOD = 7500
