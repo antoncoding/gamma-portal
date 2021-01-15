@@ -98,8 +98,7 @@ export default function AccountBalances({ account }: { account: string }) {
         <OpynTokenAmount chainId={networkId} token={token} amount={balance.toString()} />,
         payout !== null ? (
           <>
-            {' '}
-            {getPayoutText(payout)} {secondary(token.collateralAsset.symbol)}{' '}
+            {getPayoutText(payout)} {secondary(`${token.collateralAsset.symbol}`)}{' '}
           </>
         ) : (
           '-'
@@ -141,5 +140,5 @@ export default function AccountBalances({ account }: { account: string }) {
 
 function getPayoutText(payout: BigNumber): JSX.Element {
   const payoutText = payout.gt(0) ? green(payout.toFixed(4)) : secondary(payout.toFixed(4))
-  return payoutText
+  return <div style={{ paddingRight: '5px' }}> {payoutText} </div>
 }
