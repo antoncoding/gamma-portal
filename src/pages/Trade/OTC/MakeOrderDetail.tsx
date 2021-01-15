@@ -339,7 +339,7 @@ export default function MakeOrderDetail({ selectedOToken, usdcBalance, oTokenBal
         {/* Need to enable usdc in the following: it's a buy or sell nned approve USDC for fee */}
         {((action === TradeAction.Buy && needApproveInputToken) || needApproveUSDCForFee) && (
           <Button
-            label="approve"
+            label="approve-fee"
             icon={isApprovingUSDC ? <LoadingRing /> : <IconUnlock />}
             display="icon"
             onClick={approveUSDCAndFee}
@@ -349,7 +349,7 @@ export default function MakeOrderDetail({ selectedOToken, usdcBalance, oTokenBal
         {/* Need to enable oToken if it's a sell order. */}
         {action === TradeAction.Sell && needApproveInputToken && (
           <Button
-            label="approve"
+            label="approve-otoken"
             icon={isApprovingOToken ? <LoadingRing /> : <IconUnlock />}
             display="icon"
             onClick={approveOToken}

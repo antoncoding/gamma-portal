@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react'
-import { TextInput, useToast, Button, Timer, IconUnlock } from '@aragon/ui'
+import { TextInput, useToast, Button, Timer, IconUnlock, LoadingRing } from '@aragon/ui'
 import { assetDataUtils, ERC20AssetData } from '@0x/order-utils'
 import BigNumber from 'bignumber.js'
 import { OTokenBalance, SignedOrder, SubgraphOToken, Token } from '../../../types'
@@ -38,6 +38,8 @@ export default function TakerOrder({ oTokenBalances, wethBalance, usdcBalance, a
 
   const [makerAsset, setMakerAsset] = useState<Token | null>(null)
   const [takerAsset, setTakerAsset] = useState<Token | null>(null)
+
+  const [isApproving, setIsApproving] = useState(false)
 
   const payFeeWithWeth = useMemo(() => getPreference(ZEROX_PROTOCOL_FEE_KEY, FeeTypes.ETH) === FeeTypes.WETH, [])
 
@@ -102,6 +104,18 @@ export default function TakerOrder({ oTokenBalances, wethBalance, usdcBalance, a
     [order, user],
   )
 
+  const approveOToken = useCallback(async () => {
+    if (!order) return toast('No order selected')
+    setIsApproving(true)
+    try {
+      await approve(new BigNumber(order.takerAssetAmount))
+    } catch (error) {
+      toast(error.message)
+    } finally {
+      setIsApproving(false)
+    }
+  }, [approve, order, toast])
+
   return (
     <>
       <SectionHeader title="Order" />
@@ -159,10 +173,11 @@ export default function TakerOrder({ oTokenBalances, wethBalance, usdcBalance, a
 
             {needApprove && (
               <Button
+                label="approve"
                 mode="positive"
                 display="icon"
-                icon={<IconUnlock />}
-                onClick={() => approve(new BigNumber(order.takerAssetAmount))}
+                icon={isApproving ? <LoadingRing /> : <IconUnlock />}
+                onClick={approveOToken}
               />
             )}
           </div>
