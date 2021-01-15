@@ -87,7 +87,7 @@ export default function TakerOrder({ oTokenBalances, wethBalance, usdcBalance, a
   // get taker asset allowance
   const { approve, allowance } = useUserAllowance(takerAsset?.id || usdc.id, Spenders.ZeroXERC20Proxy)
 
-  const needApprove = useMemo(() => (order ? new BigNumber(order.takerAssetAmount).gte(allowance) : false), [
+  const needApprove = useMemo(() => (order ? new BigNumber(order.takerAssetAmount).gt(allowance) : false), [
     order,
     allowance,
   ])
