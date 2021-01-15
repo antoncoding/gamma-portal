@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react'
-import { TextInput, useToast, Button, Timer, IconUnlock } from '@aragon/ui'
+import { TextInput, useToast, Button, Timer, IconUnlock, LoadingRing } from '@aragon/ui'
 import { assetDataUtils, ERC20AssetData } from '@0x/order-utils'
 import BigNumber from 'bignumber.js'
 import { OTokenBalance, SignedOrder, SubgraphOToken, Token } from '../../../types'
@@ -38,6 +38,8 @@ export default function TakerOrder({ oTokenBalances, wethBalance, usdcBalance, a
 
   const [makerAsset, setMakerAsset] = useState<Token | null>(null)
   const [takerAsset, setTakerAsset] = useState<Token | null>(null)
+
+  const [isApproving, setIsApproving] = useState(false)
 
   const payFeeWithWeth = useMemo(() => getPreference(ZEROX_PROTOCOL_FEE_KEY, FeeTypes.ETH) === FeeTypes.WETH, [])
 
@@ -87,7 +89,7 @@ export default function TakerOrder({ oTokenBalances, wethBalance, usdcBalance, a
   // get taker asset allowance
   const { approve, allowance } = useUserAllowance(takerAsset?.id || usdc.id, Spenders.ZeroXERC20Proxy)
 
-  const needApprove = useMemo(() => (order ? new BigNumber(order.takerAssetAmount).gte(allowance) : false), [
+  const needApprove = useMemo(() => (order ? new BigNumber(order.takerAssetAmount).gt(allowance) : false), [
     order,
     allowance,
   ])
@@ -101,6 +103,18 @@ export default function TakerOrder({ oTokenBalances, wethBalance, usdcBalance, a
     () => (order ? order.takerAddress === ZERO_ADDR || order.takerAddress.toLowerCase() === user : true),
     [order, user],
   )
+
+  const approveOToken = useCallback(async () => {
+    if (!order) return toast('No order selected')
+    setIsApproving(true)
+    try {
+      await approve(new BigNumber(order.takerAssetAmount))
+    } catch (error) {
+      toast(error.message)
+    } finally {
+      setIsApproving(false)
+    }
+  }, [approve, order, toast])
 
   return (
     <>
@@ -159,10 +173,11 @@ export default function TakerOrder({ oTokenBalances, wethBalance, usdcBalance, a
 
             {needApprove && (
               <Button
+                label="approve"
                 mode="positive"
                 display="icon"
-                icon={<IconUnlock />}
-                onClick={() => approve(new BigNumber(order.takerAssetAmount))}
+                icon={isApproving ? <LoadingRing /> : <IconUnlock />}
+                onClick={approveOToken}
               />
             )}
           </div>
