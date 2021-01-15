@@ -13,6 +13,10 @@ import { OTOKENS } from '../../constants/dataviewContents'
 
 import BigNumber from 'bignumber.js'
 import { useController } from '../../hooks/useController'
+import { getOracleAssetsAndPricers } from '../../utils/graph'
+import useAsyncMemo from '../../hooks/useAsyncMemo'
+import { toTokenAmount } from '../../utils/math'
+import { green, secondary } from '../Trade/OrderBookTrade/StyleDiv'
 
 export default function AccountBalances({ account }: { account: string }) {
   const { networkId, user } = useConnectedWallet()
@@ -22,6 +26,15 @@ export default function AccountBalances({ account }: { account: string }) {
   const history = useHistory()
 
   const { balances, isLoading: isLoadingBalance } = useOTokenBalances(account, networkId)
+
+  const allOracleAssets = useAsyncMemo(
+    async () => {
+      const assets = await getOracleAssetsAndPricers(networkId, toast)
+      return assets === null ? [] : assets
+    },
+    [],
+    [],
+  )
 
   const { redeemBatch } = useController()
 
@@ -49,24 +62,52 @@ export default function AccountBalances({ account }: { account: string }) {
   }, [user, account, tokensToSettle, redeemBatch, toast])
 
   const renderRow = useCallback(
-    (balance: OTokenBalance) => {
-      const expired = isExpired(balance.token)
+    ({ token, balance }: OTokenBalance) => {
+      const expired = isExpired(token)
+
+      let payout: null | BigNumber = null
+      if (expired) {
+        const asset = allOracleAssets.find(a => a.asset.id === token.underlyingAsset.id)
+        if (asset) {
+          const priceRecord = asset.prices.find(p => p.expiry === token.expiryTimestamp)
+          if (priceRecord) {
+            const expiryPrice = priceRecord.price
+            if (token.isPut) {
+              payout = BigNumber.max(
+                toTokenAmount(new BigNumber(token.strikePrice).minus(new BigNumber(expiryPrice)), 8).times(
+                  toTokenAmount(balance, 8),
+                ),
+                0,
+              )
+            } else {
+              payout = BigNumber.max(
+                toTokenAmount(new BigNumber(expiryPrice).minus(token.strikePrice), 8).times(toTokenAmount(balance, 8)),
+                0,
+              ).div(toTokenAmount(token.strikePrice, 8))
+            }
+          }
+        }
+      }
+
       const button = expired ? (
-        <Button
-          label="Redeem"
-          onClick={() => redeemToken(balance.token.id, balance.balance)}
-          disabled={!isSettlementAllowed(balance.token)}
-        />
+        <Button label="Redeem" onClick={() => redeemToken(token.id, balance)} disabled={!isSettlementAllowed(token)} />
       ) : (
-        <Button label="Trade" onClick={() => history.push(`/trade/swap/${balance.token.id}`)} />
+        <Button label="Trade" onClick={() => history.push(`/trade/swap/${token.id}`)} />
       )
       return [
-        <OpynTokenAmount chainId={networkId} token={balance.token} amount={balance.balance.toString()} />,
-        '-',
+        <OpynTokenAmount chainId={networkId} token={token} amount={balance.toString()} />,
+        payout !== null ? (
+          <>
+            {' '}
+            {getPayoutText(payout)} {secondary(token.collateralAsset.symbol)}{' '}
+          </>
+        ) : (
+          '-'
+        ),
         button,
       ]
     },
-    [networkId, redeemToken, history],
+    [networkId, redeemToken, history, allOracleAssets],
   )
 
   return (
@@ -89,11 +130,16 @@ export default function AccountBalances({ account }: { account: string }) {
 
       <DataView
         status={isLoadingBalance ? 'loading' : 'default'}
-        fields={['balance', 'PnL', '']}
+        fields={['balance', 'Payout', '']}
         emptyState={OTOKENS}
         entries={entries.sort((a, b) => sortByExpiryThanStrike(a.token, b.token)) || []}
         renderEntry={renderRow}
       />
     </>
   )
+}
+
+function getPayoutText(payout: BigNumber): JSX.Element {
+  const payoutText = payout.gt(0) ? green(payout.toFixed(4)) : secondary(payout.toFixed(4))
+  return payoutText
 }
