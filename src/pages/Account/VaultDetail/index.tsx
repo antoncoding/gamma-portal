@@ -352,7 +352,12 @@ export default function VaultDetail() {
             <Button disabled={!settleAllowed} label="Settle" onClick={simpleSettle} />
           ) : (
             <div style={{ display: 'flex' }}>
-              <Button mode="strong" disabled={controller.actions.length === 0 || isSendingTx} onClick={onClickOperate}>
+              <Button
+                label={'operate'}
+                mode="strong"
+                disabled={controller.actions.length === 0 || isSendingTx}
+                onClick={onClickOperate}
+              >
                 {' '}
                 Operate{' '}
                 {isSendingTx ? (
@@ -364,6 +369,7 @@ export default function VaultDetail() {
                 )}
               </Button>
               <Button
+                label={'trash'}
                 disabled={controller.actions.length === 0}
                 display="icon"
                 icon={<IconTrash />}

@@ -59,7 +59,8 @@ export type SubgraphVaultAction = {
   asset: { id: string; symbol: string; decimals: number }
   amount: null | string
   // for settlel vault action
-  collateral?: { id: string; symbol: string; decimals: number }
+  collateral?: { name: string; id: string; symbol: string; decimals: number }
+  short: null | { name: string; id: string; symbol: string; decimals: number; collateralAsset: SubgraphToken }
 }
 
 export type SubgraphToken = {

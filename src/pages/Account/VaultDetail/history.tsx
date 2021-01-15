@@ -14,7 +14,7 @@ import { getVaultHistory } from '../../../utils/graph'
 import { timeSince } from '../../../utils/math'
 import { toTokenAmount } from '../../../utils/math'
 
-import { SubgraphVaultAction, SubgraphToken } from '../../../types'
+import { SubgraphVaultAction } from '../../../types'
 import useAsyncMemo from '../../../hooks/useAsyncMemo'
 
 import { VAULT_HISTORY } from '../../../constants/dataviewContents'
@@ -54,13 +54,15 @@ export default function VaultHistory() {
     (entry: SubgraphVaultAction) => {
       const hash = entry.transactionHash
       const badge = <ActionBadgeFromId id={entry.id} />
-      const assetToken = entry.oToken
-        ? entry.id.includes('SETTLE')
-          ? (entry.collateral as SubgraphToken) // if it's a settle action, show payout in collateral asset
-          : entry.oToken
-        : entry.asset
-        ? entry.asset
-        : null
+
+      let assetToken: { id: string; symbol: string; decimals: number } | null = entry.asset
+
+      if (entry.id.includes('SETTLE')) {
+        assetToken = entry.short ? entry.short.collateralAsset : null
+      } else {
+        assetToken = entry.oToken ? entry.oToken : entry.asset
+      }
+
       const assetDecimals = assetToken ? (assetToken.decimals ? assetToken.decimals : 8) : 8
       const amount = toTokenAmount(new BigNumber(entry.amount ? entry.amount : 0), assetDecimals).toString()
       const timestamp = new BigNumber(entry.timestamp).times(1000).toNumber()
