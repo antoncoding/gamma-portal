@@ -97,7 +97,12 @@ export const initOnboard = (addressChangeCallback, walletChangeCallback, network
         { walletName: 'metamask', preferred: true },
         {
           walletName: 'walletConnect',
-          infuraKey: INFURA_KEY,
+          rpc: {
+            // eslint-disable-next-line
+            ['1']: RPC_URL,
+            // eslint-disable-next-line
+            ['42']: RPC_URL,
+          }, // [Optional]
           preferred: true,
         },
         {
