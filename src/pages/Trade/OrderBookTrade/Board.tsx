@@ -122,10 +122,10 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken, spot
         callBid: Number(row.callBid) === 0 ? '-' : row.callBid,
         putAsk: Number(row.putAsk) === 0 ? '-' : row.putAsk,
         putBid: Number(row.putBid) === 0 ? '-' : row.putBid,
-        putbidIV: `${(putbidIV * 100).toFixed(2)}%`,
-        putAskIV: `${(putAskIV * 100).toFixed(2)}%`,
-        callbidIV: `${(callbidIV * 100).toFixed(2)}%`,
-        callAskIV: `${(callAskIV * 100).toFixed(2)}%`,
+        putbidIV: Number(row.putBid) === 0 ? '-' : `${(putbidIV * 100).toFixed(2)}%`,
+        putAskIV: Number(row.putAsk) === 0 ? '-' : `${(putAskIV * 100).toFixed(2)}%`,
+        callbidIV: Number(row.callBid) === 0 ? '-' : `${(callbidIV * 100).toFixed(2)}%`,
+        callAskIV: Number(row.callAsk) === 0 ? '-' : `${(callAskIV * 100).toFixed(2)}%`,
       }
     })
   }, [rowsWithDetail, spotPrice])
