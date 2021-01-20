@@ -27,7 +27,8 @@ export function useUserAllowance(token: string, spender: Spenders) {
   const approve = useCallback(
     async (amount: BigNumber) => {
       if (!web3) return
-      const approveMode = getPreference('approval', 'normal')
+      const approveMode = getPreference('unlimited', 'normal')
+      console.log(`approveMode`, approveMode)
       const erc = new web3.eth.Contract(abi, token)
       const approveAmount = approveMode === 'normal' ? amount.toString() : MAX_UINT
 

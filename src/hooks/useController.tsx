@@ -174,7 +174,7 @@ export function useController() {
       const token = new web3.eth.Contract(erc20Abi, erc20)
       const allowance = await token.methods.allowance(from, pool).call()
       if (new BigNumber(allowance).lt(new BigNumber(amount))) {
-        const approveAmount = getPreference('approval', 'normal') === 'normal' ? amount : MAX_UINT
+        const approveAmount = getPreference('approval', 'unlimited') === 'normal' ? amount : MAX_UINT
         await token.methods.approve(pool, approveAmount).send({ from: user }).on('transactionHash', notifyCallback)
       }
     },
