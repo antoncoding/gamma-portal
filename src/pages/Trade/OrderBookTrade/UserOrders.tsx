@@ -28,25 +28,18 @@ export default function UserOrders({ selectedOToken }: OrderbookProps) {
 
   const usdc = useMemo(() => getUSDC(networkId), [networkId])
 
-  const [bids, setBids] = useState<OrderWithMetaData[]>([])
-  const [asks, setAsks] = useState<OrderWithMetaData[]>([])
+  const [entries, setEntries] = useState<OrderWithMetaData[]>([])
 
   useEffect(() => {
     const thisBook = selectedOToken ? orderbooks.find(book => book.id === selectedOToken.id) : undefined
-    if (!thisBook) {
-      setBids([])
-      setAsks([])
-    } else {
-      setBids(thisBook.bids)
-      setAsks(thisBook.asks)
+    if (!thisBook) setEntries([])
+    else {
+      const _entries = thisBook.bids
+        .concat(thisBook.asks)
+        .filter((o: OrderWithMetaData) => o.order.makerAddress === user)
+      setEntries(_entries)
     }
-  }, [selectedOToken, orderbooks])
-
-  const entries = useMemo(() => bids.concat(asks).filter((o: OrderWithMetaData) => o.order.makerAddress === user), [
-    bids,
-    asks,
-    user,
-  ])
+  }, [selectedOToken, orderbooks, user])
 
   const renderRow = useCallback(
     (order: OrderWithMetaData) => {
