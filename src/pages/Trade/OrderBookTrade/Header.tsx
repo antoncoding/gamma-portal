@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react'
-
+import BigNumber from 'bignumber.js'
 import { Header, DropDown, LoadingRing } from '@aragon/ui'
 
 import { useOTokenInSeries } from '../../../hooks/useOTokens'
@@ -9,10 +9,12 @@ import { Token } from '../../../types'
 
 type HeaderProps = {
   setOTokens: any
+  spotPrice: BigNumber
+  underlying: Token
   setSelectedUnderlying: React.Dispatch<React.SetStateAction<Token>>
 }
 
-export default function TradeHeadBar({ setOTokens, setSelectedUnderlying }: HeaderProps) {
+export default function TradeHeadBar({ underlying, spotPrice, setOTokens, setSelectedUnderlying }: HeaderProps) {
   const [seriesId, setSeiresId] = useState(0)
   const [expiryId, setExpiryId] = useState(0)
 
@@ -55,7 +57,7 @@ export default function TradeHeadBar({ setOTokens, setSelectedUnderlying }: Head
   return (
     <>
       <Header
-        primary={'Trade'}
+        primary={`Trade ${underlying.symbol} Options ($${spotPrice.toFixed(2)})`}
         secondary={
           <div style={{ display: 'flex' }}>
             <DropDown

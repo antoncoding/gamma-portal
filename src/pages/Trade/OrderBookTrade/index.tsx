@@ -32,7 +32,12 @@ export default function TradePage() {
 
   return (
     <>
-      <TradeHeader setOTokens={setOTokens} setSelectedUnderlying={setSelectedUnderlying} />
+      <TradeHeader
+        underlying={selectedUnderlying}
+        spotPrice={spotPrice}
+        setOTokens={setOTokens}
+        setSelectedUnderlying={setSelectedUnderlying}
+      />
       <Board
         spotPrice={spotPrice}
         oTokens={oTokens}
