@@ -11,6 +11,16 @@ export const NO_TOKEN_SELECTED = {
   },
 }
 
+export const generateNoUserOrderContent = (symbol: string) => {
+  return {
+    default: {
+      title: `No Orders`,
+      subtitle: `You have no active orders for ${symbol}`,
+      illustration: null,
+    },
+  }
+}
+
 export const generateNoOrderContent = (type: 'bids' | 'asks', symbol: string) => {
   return {
     default: {

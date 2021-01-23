@@ -211,7 +211,7 @@ export async function getOTokenUSDCOrderBook(
  * Return true if the order is valid
  */
 export const isValid = (entry: OrderWithMetaData) => {
-  const FILL_BUFFER = 37.5
+  const FILL_BUFFER = 35
   const notExpired = parseInt(entry.order.expirationTimeSeconds, 10) > Date.now() / 1000 + FILL_BUFFER
   const notDust = getOrderFillRatio(entry).gt(5) // got at least 5% unfill
   return notExpired && notDust

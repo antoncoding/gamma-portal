@@ -4,12 +4,14 @@ import TradeHeader from './Header'
 import Board from './Board'
 import MintPanel from './MintPanel'
 import Orderbook from './Orderbook'
+import UserOrders from './UserOrders'
 import TradePanel from './TradePanel'
-
+import CheckBoxWithLabel from '../../../components/CheckBoxWithLabel'
 import { SubgraphOToken } from '../../../types'
-import { TradeAction } from '../../../constants'
+import { TradeAction, SHOW_BOTH_KEY, SHOW_MINE_KEY } from '../../../constants'
 import { useTokenPrice } from '../../../hooks'
 import { emptyToken } from '../../../constants/addresses'
+import { getPreference } from '../../../utils/storage'
 
 export default function TradePage() {
   useEffect(() => {
@@ -20,13 +22,21 @@ export default function TradePage() {
   const [oTokens, setOTokens] = useState<SubgraphOToken[]>([])
   const [action, setAction] = useState<TradeAction>(TradeAction.Buy)
 
+  const [showBoth, setShowBoth] = useState(getPreference(SHOW_BOTH_KEY, 'false') === 'true')
+  const [showMyOrder, setShowMyOrder] = useState(getPreference(SHOW_MINE_KEY, 'false') === 'true')
+
   const [mintPanelOpened, setMintPanelOpened] = useState(false)
 
   const spotPrice = useTokenPrice(selectedUnderlying.id, 10)
 
   return (
     <>
-      <TradeHeader setOTokens={setOTokens} setSelectedUnderlying={setSelectedUnderlying} />
+      <TradeHeader
+        underlying={selectedUnderlying}
+        spotPrice={spotPrice}
+        setOTokens={setOTokens}
+        setSelectedUnderlying={setSelectedUnderlying}
+      />
       <Board
         spotPrice={spotPrice}
         oTokens={oTokens}
@@ -35,7 +45,22 @@ export default function TradePage() {
       />
       <div style={{ display: 'flex', paddingTop: '15px' }}>
         <div style={{ width: '30%' }}>
-          <Orderbook selectedOToken={selectedOToken} setAction={setAction} action={action} />
+          <Orderbook selectedOToken={selectedOToken} action={action} showBoth={showBoth} />
+          {showMyOrder && <UserOrders selectedOToken={selectedOToken} />}
+          <div style={{ display: 'flex' }}>
+            <CheckBoxWithLabel
+              checked={showBoth}
+              setChecked={setShowBoth}
+              storageKey={SHOW_BOTH_KEY}
+              label={`Show ${action === TradeAction.Buy ? 'bids' : 'asks'}`}
+            />
+            <CheckBoxWithLabel
+              checked={showMyOrder}
+              setChecked={setShowMyOrder}
+              storageKey={SHOW_MINE_KEY}
+              label={`Show My Orders`}
+            />
+          </div>
         </div>
         <div style={{ paddingLeft: '15px', width: '70%' }}>
           <TradePanel selectedOToken={selectedOToken} action={action} setAction={setAction} />

@@ -1,12 +1,14 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useState } from 'react'
 
 import { DataView, Radio, SyncIndicator } from '@aragon/ui'
 import { SubgraphOToken } from '../../../types'
 import { OTOKENS_BOARD } from '../../../constants/dataviewContents'
+import { SHOW_EMPTY } from '../../../constants'
 import { toTokenAmount } from '../../../utils/math'
 import { useOrderbook } from '../../../contexts/orderbook'
 import { getOrderBookDetail } from '../../../utils/0x-utils'
-
+import { getPreference } from '../../../utils/storage'
+import CheckBoxWithLabel from '../../../components/CheckBoxWithLabel'
 import { green, red, onclickWrapper, bold, secondary } from './StyleDiv'
 import BigNumber from 'bignumber.js'
 
@@ -47,6 +49,8 @@ type BoardProps = {
 export default function Board({ oTokens, selectedOToken, setSelectedOToken, spotPrice }: BoardProps) {
   const { isLoading: isLoadingOrderbook, orderbooks } = useOrderbook()
 
+  const [showEmpty, setShowEmpty] = useState(getPreference(SHOW_EMPTY, 'false') === 'true')
+
   const rows = useMemo(() => {
     let _rows: BoardRow[] = []
     const _sortedOTokens = oTokens.sort((a, b) => (Number(a.strikePrice) > Number(b.strikePrice) ? 1 : -1))
@@ -71,36 +75,43 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken, spot
   }, [oTokens])
 
   const rowsWithDetail = useMemo(() => {
-    return rows.map(row => {
-      const callbook = orderbooks.find(b => b.id === row.call?.id)
-      const putbook = row.put ? orderbooks.find(b => b.id === row.put?.id) : undefined
-      const {
-        bestBidPrice: callBid,
-        totalBidAmt: callBidSize,
-        bestAskPrice: callAsk,
-        totalAskAmt: callAskSize,
-      } = getOrderBookDetail(callbook)
+    return rows
+      .map(row => {
+        const callbook = orderbooks.find(b => b.id === row.call?.id)
+        const putbook = orderbooks.find(b => b.id === row.put?.id)
+        const {
+          bestBidPrice: callBid,
+          totalBidAmt: callBidSize,
+          bestAskPrice: callAsk,
+          totalAskAmt: callAskSize,
+        } = getOrderBookDetail(callbook)
 
-      const {
-        bestBidPrice: putBid,
-        totalBidAmt: putBidSize,
-        bestAskPrice: putAsk,
-        totalAskAmt: putAskSize,
-      } = getOrderBookDetail(putbook)
+        const {
+          bestBidPrice: putBid,
+          totalBidAmt: putBidSize,
+          bestAskPrice: putAsk,
+          totalAskAmt: putAskSize,
+        } = getOrderBookDetail(putbook)
 
-      return {
-        ...row,
-        callBid,
-        callBidSize,
-        callAsk,
-        callAskSize,
-        putBid,
-        putBidSize,
-        putAsk,
-        putAskSize,
-      }
-    })
-  }, [rows, orderbooks])
+        const isEmpty =
+          (putbook === undefined || (putbook.asks.length === 0 && putbook.bids.length === 0)) &&
+          (callbook === undefined || (callbook.asks.length === 0 && callbook.bids.length === 0))
+
+        return {
+          ...row,
+          isEmpty,
+          callBid,
+          callBidSize,
+          callAsk,
+          callAskSize,
+          putBid,
+          putBidSize,
+          putAsk,
+          putAskSize,
+        }
+      })
+      .filter(row => (showEmpty ? true : !row.isEmpty))
+  }, [rows, orderbooks, showEmpty])
 
   const rowsWithGreeks = useMemo(() => {
     return rowsWithDetail.map(row => {
@@ -197,6 +208,7 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken, spot
   return (
     <div style={{ minWidth: 600 }}>
       <SyncIndicator visible={isLoadingOrderbook} children={'Syncing order book... 🍕'} />
+      <CheckBoxWithLabel checked={showEmpty} setChecked={setShowEmpty} storageKey={SHOW_EMPTY} label={'Show Empty'} />
       <DataView
         tableRowHeight={35}
         status={isLoadingOrderbook ? 'loading' : 'default'}
