@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useState } from 'react'
 
-import { DataView, Timer, Checkbox } from '@aragon/ui'
+import { DataView, Timer } from '@aragon/ui'
 import { SubgraphOToken, OrderWithMetaData } from '../../../types'
 import { useOrderbook } from '../../../contexts/orderbook'
 import { getAskPrice, getBidPrice, getRemainingAmounts } from '../../../utils/0x-utils'
@@ -9,21 +9,16 @@ import { toTokenAmount } from '../../../utils/math'
 import { generateNoOrderContent, NO_TOKEN_SELECTED } from '../../../constants/dataviewContents'
 import { TradeAction } from '../../../constants'
 import { simplifyOTokenSymbol } from '../../../utils/others'
-import { getPreference, storePreference } from '../../../utils/storage'
-
-const SHOW_BOTH_KEY = 'orderbook-show-all'
 
 type OrderbookProps = {
   selectedOToken: SubgraphOToken | null
   action: TradeAction
-  setAction: any
+  showBoth: boolean
 }
 
-export default function Orderbook({ selectedOToken, action }: OrderbookProps) {
+export default function Orderbook({ showBoth, selectedOToken, action }: OrderbookProps) {
   const [askPage, setAskPage] = useState(0)
   const [bidPage, setBidPage] = useState(0)
-
-  const [showBoth, setShowBoth] = useState(getPreference(SHOW_BOTH_KEY, 'false') === 'true')
 
   const { orderbooks } = useOrderbook()
 
@@ -67,9 +62,6 @@ export default function Orderbook({ selectedOToken, action }: OrderbookProps) {
           onPageChange={setAskPage}
           entries={asks}
           tableRowHeight={40}
-          // onSelectEntries={onSelectAskEntry}
-          // If other operation reset selected orders, should change selected accordingly
-          // selection={selectedAskIdxs}
           renderSelectionCount={x => `${x} Orders Selected`}
           fields={['ask price', 'amount', 'expiration']}
           renderEntry={renderAskRow}
@@ -87,28 +79,11 @@ export default function Orderbook({ selectedOToken, action }: OrderbookProps) {
           onPageChange={setBidPage}
           entries={bids}
           tableRowHeight={40}
-          // onSelectEntries={onSelectBidEntry}
-          // If other operation reset selected orders, should change selected accordingly
-          // selection={selectedBidIdxs}
           renderSelectionCount={x => `${x} Orders Selected`}
           fields={['bid price', 'amount', 'expiration']}
           renderEntry={renderBidRow}
         />
       )}
-      {
-        <div style={{ display: 'flex', fontSize: 12, opacity: 0.7 }}>
-          <div style={{ paddingTop: '5px' }}>
-            <Checkbox
-              checked={showBoth}
-              onChange={(checked: boolean) => {
-                setShowBoth(checked)
-                storePreference(SHOW_BOTH_KEY, String(checked))
-              }}
-            />
-          </div>
-          <div style={{ padding: '8px' }}>Show {action === TradeAction.Buy ? 'bids' : 'asks'}</div>
-        </div>
-      }
     </div>
   )
 }

@@ -165,5 +165,22 @@ export function use0xExchange() {
     [httpEndpoint, toast],
   )
 
-  return { getProtocolFee, fillOrders, fillOrder, createOrder, broadcastOrder }
+  const cancelOrders = useCallback(
+    async (orders: SignedOrder[], callback: Function) => {
+      if (!web3) return toast('No wallet detected')
+      const exchange = new web3.eth.Contract(abi, addresses[networkId].zeroxExchange)
+
+      await exchange.methods
+        .batchCancelOrders(orders)
+        .send({
+          from: user,
+        })
+        .on('transactionHash', notifyCallback)
+      track('cancel-order')
+      callback()
+    },
+    [web3, notifyCallback, toast, networkId, track, user],
+  )
+
+  return { getProtocolFee, fillOrders, fillOrder, createOrder, broadcastOrder, cancelOrders }
 }
