@@ -1,14 +1,14 @@
 import React, { useMemo, useCallback, useState } from 'react'
 
-import { DataView, Radio, SyncIndicator, Checkbox } from '@aragon/ui'
+import { DataView, Radio, SyncIndicator } from '@aragon/ui'
 import { SubgraphOToken } from '../../../types'
 import { OTOKENS_BOARD } from '../../../constants/dataviewContents'
 import { SHOW_EMPTY } from '../../../constants'
 import { toTokenAmount } from '../../../utils/math'
 import { useOrderbook } from '../../../contexts/orderbook'
 import { getOrderBookDetail } from '../../../utils/0x-utils'
-import { getPreference, storePreference } from '../../../utils/storage'
-
+import { getPreference } from '../../../utils/storage'
+import CheckBoxWithLabel from '../../../components/CheckBoxWithLabel'
 import { green, red, onclickWrapper, bold, secondary } from './StyleDiv'
 import BigNumber from 'bignumber.js'
 
@@ -208,18 +208,7 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken, spot
   return (
     <div style={{ minWidth: 600 }}>
       <SyncIndicator visible={isLoadingOrderbook} children={'Syncing order book... 🍕'} />
-      <div style={{ display: 'flex', fontSize: 12, opacity: 0.7 }}>
-        <div style={{ paddingTop: '5px' }}>
-          <Checkbox
-            checked={showEmpty}
-            onChange={(checked: boolean) => {
-              setShowEmpty(checked)
-              storePreference(SHOW_EMPTY, String(checked))
-            }}
-          />
-        </div>
-        <div style={{ padding: '8px' }}>Show Empty</div>
-      </div>
+      <CheckBoxWithLabel checked={showEmpty} setChecked={setShowEmpty} storageKey={SHOW_EMPTY} label={'Show Empty'} />
       <DataView
         tableRowHeight={35}
         status={isLoadingOrderbook ? 'loading' : 'default'}

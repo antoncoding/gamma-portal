@@ -4,10 +4,9 @@ import TradeHeader from './Header'
 import Board from './Board'
 import MintPanel from './MintPanel'
 import Orderbook from './Orderbook'
-import BoxPreference from './OrderBoxPreference'
 import UserOrders from './UserOrders'
 import TradePanel from './TradePanel'
-
+import CheckBoxWithLabel from '../../../components/CheckBoxWithLabel'
 import { SubgraphOToken } from '../../../types'
 import { TradeAction, SHOW_BOTH_KEY, SHOW_MINE_KEY } from '../../../constants'
 import { useTokenPrice } from '../../../hooks'
@@ -48,13 +47,20 @@ export default function TradePage() {
         <div style={{ width: '30%' }}>
           <Orderbook selectedOToken={selectedOToken} action={action} showBoth={showBoth} />
           {showMyOrder && <UserOrders selectedOToken={selectedOToken} />}
-          <BoxPreference
-            action={action}
-            showBoth={showBoth}
-            setShowBoth={setShowBoth}
-            showMine={showMyOrder}
-            setShowMine={setShowMyOrder}
-          />
+          <div style={{ display: 'flex' }}>
+            <CheckBoxWithLabel
+              checked={showBoth}
+              setChecked={setShowBoth}
+              storageKey={SHOW_BOTH_KEY}
+              label={`Show ${action === TradeAction.Buy ? 'bids' : 'asks'}`}
+            />
+            <CheckBoxWithLabel
+              checked={showMyOrder}
+              setChecked={setShowMyOrder}
+              storageKey={SHOW_MINE_KEY}
+              label={`Show My Orders`}
+            />
+          </div>
         </div>
         <div style={{ paddingLeft: '15px', width: '70%' }}>
           <TradePanel selectedOToken={selectedOToken} action={action} setAction={setAction} />
