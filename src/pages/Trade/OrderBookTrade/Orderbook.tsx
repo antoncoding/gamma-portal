@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 
 import { DataView, Timer } from '@aragon/ui'
 import { SubgraphOToken, OrderWithMetaData } from '../../../types'
@@ -22,13 +22,19 @@ export default function Orderbook({ showBoth, selectedOToken, action }: Orderboo
 
   const { orderbooks } = useOrderbook()
 
-  const thisBook = useMemo(
-    () => (selectedOToken ? orderbooks.find(book => book.id === selectedOToken.id) : undefined),
-    [selectedOToken, orderbooks],
-  )
+  const [bids, setBids] = useState<OrderWithMetaData[]>([])
+  const [asks, setAsks] = useState<OrderWithMetaData[]>([])
 
-  const bids = thisBook?.bids ?? []
-  const asks = thisBook?.asks ?? []
+  useEffect(() => {
+    const thisBook = selectedOToken ? orderbooks.find(book => book.id === selectedOToken.id) : undefined
+    if (!thisBook) {
+      setBids([])
+      setAsks([])
+    } else {
+      setBids(thisBook.bids)
+      setAsks(thisBook.asks)
+    }
+  }, [selectedOToken, orderbooks])
 
   const renderAskRow = useCallback(
     (order: OrderWithMetaData) => [

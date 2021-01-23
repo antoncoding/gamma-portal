@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState } from 'react'
+import React, { useMemo, useCallback, useState, useEffect } from 'react'
 import { assetDataUtils } from '@0x/order-utils'
 import { DataView, Timer, useToast, Button, LoadingRing } from '@aragon/ui'
 import { SubgraphOToken, OrderWithMetaData } from '../../../types'
@@ -28,13 +28,19 @@ export default function UserOrders({ selectedOToken }: OrderbookProps) {
 
   const usdc = useMemo(() => getUSDC(networkId), [networkId])
 
-  const thisBook = useMemo(
-    () => (selectedOToken ? orderbooks.find(book => book.id === selectedOToken.id) : undefined),
-    [selectedOToken, orderbooks],
-  )
+  const [bids, setBids] = useState<OrderWithMetaData[]>([])
+  const [asks, setAsks] = useState<OrderWithMetaData[]>([])
 
-  const bids = thisBook?.bids ?? []
-  const asks = thisBook?.asks ?? []
+  useEffect(() => {
+    const thisBook = selectedOToken ? orderbooks.find(book => book.id === selectedOToken.id) : undefined
+    if (!thisBook) {
+      setBids([])
+      setAsks([])
+    } else {
+      setBids(thisBook.bids)
+      setAsks(thisBook.asks)
+    }
+  }, [selectedOToken, orderbooks])
 
   const entries = useMemo(() => bids.concat(asks).filter((o: OrderWithMetaData) => o.order.makerAddress === user), [
     bids,
