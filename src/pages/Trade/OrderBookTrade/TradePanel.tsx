@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { Row, Col } from 'react-grid-system'
+import { Row, Col, Visible } from 'react-grid-system'
 import BigNumber from 'bignumber.js'
 import { Box, Button, useTheme } from '@aragon/ui'
 
@@ -43,6 +43,11 @@ export default function TradePanel({ selectedOToken, action, setAction }: TradeD
   return (
     <Box heading={titleText}>
       <Row>
+        <Visible xs sm={true}>
+          <div style={{ padding: '15px' }}>
+            <TradeType action={action} setAction={setAction} setMarketType={setMarketType} marketType={marketType} />
+          </div>
+        </Visible>
         <Col sm={12} md={8} lg={9}>
           {selectedOToken === null ? (
             <div style={{ color: theme.contentSecondary }}> Select an oToken to proceed </div>
@@ -71,9 +76,11 @@ export default function TradePanel({ selectedOToken, action, setAction }: TradeD
             />
           )}
         </Col>
-        <Col sm={12} md={4} lg={3}>
-          <TradeType action={action} setAction={setAction} setMarketType={setMarketType} marketType={marketType} />
-        </Col>
+        <Visible md={true} lg={true} xl={true}>
+          <Col md={4} lg={3}>
+            <TradeType action={action} setAction={setAction} setMarketType={setMarketType} marketType={marketType} />
+          </Col>
+        </Visible>
       </Row>
     </Box>
   )
