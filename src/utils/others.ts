@@ -2,6 +2,8 @@ import Web3 from 'web3'
 import ENS from 'ethereum-ens'
 import { SubgraphOToken } from '../types'
 import { WAITINT_PERIOD } from '../constants'
+import { toTokenAmount } from './math'
+import BigNumber from 'bignumber.js'
 
 const INFURA_KEY = process.env.REACT_APP_INFURA_KEY
 
@@ -38,6 +40,29 @@ export const isExpired = (token: SubgraphOToken) => {
 
 export const isSettlementAllowed = (token: SubgraphOToken) => {
   return Number(token.expiryTimestamp) + WAITINT_PERIOD < Date.now() / 1000
+}
+
+export const isITM = (token: SubgraphOToken, expiryPrice: string) => {
+  return (
+    (token.isPut && Number(expiryPrice)) < Number(token.strikePrice) ||
+    (!token.isPut && Number(expiryPrice) > Number(token.strikePrice))
+  )
+}
+
+export const getExpiryPayout = (token: SubgraphOToken, amount: string, expiryPrice: string) => {
+  if (token.isPut) {
+    return BigNumber.max(
+      toTokenAmount(new BigNumber(token.strikePrice).minus(new BigNumber(expiryPrice)), 8).times(
+        toTokenAmount(amount, 8),
+      ),
+      0,
+    )
+  } else {
+    return BigNumber.max(
+      toTokenAmount(new BigNumber(expiryPrice).minus(token.strikePrice), 8).times(toTokenAmount(amount, 8)),
+      0,
+    ).div(toTokenAmount(token.strikePrice, 8))
+  }
 }
 
 export function toUTCDateString(expiry: number): string {
