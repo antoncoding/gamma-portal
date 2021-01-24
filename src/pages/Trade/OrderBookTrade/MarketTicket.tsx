@@ -223,7 +223,7 @@ export default function MarketTicket({
   return (
     <>
       <Row>
-        <Col sm={12} md={4}>
+        <Col sm={12} md={5}>
           <TextInput
             type="number"
             adornment={inputIcon}
@@ -234,12 +234,10 @@ export default function MarketTicket({
           />
           <WarningText show={error !== Errors.NO_ERROR} text={error} />
         </Col>
-        <Col sm={1} md={1}>
-          <div style={{ padding: '5px' }}>
-            <IconArrowRight size="medium" />
-          </div>
+        <Col sm={1} md={1} style={{ padding: '10px' }}>
+          <IconArrowRight size="medium" />
         </Col>
-        <Col sm={12} md={4}>
+        <Col sm={12} md={5}>
           <TextInput
             type="number"
             adornment={outputIcon}

@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
+import { Row, Col } from 'react-grid-system'
 import { Button, TextInput, IconArrowRight, IconUnlock } from '@aragon/ui'
 import EditOrderDeadlineModal from './EditOrderDeadlineModal'
 import { SubgraphOToken, OTokenBalance } from '../../../types'
@@ -184,30 +185,32 @@ export default function LimitTicket({
 
   return (
     <>
-      <div style={{ display: 'flex' }}>
-        <div>
+      <Row>
+        <Col sm={12} md={5}>
           <TextInput
             type="number"
             adornment={inputIcon}
             adornmentPosition="end"
             value={inputTokenAmount.toNumber()}
             onChange={handleInputChange}
+            wide
           />
           <WarningText show={error !== Errors.NO_ERROR} text={error} />
-        </div>
-        <div style={{ padding: '5px' }}>
+        </Col>
+        <Col sm={1} md={1} style={{ padding: '10px' }}>
           <IconArrowRight size="medium" />
-        </div>
-        <div>
+        </Col>
+        <Col sm={12} md={5}>
           <TextInput
             type="number"
             adornment={outputIcon}
             adornmentPosition="end"
             value={outputTokenAmount.toFixed()}
             onChange={handleOuputChange}
+            wide
           />
-        </div>
-      </div>
+        </Col>
+      </Row>
       <br />
       <TokenBalanceEntry label="Price" amount={price.toFixed(4)} symbol="USDC / oToken" />
       <TokenBalanceEntry
