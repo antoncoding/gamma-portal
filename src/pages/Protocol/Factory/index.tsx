@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import ReactGA from 'react-ga'
+import { Row, Col } from 'react-grid-system'
 import BigNumber from 'bignumber.js'
 import {
   Header,
@@ -127,41 +128,42 @@ export default function CreateOption() {
       />
       <br />
       <br />
-      <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '3%' }}>
-        <div style={{ width: '20%', marginRight: '5%' }}>
+      <Row style={{ paddingBottom: '3%', alignItems: 'center' }}>
+        <CellQuarter>
           <LabelText label="Underlying" />
           <TokenAddress
             token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].underlying : null}
             nullLabel="N/A"
           />
-        </div>
+        </CellQuarter>
 
-        <div style={{ width: '20%', marginRight: '5%' }}>
+        <CellQuarter>
           <LabelText label="Strike" />
           <TokenAddress
             token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].strike : null}
             nullLabel="N/A"
           />
-        </div>
+        </CellQuarter>
 
-        <div style={{ width: '20%', marginRight: '5%' }}>
+        <CellQuarter>
           <LabelText label="Collateral" />
           <TokenAddress
             token={allProducts[selectedProductIndex] ? allProducts[selectedProductIndex].collateral : null}
             nullLabel="N/A"
           />
-        </div>
+        </CellQuarter>
 
-        <div style={{ width: '20%', marginRight: '5%' }}>
+        <CellQuarter>
           <LabelText label="Type" />
           {allProducts[selectedProductIndex] ? (allProducts[selectedProductIndex].isPut ? 'Put' : 'Call') : 'Put'}{' '}
           Option
-        </div>
-      </div>
+        </CellQuarter>
+        {/* </div> */}
+      </Row>
       <SectionTitle title="Details" />
 
-      <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '1%' }}>
-        <div style={{ width: '20%' }}>
+      <Row style={{ alignItems: 'center', paddingBottom: '1%' }}>
+        <CellQuarter>
           <LabelText label="Strike Price" />
           <TextInput
             type="number"
@@ -169,9 +171,9 @@ export default function CreateOption() {
             onChange={e => setStrikePriceReadable(new BigNumber(e.target.value))}
             wide
           />
-        </div>
+        </CellQuarter>
 
-        <div style={{ width: '20%', marginLeft: '5%' }}>
+        <CellQuarter>
           <LabelText label="Expiry Timestamp" />
           <TextInput
             type="number"
@@ -182,9 +184,9 @@ export default function CreateOption() {
             wide
           />
           <Warning text={expiryWarning} show={hasExpiryWarning} />
-        </div>
+        </CellQuarter>
 
-        <div style={{ width: '20%', marginLeft: '5%' }}>
+        <CellQuarter>
           <div style={{ display: 'flex' }}>
             {' '}
             <LabelText label="Create!" /> <WarningText text="This option has been created" show={isDuplicated} />{' '}
@@ -200,9 +202,9 @@ export default function CreateOption() {
               'Create'
             )}{' '}
           </Button>
-        </div>
+        </CellQuarter>
 
-        <div style={{ width: '20%', marginLeft: '5%' }}>
+        <CellQuarter>
           <div style={{ display: 'flex' }}>
             <LabelText label="Output" />
             <Help hint={'What is this output address'}>
@@ -211,8 +213,16 @@ export default function CreateOption() {
             </Help>
           </div>
           <AddressField address={targetAddress} />
-        </div>
-      </div>
+        </CellQuarter>
+      </Row>
     </>
+  )
+}
+
+function CellQuarter(props) {
+  return (
+    <Col xs={10} md={3} offset={{ xs: 1, md: 0 }} style={{ paddingBottom: '2%' }}>
+      {props.children}
+    </Col>
   )
 }
