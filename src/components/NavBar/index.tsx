@@ -1,6 +1,8 @@
 import React from 'react'
 
 import { Bar, LinkBase, IconMenu } from '@aragon/ui'
+import { storePreference } from '../../utils/storage'
+import { SHOW_SIDE_BAR } from '../../constants'
 import ConnectButton from './ConnectButton'
 import Settings from './SettingsButton'
 
@@ -11,6 +13,7 @@ function MyBar({ isSideBarOpen, setSideBarOpen }: { isSideBarOpen: boolean; setS
         <LinkBase
           onClick={() => {
             setSideBarOpen(!isSideBarOpen)
+            storePreference(SHOW_SIDE_BAR, String(!isSideBarOpen))
           }}
         >
           <IconMenu />

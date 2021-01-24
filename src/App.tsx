@@ -32,6 +32,8 @@ import { getPreference } from './utils/storage'
 
 import { HashRouter as Router, Switch, Route } from 'react-router-dom'
 
+import { SHOW_SIDE_BAR } from './constants'
+
 ReactGA.initialize(process.env.REACT_APP_GA_TRACKINK_ID || '')
 
 function App() {
@@ -39,7 +41,7 @@ function App() {
   const defaultTheme = getPreference('theme', 'light')
   const [theme, setTheme] = useState(defaultTheme)
 
-  const [isSideBarOpen, setSideBarOpen] = useState(true)
+  const [isSideBarOpen, setSideBarOpen] = useState(getPreference(SHOW_SIDE_BAR, 'true') === 'true')
 
   return (
     <Router>

@@ -11,3 +11,6 @@ export enum FeeTypes {
 export const SHOW_BOTH_KEY = 'orderbook-show-all'
 export const SHOW_MINE_KEY = 'orderbook-show-mine'
 export const SHOW_EMPTY = 'orderbook-show-empty'
+
+//
+export const SHOW_SIDE_BAR = 'show-side-bar'
