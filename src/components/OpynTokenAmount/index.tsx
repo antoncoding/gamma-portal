@@ -9,6 +9,7 @@ import ETH from '../../imgs/ETH.png'
 import WBTC from '../../imgs/WBTC.png'
 import oETH from '../../imgs/oETH.svg'
 import USDC from '../../imgs/USDC.png'
+import { simplifyOTokenSymbol } from '../../utils/others'
 
 type TokenAmountProps = {
   token: SubgraphOToken | SubgraphToken | null
@@ -35,6 +36,13 @@ export default function OpynTokenAmount({ token, amount, chainId }: TokenAmountP
       : null
   }, [token])
 
+  const symbol =
+    token === null
+      ? ''
+      : (token as SubgraphOToken).strikePrice !== undefined
+      ? simplifyOTokenSymbol(token?.symbol)
+      : token?.symbol
+
   return token ? (
     <>
       <LinkBase onClick={() => setOpen(true)}>
@@ -42,7 +50,7 @@ export default function OpynTokenAmount({ token, amount, chainId }: TokenAmountP
           address={token.id}
           amount={amount}
           chainId={chainId}
-          symbol={token.symbol}
+          symbol={symbol}
           decimals={token.decimals}
           iconUrl={imgUrl}
           digits={8}

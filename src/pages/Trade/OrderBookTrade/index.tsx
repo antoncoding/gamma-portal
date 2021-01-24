@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import ReactGA from 'react-ga'
+import { Col, Row } from 'react-grid-system'
 import TradeHeader from './Header'
 import Board from './Board'
 import MintPanel from './MintPanel'
@@ -43,8 +44,8 @@ export default function TradePage() {
         selectedOToken={selectedOToken}
         setSelectedOToken={setSelectedOToken}
       />
-      <div style={{ display: 'flex', paddingTop: '15px' }}>
-        <div style={{ width: '30%' }}>
+      <Row style={{ display: 'flex', paddingTop: '15px' }}>
+        <Col sm={12} md={4} lg={3}>
           <Orderbook selectedOToken={selectedOToken} action={action} showBoth={showBoth} />
           {showMyOrder && <UserOrders selectedOToken={selectedOToken} />}
           <div style={{ display: 'flex' }}>
@@ -61,11 +62,11 @@ export default function TradePage() {
               label={`Show My Orders`}
             />
           </div>
-        </div>
-        <div style={{ paddingLeft: '15px', width: '70%' }}>
+        </Col>
+        <Col sm={12} md={8} lg={9}>
           <TradePanel selectedOToken={selectedOToken} action={action} setAction={setAction} />
-        </div>
-      </div>
+        </Col>
+      </Row>
       <MintPanel oToken={selectedOToken} opened={mintPanelOpened} onClose={() => setMintPanelOpened(false)} />
     </>
   )

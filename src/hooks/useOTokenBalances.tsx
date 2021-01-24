@@ -26,12 +26,11 @@ export function useOTokenBalances(
       if (balances === null) return
       setIsLoadig(false)
       setBalances(balances)
-      setRefreshCount(count => count + 1)
     }
     updateBalances()
     const interval = setInterval(updateBalances, refetchInterval ? refetchInterval * 1000 : 10000)
-    return clearInterval(interval)
-  }, [networkId, account, toast, refreshCount, refetchInterval])
+    return () => clearInterval(interval)
+  }, [networkId, account, toast, refetchInterval, refreshCount])
 
   return { balances, isLoading, refetch }
 }

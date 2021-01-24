@@ -7,7 +7,7 @@ import { useOTokenBalances } from '../../hooks/useOTokenBalances'
 
 import { useConnectedWallet } from '../../contexts/wallet'
 import { OTokenBalance } from '../../types'
-import { sortByExpiryThanStrike, isExpired, isSettlementAllowed } from '../../utils/others'
+import { sortByExpiryThanStrike, isExpired, isSettlementAllowed, isITM, getExpiryPayout } from '../../utils/others'
 
 import { OTOKENS } from '../../constants/dataviewContents'
 
@@ -15,7 +15,6 @@ import BigNumber from 'bignumber.js'
 import { useController } from '../../hooks/useController'
 import { getOracleAssetsAndPricers } from '../../utils/graph'
 import useAsyncMemo from '../../hooks/useAsyncMemo'
-import { toTokenAmount } from '../../utils/math'
 import { green, secondary } from '../Trade/OrderBookTrade/StyleDiv'
 
 export default function AccountBalances({ account }: { account: string }) {
@@ -51,46 +50,51 @@ export default function AccountBalances({ account }: { account: string }) {
 
   const hasExpiredToken = useMemo(() => entries.find(e => isExpired(e.token)), [entries])
 
-  const tokensExpired = useMemo(() => entries.filter(e => isExpired(e.token)), [entries])
-  const tokensToSettle = useMemo(() => entries.filter(e => isSettlementAllowed(e.token)), [entries])
+  // const tokensExpired = useMemo(() => entries.filter(e => isExpired(e.token)), [entries])
+  const tokensToRedeem = useMemo(
+    () =>
+      entries
+        .filter(e => isSettlementAllowed(e.token))
+        // onnly redeem otokens that's ITM
+        .filter(({ token }) => {
+          const asset = allOracleAssets.find(a => a.asset.id === token.underlyingAsset.id)
+          const price = asset && asset.prices.find(p => p.expiry === token.expiryTimestamp)?.price
+          return price !== undefined && isITM(token, price)
+        }),
+    [entries, allOracleAssets],
+  )
 
   const redeemAll = useCallback(async () => {
     if (user !== account) return toast('Connected account is not the owner.')
-    const tokens = tokensToSettle.map(t => t.token.id)
-    const amounts = tokensToSettle.map(b => b.balance)
+    const tokens = tokensToRedeem.map(t => t.token.id)
+    const amounts = tokensToRedeem.map(b => b.balance)
     await redeemBatch(user, tokens, amounts)
-  }, [user, account, tokensToSettle, redeemBatch, toast])
+  }, [user, account, tokensToRedeem, redeemBatch, toast])
 
   const renderRow = useCallback(
     ({ token, balance }: OTokenBalance) => {
       const expired = isExpired(token)
-
+      let hasPrice = false
+      let expiredITM = false
       let payout: null | BigNumber = null
       if (expired) {
         const asset = allOracleAssets.find(a => a.asset.id === token.underlyingAsset.id)
         if (asset) {
-          const priceRecord = asset.prices.find(p => p.expiry === token.expiryTimestamp)
-          if (priceRecord) {
-            const expiryPrice = priceRecord.price
-            if (token.isPut) {
-              payout = BigNumber.max(
-                toTokenAmount(new BigNumber(token.strikePrice).minus(new BigNumber(expiryPrice)), 8).times(
-                  toTokenAmount(balance, 8),
-                ),
-                0,
-              )
-            } else {
-              payout = BigNumber.max(
-                toTokenAmount(new BigNumber(expiryPrice).minus(token.strikePrice), 8).times(toTokenAmount(balance, 8)),
-                0,
-              ).div(toTokenAmount(token.strikePrice, 8))
-            }
+          const expiryPrice = asset && asset.prices.find(p => p.expiry === token.expiryTimestamp)?.price
+          hasPrice = expiryPrice !== undefined
+          if (expiryPrice) {
+            expiredITM = isITM(token, expiryPrice)
+            payout = getExpiryPayout(token, balance.toString(), expiryPrice)
           }
         }
       }
 
       const button = expired ? (
-        <Button label="Redeem" onClick={() => redeemToken(token.id, balance)} disabled={!isSettlementAllowed(token)} />
+        <Button
+          label="Redeem"
+          onClick={() => redeemToken(token.id, balance)}
+          disabled={!isSettlementAllowed(token) || !hasPrice || !expiredITM}
+        />
       ) : (
         <Button label="Trade" onClick={() => history.push(`/trade/swap/${token.id}`)} />
       )
@@ -116,10 +120,10 @@ export default function AccountBalances({ account }: { account: string }) {
         secondary={
           hasExpiredToken && (
             <div style={{ float: 'right' }}>
-              <Button onClick={redeemAll} disabled={tokensToSettle.length === 0}>
+              <Button onClick={redeemAll} disabled={tokensToRedeem.length === 0}>
                 Redeem Batch
                 <span style={{ paddingLeft: '7px' }}>
-                  <Tag>{tokensExpired.length}</Tag>
+                  <Tag>{tokensToRedeem.length}</Tag>
                 </span>
               </Button>
             </div>
