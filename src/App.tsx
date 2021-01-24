@@ -41,8 +41,6 @@ function App() {
 
   const [isSideBarOpen, setSideBarOpen] = useState(true)
 
-  const maincontentOffset = isSideBarOpen ? {} : { md: 3, xl: 2 }
-
   return (
     <Router>
       <Main layout={false} theme={theme}>
@@ -51,15 +49,25 @@ function App() {
             <NavBar isSideBarOpen={isSideBarOpen} setSideBarOpen={setSideBarOpen} />
             <Row style={{ height: '100%' }}>
               {isSideBarOpen && (
-                <Col sm={12} md={3} xl={2}>
+                <Col sm={12} md={3} lg={3} xl={2}>
                   <SideBar />
                 </Col>
               )}
-              <Col sm={12} md={9} xl={10} offset={maincontentOffset}>
+              <Col
+                sm={12}
+                md={isSideBarOpen ? 9 : 12}
+                lg={isSideBarOpen ? 9 : 12}
+                xl={isSideBarOpen ? 10 : 12}
+                // offset={maincontentOffset}
+              >
                 <Switch>
                   {/* without layout */}
                   <Route path="/trade/orderbook">
-                    <Orderbook />
+                    <Row>
+                      <Col md={12} lg={10} xl={10} offset={{ lg: 1, xl: 1 }}>
+                        <Orderbook />
+                      </Col>
+                    </Row>
                   </Route>
 
                   {/* pages with layout */}

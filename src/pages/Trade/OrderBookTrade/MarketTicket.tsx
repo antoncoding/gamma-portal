@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
+import { Row, Col } from 'react-grid-system'
 import BigNumber from 'bignumber.js'
 import { Button, TextInput, IconArrowRight, IconUnlock, Timer } from '@aragon/ui'
 import { SubgraphOToken, SignedOrder, OTokenBalance } from '../../../types'
@@ -221,30 +222,34 @@ export default function MarketTicket({
 
   return (
     <>
-      <div style={{ display: 'flex' }}>
-        <div>
+      <Row>
+        <Col sm={12} md={4}>
           <TextInput
             type="number"
             adornment={inputIcon}
             adornmentPosition="end"
             value={inputTokenAmount.toNumber()}
             onChange={handleInputChange}
+            wide
           />
           <WarningText show={error !== Errors.NO_ERROR} text={error} />
-        </div>
-        <div style={{ padding: '5px' }}>
-          <IconArrowRight size="medium" />
-        </div>
-        <div>
+        </Col>
+        <Col sm={1} md={1}>
+          <div style={{ padding: '5px' }}>
+            <IconArrowRight size="medium" />
+          </div>
+        </Col>
+        <Col sm={12} md={4}>
           <TextInput
             type="number"
             adornment={outputIcon}
             adornmentPosition="end"
             value={outputTokenAmount.toFixed()}
             onChange={handleOuputChange}
+            wide
           />
-        </div>
-      </div>
+        </Col>
+      </Row>
       <br />
       <TokenBalanceEntry
         label="Protocol Fee"
