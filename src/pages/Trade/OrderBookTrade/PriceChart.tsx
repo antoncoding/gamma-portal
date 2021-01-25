@@ -5,6 +5,7 @@ import { Box } from '@aragon/ui'
 import { useOTokenTrades } from '../../../hooks'
 import { SubgraphOToken, OTokenTrade } from '../../../types'
 import { toTokenAmount, timeSince } from '../../../utils/math'
+import { simplifyOTokenSymbol } from '../../../utils/others'
 
 type PriceChartProps = {
   selectedOToken: SubgraphOToken
@@ -43,13 +44,25 @@ export default function PriceChart({ selectedOToken }: PriceChartProps) {
       chartData: {
         datasets: [
           {
-            label: 'all',
-            borderWidth: 1,
-            backgroundColor: 'rgba(0,192,192,0.2)',
+            label: simplifyOTokenSymbol(selectedOToken.symbol),
+            lineTension: 0.1,
             borderColor: 'rgba(75,192,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,192,1)',
+            pointBackgroundColor: '#fff',
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            pointBorderWidth: 1,
+            backgroundColor: 'rgba(0,0,0,0)',
             data: data.slice(Math.max(data.length - maxPoints, 1)),
             fill: true,
-            lineTension: 0.2,
             showLine: true,
           },
         ],
@@ -60,7 +73,7 @@ export default function PriceChart({ selectedOToken }: PriceChartProps) {
             {
               ticks: {
                 // Include a dollar sign in the ticks
-                callback: function (value, index, values) {
+                callback: function (value) {
                   return '$' + value
                 },
               },
@@ -70,7 +83,7 @@ export default function PriceChart({ selectedOToken }: PriceChartProps) {
             {
               ticks: {
                 // Include a dollar sign in the ticks
-                callback: function (value, index, values) {
+                callback: function (value) {
                   return timeSince(value * 1000)
                 },
               },
@@ -79,7 +92,7 @@ export default function PriceChart({ selectedOToken }: PriceChartProps) {
         },
       },
     }
-  }, [trades])
+  }, [trades, selectedOToken.symbol])
 
   return (
     <Box heading={`price chart`}>
