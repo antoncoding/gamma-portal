@@ -45,7 +45,7 @@ export default function TradePage() {
         setSelectedOToken={setSelectedOToken}
       />
       <Row style={{ display: 'flex', paddingTop: '15px' }}>
-        <Col sm={12} md={4} lg={3}>
+        <Col sm={12} md={4}>
           <Orderbook selectedOToken={selectedOToken} action={action} showBoth={showBoth} />
           {showMyOrder && <UserOrders selectedOToken={selectedOToken} />}
           <div style={{ display: 'flex' }}>
@@ -63,8 +63,8 @@ export default function TradePage() {
             />
           </div>
         </Col>
-        <Col sm={12} md={8} lg={9}>
-          <TradePanel selectedOToken={selectedOToken} action={action} setAction={setAction} />
+        <Col sm={12} md={8}>
+          <TradePanel compact={true} selectedOToken={selectedOToken} action={action} setAction={setAction} />
         </Col>
       </Row>
       <MintPanel oToken={selectedOToken} opened={mintPanelOpened} onClose={() => setMintPanelOpened(false)} />

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { Row, Col, Visible } from 'react-grid-system'
+import { Row, Col, Visible, Hidden } from 'react-grid-system'
 import BigNumber from 'bignumber.js'
 import { Box, Button, useTheme } from '@aragon/ui'
 
@@ -16,10 +16,11 @@ import { useConnectedWallet } from '../../../contexts/wallet'
 type TradeDetailProps = {
   selectedOToken: SubgraphOToken | null
   action: TradeAction
+  compact?: boolean // true when used in orderbook
   setAction: any
 }
 
-export default function TradePanel({ selectedOToken, action, setAction }: TradeDetailProps) {
+export default function TradePanel({ selectedOToken, action, setAction, compact }: TradeDetailProps) {
   const theme = useTheme()
   const [marketType, setMarketType] = useState(MarketTypes.Market)
 
@@ -43,12 +44,12 @@ export default function TradePanel({ selectedOToken, action, setAction }: TradeD
   return (
     <Box heading={titleText}>
       <Row>
-        <Visible xs sm={true}>
-          <div style={{ padding: '15px' }}>
+        <Visible xs sm md>
+          <Col xs={12} style={{ padding: '15px' }}>
             <TradeType action={action} setAction={setAction} setMarketType={setMarketType} marketType={marketType} />
-          </div>
+          </Col>
         </Visible>
-        <Col sm={12} md={8} lg={9}>
+        <Col sm={12} lg={compact ? 6.5 : 8} xl={compact ? 8 : 9}>
           {selectedOToken === null ? (
             <div style={{ color: theme.contentSecondary }}> Select an oToken to proceed </div>
           ) : marketType === MarketTypes.Market ? (
@@ -76,11 +77,11 @@ export default function TradePanel({ selectedOToken, action, setAction }: TradeD
             />
           )}
         </Col>
-        <Visible md={true} lg={true} xl={true}>
-          <Col md={4} lg={3}>
+        <Hidden xs sm md>
+          <Col lg={compact ? 5.5 : 4} xl={compact ? 4 : 3}>
             <TradeType action={action} setAction={setAction} setMarketType={setMarketType} marketType={marketType} />
           </Col>
-        </Visible>
+        </Hidden>
       </Row>
     </Box>
   )
@@ -96,24 +97,20 @@ type TradeTypeProps = {
 function TradeType({ action, setAction, marketType, setMarketType }: TradeTypeProps) {
   return (
     <div style={{ display: 'flex' }}>
-      <div style={{ paddingRight: '20', display: 'flex', marginRight: 0, marginLeft: 'auto' }}>
-        <Button
-          size="small"
-          label={marketType === MarketTypes.Market ? 'Market' : 'Limit'}
-          onClick={() =>
-            marketType === MarketTypes.Market ? setMarketType(MarketTypes.Limit) : setMarketType(MarketTypes.Market)
-          }
-        />
+      <Button
+        size="small"
+        label={marketType === MarketTypes.Market ? 'Market' : 'Limit'}
+        onClick={() =>
+          marketType === MarketTypes.Market ? setMarketType(MarketTypes.Limit) : setMarketType(MarketTypes.Market)
+        }
+      />
 
-        <div style={{ paddingRight: '15px' }}>
-          <Button
-            size="small"
-            label={action === TradeAction.Buy ? 'Buy' : 'Sell'}
-            mode={action === TradeAction.Buy ? 'positive' : 'negative'}
-            onClick={() => (action === TradeAction.Buy ? setAction(TradeAction.Sell) : setAction(TradeAction.Buy))}
-          />
-        </div>
-      </div>
+      <Button
+        size="small"
+        label={action === TradeAction.Buy ? 'Buy' : 'Sell'}
+        mode={action === TradeAction.Buy ? 'positive' : 'negative'}
+        onClick={() => (action === TradeAction.Buy ? setAction(TradeAction.Sell) : setAction(TradeAction.Buy))}
+      />
     </div>
   )
 }

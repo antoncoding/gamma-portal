@@ -66,7 +66,7 @@ function App() {
                   {/* without layout */}
                   <Route path="/trade/orderbook">
                     <Row>
-                      <Col md={12} lg={10} xl={10} offset={{ lg: 1, xl: 1 }}>
+                      <Col sm={12} xl={10} offset={{ xl: 1 }}>
                         <Orderbook />
                       </Col>
                     </Row>
