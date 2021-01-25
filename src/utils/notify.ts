@@ -2,11 +2,6 @@ import Notify from 'bnc-notify'
 
 const BLOCKNATIVE_KEY = process.env.REACT_APP_BLOCKNATIVE_KEY
 
-export const networkIdToUrl = {
-  '1': 'https://etherscan.io/tx',
-  '42': 'https://kovan.etherscan.io/tx',
-}
-
 let notify: any = undefined
 
 // eslint-disable-next-line import/prefer-default-export

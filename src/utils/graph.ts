@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { subgraph as endpoints } from '../constants/endpoints'
 import { blacklistOTokens } from '../constants/addresses'
 import { SupportedNetworks } from '../constants/networks'
-import { SubgraphVault, SubgraphToken, SubgraphOracleAsset, SubgraphOToken, OTokenBalance } from '../types'
+import { SubgraphVault, SubgraphToken, SubgraphOracleAsset, SubgraphOToken, OTokenBalance, OTokenTrade } from '../types'
 
 /**
  * Get all oTokens
@@ -61,6 +61,39 @@ export async function getAccount(
   try {
     const response = await postQuery(endpoints[networkId], query)
     return response.data.account
+  } catch (error) {
+    errorCallback(error.toString())
+    return null
+  }
+}
+
+export async function getOTokenTrades(
+  networkId: SupportedNetworks,
+  otoken: string,
+  secsBack: number,
+  errorCallback: Function,
+): Promise<null | OTokenTrade[]> {
+  const start = (Date.now() / 1000 - secsBack).toFixed(0)
+  const query = `{
+    otokenTrades(where: {
+      oToken_contains: "${otoken}"
+      timestamp_gt: "${start}"
+    }) {
+      oTokenAmount
+      paymentTokenAmount
+      paymentToken {
+        symbol
+        decimals
+        id
+      }
+      timestamp
+      transactionHash
+    }
+  }
+  `
+  try {
+    const response = await postQuery(endpoints[networkId], query)
+    return response.data.otokenTrades
   } catch (error) {
     errorCallback(error.toString())
     return null

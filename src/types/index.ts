@@ -104,3 +104,11 @@ export type OTokenBalance = {
   token: SubgraphOToken
   balance: BigNumber
 }
+
+export type OTokenTrade = {
+  oTokenAmount: string
+  paymentToken: SubgraphToken
+  paymentTokenAmount: string
+  timestamp: string
+  transactionHash: string
+}
