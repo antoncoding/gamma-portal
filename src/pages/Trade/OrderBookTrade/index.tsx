@@ -7,6 +7,8 @@ import MintPanel from './MintPanel'
 import Orderbook from './Orderbook'
 import UserOrders from './UserOrders'
 import TradePanel from './TradePanel'
+import PriceChart from './PriceChart'
+
 import CheckBoxWithLabel from '../../../components/CheckBoxWithLabel'
 import { SubgraphOToken } from '../../../types'
 import { TradeAction, SHOW_BOTH_KEY, SHOW_MINE_KEY } from '../../../constants'
@@ -65,6 +67,7 @@ export default function TradePage() {
         </Col>
         <Col sm={12} md={8}>
           <TradePanel compact={true} selectedOToken={selectedOToken} action={action} setAction={setAction} />
+          {selectedOToken && <PriceChart selectedOToken={selectedOToken} />}
         </Col>
       </Row>
       <MintPanel oToken={selectedOToken} opened={mintPanelOpened} onClose={() => setMintPanelOpened(false)} />
