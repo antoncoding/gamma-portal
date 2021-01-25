@@ -6,6 +6,8 @@ import BoxButton from '../../components/BoxButton'
 import { Header, IconUser, IconConfiguration, IconSwap } from '@aragon/ui'
 
 import Comment from '../../components/Comment'
+import SectionTitle from '../../components/SectionHeader'
+import TotalAsset from './TotalAsset'
 
 function HomePage() {
   const history = useHistory()
@@ -51,6 +53,18 @@ function HomePage() {
             }}
           />
         </Col>
+      </Row>
+
+      <SectionTitle title={'Overview'} />
+
+      <Row>
+        <Col sm={12} md={6} lg={4}>
+          <TotalAsset />
+        </Col>
+
+        <Col sm={12} md={6} lg={4}></Col>
+
+        <Col sm={12} md={6} lg={4}></Col>
       </Row>
     </Container>
   )

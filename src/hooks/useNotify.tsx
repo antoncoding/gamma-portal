@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react'
 
-import { createNotify, networkIdToUrl } from '../utils/notify'
+import { createNotify } from '../utils/notify'
+import { networkIdToTxUrl } from '../constants'
 import { useConnectedWallet } from '../contexts/wallet'
 
 export function useNotify() {
@@ -12,7 +13,7 @@ export function useNotify() {
       const { emitter } = notify.hash(hash)
       emitter.on('all', transaction => {
         return {
-          onclick: () => window.open(`${networkIdToUrl[networkId]}/${transaction.hash}`),
+          onclick: () => window.open(`${networkIdToTxUrl[networkId]}/${transaction.hash}`),
         }
       })
     },
