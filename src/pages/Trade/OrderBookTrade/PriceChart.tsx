@@ -3,7 +3,6 @@ import { Scatter } from 'react-chartjs-2'
 import { Box } from '@aragon/ui'
 
 import { useOTokenTrades } from '../../../hooks'
-import { themeColors } from '../../../constants'
 import { SubgraphOToken, OTokenTrade } from '../../../types'
 import { toTokenAmount, timeSince } from '../../../utils/math'
 
@@ -15,6 +14,7 @@ export default function PriceChart({ selectedOToken }: PriceChartProps) {
   const { trades } = useOTokenTrades(selectedOToken.id, 8640000, 30)
 
   const { chartData, options } = useMemo(() => {
+    const maxPoints = 20
     const data =
       trades === null
         ? []
@@ -28,6 +28,16 @@ export default function PriceChart({ selectedOToken }: PriceChartProps) {
 
               return { y: price, x: timestamp }
             })
+            .reduce((prev: { x: string; y: number }[], curr) => {
+              const idx = prev.length - 1
+              if (prev.length > 0 && prev[idx].x === curr.x) {
+                const copy = [...prev]
+                copy[idx].y = (copy[idx].y + curr.y) / 2
+                return copy
+              } else {
+                return [...prev, curr]
+              }
+            }, [])
 
     return {
       chartData: {
@@ -35,10 +45,11 @@ export default function PriceChart({ selectedOToken }: PriceChartProps) {
           {
             label: 'all',
             borderWidth: 1,
-            borderColor: themeColors[0],
-            backgroundColor: themeColors[4],
-            data,
+            backgroundColor: 'rgba(0,192,192,0.2)',
+            borderColor: 'rgba(75,192,192,1)',
+            data: data.slice(Math.max(data.length - maxPoints, 1)),
             fill: true,
+            lineTension: 0.2,
             showLine: true,
           },
         ],
