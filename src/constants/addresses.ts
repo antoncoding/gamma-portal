@@ -44,6 +44,12 @@ export const tokens: TokensTyps = {
       symbol: 'WETH',
       decimals: 18,
     },
+    {
+      name: 'Wrapped Bitcoin',
+      id: '0xd3a691c852cdb01e281545a27064741f0b7f6825',
+      symbol: 'WBTC',
+      decimals: 8,
+    },
   ],
 }
 
