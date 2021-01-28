@@ -100,6 +100,27 @@ export async function getOTokenTrades(
   }
 }
 
+export async function getERC20s(
+  networkId: SupportedNetworks,
+  errorCallback: Function,
+): Promise<SubgraphToken[] | null> {
+  const query = `
+  {
+    erc20S{
+      symbol
+      id
+      decimals
+    }
+  }`
+  try {
+    const response = await postQuery(endpoints[networkId], query)
+    return response.data.erc20S
+  } catch (error) {
+    errorCallback(error.toString())
+    return null
+  }
+}
+
 export async function getWhitelistedProducts(
   networkId: SupportedNetworks,
   errorCallback: Function,

@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { Doughnut } from 'react-chartjs-2'
 
 import ChartBox from '../../components/ChartBox'
-import { useAllProducts, getTokenPriceCoingecko } from '../../hooks'
+import { useProtocolAssets, getTokenPriceCoingecko } from '../../hooks'
 import { addresses, themeColors, networkIdToAddressUrl } from '../../constants'
 import { useConnectedWallet } from '../../contexts/wallet'
 import { SubgraphToken } from '../../types'
@@ -12,15 +12,13 @@ import { toTokenAmount } from '../../utils/math'
 const erc20Abi = require('../../constants/abis/erc20.json')
 
 export default function TotalAsset() {
-  const { allProducts } = useAllProducts()
+  const { assets } = useProtocolAssets()
 
   const { networkId, web3 } = useConnectedWallet()
 
   const [assetBalances, setAssetBalances] = useState<{ token: SubgraphToken; balance: BigNumber; price: BigNumber }[]>(
     [],
   )
-
-  const allCollaterals = useMemo(() => allProducts.map(p => p.collateral), [allProducts])
 
   const poolAddress = useMemo(() => addresses[networkId].pool, [networkId])
 
@@ -55,7 +53,7 @@ export default function TotalAsset() {
     async function syncBalances() {
       if (!web3) return
       const balances = await Promise.all(
-        allCollaterals.map(async collateral => {
+        assets.map(async collateral => {
           const token = new web3.eth.Contract(erc20Abi, collateral.id)
           const price = collateral.symbol === 'USDC' ? new BigNumber(1) : await getTokenPriceCoingecko(collateral.id)
           const rawBalance: string = await token.methods.balanceOf(poolAddress).call()
@@ -70,7 +68,7 @@ export default function TotalAsset() {
     return () => {
       cancel = true
     }
-  }, [networkId, poolAddress, web3, allCollaterals])
+  }, [networkId, poolAddress, web3, assets])
 
   return (
     <ChartBox
