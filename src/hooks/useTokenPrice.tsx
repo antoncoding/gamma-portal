@@ -40,7 +40,7 @@ export const getTokenPriceCoingecko = async (token: string | undefined): Promise
   if (requestAddr === '0xd0a1e359811322d97991e03f863a0c30c2cf029c')
     requestAddr = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
   // WBTC
-  if (requestAddr === '0x577d296678535e4903d59a4c929b718e1d575e0a')
+  if (requestAddr === '0xd3a691c852cdb01e281545a27064741f0b7f6825')
     requestAddr = '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599'
 
   const url = `https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${requestAddr}&vs_currencies=usd`
