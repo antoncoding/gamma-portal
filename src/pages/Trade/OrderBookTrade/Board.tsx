@@ -47,6 +47,7 @@ type BoardProps = {
 }
 
 export default function Board({ oTokens, selectedOToken, setSelectedOToken, spotPrice }: BoardProps) {
+  const [page, setPage] = useState(0)
   const { isLoading: isLoadingOrderbook, orderbooks } = useOrderbook()
 
   const [showEmpty, setShowEmpty] = useState(getPreference(SHOW_EMPTY, 'false') === 'true')
@@ -210,6 +211,9 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken, spot
       <SyncIndicator visible={isLoadingOrderbook} children={'Syncing order book... 🍕'} />
       <CheckBoxWithLabel checked={showEmpty} setChecked={setShowEmpty} storageKey={SHOW_EMPTY} label={'Show Empty'} />
       <DataView
+        page={page}
+        onPageChange={setPage}
+        entriesPerPage={8}
         tableRowHeight={35}
         status={isLoadingOrderbook ? 'loading' : 'default'}
         fields={[
