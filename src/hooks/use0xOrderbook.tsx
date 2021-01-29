@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useReducer } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
-import { ZeroXEndpoint, OrderType } from '../constants'
+import { ZeroXEndpoint, OrderType, SupportedNetworks } from '../constants'
 import { useConnectedWallet } from '../contexts/wallet'
 import { OrderWithMetaData, SubgraphOToken, OTokenOrderBook } from '../types'
 import { categorizeOrder, getBasePairAskAndBids, sortBids, sortAsks, isValid } from '../utils/0x-utils'
@@ -127,17 +127,22 @@ export function use0xOrderBooks(oTokens: SubgraphOToken[], completeCallback?: an
   useEffect(() => {
     // subscribe to order changes
     if (readyState === ReadyState.OPEN) return
-    const config = JSON.stringify({
+    let config: any = {
       type: 'subscribe',
       channel: 'orders',
       requestId: Date.now().toString(),
-      payload: {
-        makerAssetProxyId: '0xf47261b0',
-        takerAssetProxyId: '0xf47261b0',
-      },
-    })
-    sendMessage(config)
-  }, [readyState, sendMessage])
+    }
+    if (networkId === SupportedNetworks.Mainnet) {
+      config = {
+        ...config,
+        payload: {
+          makerAssetProxyId: '0xf47261b0',
+          takerAssetProxyId: '0xf47261b0',
+        },
+      }
+    }
+    sendMessage(JSON.stringify(config))
+  }, [readyState, sendMessage, networkId])
 
   // filter out invalid orders every 5 sec
   useEffect(() => {
