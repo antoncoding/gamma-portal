@@ -131,6 +131,10 @@ export function use0xOrderBooks(oTokens: SubgraphOToken[], completeCallback?: an
       type: 'subscribe',
       channel: 'orders',
       requestId: Date.now().toString(),
+      payload: {
+        makerAssetProxyId: '0xf47261b0',
+        takerAssetProxyId: '0xf47261b0',
+      },
     })
     sendMessage(config)
   }, [readyState, sendMessage])
