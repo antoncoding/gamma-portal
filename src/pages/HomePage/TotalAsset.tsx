@@ -42,9 +42,11 @@ export default function TotalAsset() {
 
   const tvl = useMemo(
     () =>
-      assetBalances.reduce((prev, curr) => {
-        return prev.plus(curr.price.times(curr.balance))
-      }, new BigNumber(0)),
+      assetBalances
+        .reduce((prev, curr) => {
+          return prev.plus(curr.price.times(curr.balance))
+        }, new BigNumber(0))
+        .integerValue(),
     [assetBalances],
   )
 
@@ -57,7 +59,7 @@ export default function TotalAsset() {
           const token = new web3.eth.Contract(erc20Abi, collateral.id)
           const price = collateral.symbol === 'USDC' ? new BigNumber(1) : await getTokenPriceCoingecko(collateral.id)
           const rawBalance: string = await token.methods.balanceOf(poolAddress).call()
-          const balance = toTokenAmount(rawBalance, collateral.decimals).integerValue()
+          const balance = toTokenAmount(rawBalance, collateral.decimals)
           return { token: collateral, balance, price }
         }),
       )

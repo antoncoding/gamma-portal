@@ -8,7 +8,7 @@ import {
   OTokenOrderBook,
   OTokenOrderBookWithDetail,
 } from '../types'
-import { ZeroXEndpoint, getUSDC, zx_exchange, OrderType, Errors } from '../constants'
+import { ZeroXEndpoint, getUSDC, zx_exchange, OrderType, Errors, MIN_BID, MAX_ASK } from '../constants'
 import { sleep } from '../utils/others'
 import { toTokenAmount } from './math'
 const Promise = require('bluebird')
@@ -56,8 +56,8 @@ export async function getBasePairAskAndBids(oTokens: OToken[], networkId: 1 | 42
         const { asks, bids } = await getOTokenUSDCOrderBook(networkId, oTokenAddr)
         return {
           id: oTokenAddr,
-          asks: asks.filter(record => isValid(record)),
-          bids: bids.filter(record => isValid(record)),
+          asks: asks.filter(record => isValidAsk(record)),
+          bids: bids.filter(record => isValidBid(record)),
         }
       }),
       sleep(COOLDOWN * 1000),
@@ -99,8 +99,8 @@ export const getOrderBookDetail = (basicBook: OTokenOrderBook | undefined): OTok
     }
   }
 
-  const bids = basicBook.bids.filter(order => isValid(order))
-  const asks = basicBook.asks.filter(order => isValid(order))
+  const bids = basicBook.bids.filter(order => isValidBid(order))
+  const asks = basicBook.asks.filter(order => isValidAsk(order))
 
   const { bestBidPrice, totalBidAmt } = getBidsSummary(bids)
   const { bestAskPrice, totalAskAmt } = getAsksSummary(asks)
@@ -207,10 +207,20 @@ export async function getOTokenUSDCOrderBook(
   }
 }
 
+export const isValidBid = (entry: OrderWithMetaData) => {
+  const bidPrice = getBidPrice(entry.order, 6, 8)
+  return bidPrice.gt(MIN_BID) && isValid(entry)
+}
+
+export const isValidAsk = (entry: OrderWithMetaData) => {
+  const askPrice = getAskPrice(entry.order, 6, 8)
+  return askPrice.lt(MAX_ASK) && isValid(entry)
+}
+
 /**
  * Return true if the order is valid
  */
-export const isValid = (entry: OrderWithMetaData) => {
+const isValid = (entry: OrderWithMetaData) => {
   const FILL_BUFFER = 35
   const notExpired = parseInt(entry.order.expirationTimeSeconds, 10) > Date.now() / 1000 + FILL_BUFFER
   const notDust = getOrderFillRatio(entry).gt(5) // got at least 5% unfill

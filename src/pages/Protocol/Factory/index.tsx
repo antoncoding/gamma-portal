@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import ReactGA from 'react-ga'
 import { Row, Col } from 'react-grid-system'
 import BigNumber from 'bignumber.js'
+import moment from 'moment'
 import {
   Header,
   TextInput,
@@ -41,15 +42,6 @@ export default function CreateOption() {
   const [isDuplicated, setIsDuplicated] = useState(false)
   const [isCreating, setIsCreating] = useState(Boolean)
   const [targetAddress, setTargetAddress] = useState(ZERO_ADDR)
-
-  // const expiryDate = useMemo(() => {
-  //   try {
-  //     const date = new Date(expiryTimestamp.times(1000).toNumber()).toISOString().split('T')[0]
-  //     return date
-  //   } catch (error) {
-  //     return ''
-  //   }
-  // }, [expiryTimestamp])
 
   const { allProducts } = useAllProducts()
 
@@ -176,10 +168,12 @@ export default function CreateOption() {
         <CellQuarter>
           <LabelText label="Expiry Timestamp" />
           <TextInput
-            type="number"
-            value={expiryTimestamp}
+            type="date"
+            value={moment.utc(expiryTimestamp.toNumber() * 1000).format('yyyy-MM-DD')}
             onChange={e => {
-              setExpiryTimestamp(new BigNumber(e.target.value))
+              const date = moment.utc(e.target.value)
+              date.set({ hour: 8 })
+              setExpiryTimestamp(new BigNumber(date.unix()))
             }}
             wide
           />
