@@ -3,7 +3,7 @@ import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { ZeroXEndpoint, OrderType, SupportedNetworks } from '../constants'
 import { useConnectedWallet } from '../contexts/wallet'
 import { OrderWithMetaData, SubgraphOToken, OTokenOrderBook } from '../types'
-import { categorizeOrder, getBasePairAskAndBids, sortBids, sortAsks, isValid } from '../utils/0x-utils'
+import { categorizeOrder, getBasePairAskAndBids, sortBids, sortAsks, isValidBid, isValidAsk } from '../utils/0x-utils'
 
 enum OrderbookUpdateType {
   Init,
@@ -42,7 +42,7 @@ function orderbookReducer(
               orderBookForThisOToken.bids.push(orderInfo)
               orderBookForThisOToken.bids = orderBookForThisOToken.bids.sort(sortBids)
             }
-            orderBookForThisOToken.bids = orderBookForThisOToken.bids.filter(isValid)
+            orderBookForThisOToken.bids = orderBookForThisOToken.bids.filter(isValidBid)
           } else {
             // no orderbook for this oToken
             if (orderInfo.metaData.remainingFillableTakerAssetAmount !== '0') {
@@ -61,7 +61,7 @@ function orderbookReducer(
               orderBookForThisOToken.asks.push(orderInfo)
               orderBookForThisOToken.asks = orderBookForThisOToken.asks.sort(sortAsks)
             }
-            orderBookForThisOToken.asks = orderBookForThisOToken.asks.filter(isValid)
+            orderBookForThisOToken.asks = orderBookForThisOToken.asks.filter(isValidAsk)
           } else {
             // no orderbook for this oToken
             if (orderInfo.metaData.remainingFillableTakerAssetAmount !== '0') {
@@ -76,8 +76,8 @@ function orderbookReducer(
     case OrderbookUpdateType.Expire: {
       const orderbooksCopy = [...books]
       for (let orderbook of orderbooksCopy) {
-        orderbook.bids = orderbook.bids.filter(order => isValid(order))
-        orderbook.asks = orderbook.asks.filter(order => isValid(order))
+        orderbook.bids = orderbook.bids.filter(order => isValidBid(order))
+        orderbook.asks = orderbook.asks.filter(order => isValidAsk(order))
       }
       return orderbooksCopy
     }
