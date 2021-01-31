@@ -7,7 +7,6 @@ import { useConnectedWallet } from '../contexts/wallet'
 
 export function useOTokenTrades(
   token: string,
-  secsBack: number,
   refetchInterval?: number,
 ): { trades: OTokenTrade[] | null; refetch: Function; isLoading: boolean } {
   const [trades, setTrades] = useState<OTokenTrade[]>([])
@@ -24,7 +23,7 @@ export function useOTokenTrades(
 
   useEffect(() => {
     async function fetchTrades() {
-      const trades = await getOTokenTrades(networkId, token, secsBack, toast)
+      const trades = await getOTokenTrades(networkId, token, toast)
       if (trades === null) return
       setIsLoadig(false)
       setTrades(trades)
@@ -32,7 +31,7 @@ export function useOTokenTrades(
     fetchTrades()
     const interval = setInterval(fetchTrades, refetchInterval ? refetchInterval * 1000 : 10000)
     return () => clearInterval(interval)
-  }, [networkId, token, toast, refetchInterval, refreshCount, secsBack])
+  }, [networkId, token, toast, refetchInterval, refreshCount])
 
   return { trades, isLoading, refetch }
 }

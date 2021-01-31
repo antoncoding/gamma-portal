@@ -70,14 +70,11 @@ export async function getAccount(
 export async function getOTokenTrades(
   networkId: SupportedNetworks,
   otoken: string,
-  secsBack: number,
   errorCallback: Function,
 ): Promise<null | OTokenTrade[]> {
-  const start = (Date.now() / 1000 - secsBack).toFixed(0)
   const query = `{
     otokenTrades(where: {
       oToken_contains: "${otoken}"
-      timestamp_gt: "${start}"
     }) {
       oTokenAmount
       paymentTokenAmount
