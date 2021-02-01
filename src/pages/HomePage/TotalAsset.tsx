@@ -16,9 +16,6 @@ export default function TotalAsset() {
 
   const { networkId, web3 } = useConnectedWallet()
 
-  console.log(`networkid,,`, networkId)
-  console.log(`web3`, web3)
-
   const [assetBalances, setAssetBalances] = useState<{ token: SubgraphToken; balance: BigNumber; price: BigNumber }[]>(
     [],
   )

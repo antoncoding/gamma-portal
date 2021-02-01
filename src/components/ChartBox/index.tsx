@@ -11,11 +11,11 @@ type CharBoxProps = {
 
 export function ChartBox({ title, description, children, onClickDescription = () => {} }: CharBoxProps) {
   return (
-    <LinkBase>
+    <LinkBase style={{ width: '100%', paddingBottom: 20 }}>
       <Box>
         <div style={{ fontSize: 18, paddingBottom: 20 }}>{title}</div>
         {children}
-        <div style={{ paddingTop: 10, opacity: 0.5 }}>
+        <div style={{ paddingTop: 14, opacity: 0.5 }}>
           {' '}
           <span onClick={onClickDescription as any}> {description} </span>{' '}
         </div>
