@@ -2,22 +2,21 @@ import { useCallback, useMemo } from 'react'
 import ReactGA from 'react-ga'
 import BigNumber from 'bignumber.js'
 import { useConnectedWallet } from '../contexts/wallet'
-import { useToast } from '@aragon/ui'
 
 import { addresses, ZERO_ADDR } from '../constants/addresses'
 
 import { useNotify } from './useNotify'
+import { useCustomToast } from './useCustomToast'
 
 const abi = require('../constants/abis/factory.json')
 
 export function useFactory() {
-  const toast = useToast()
+  const toast = useCustomToast()
 
   const { networkId, user, web3 } = useConnectedWallet()
   const { notifyCallback } = useNotify()
 
   const factory = useMemo(() => {
-    if (!web3) return null
     const address = addresses[networkId].factory
     return new web3.eth.Contract(abi, address)
   }, [networkId, web3])
@@ -31,7 +30,7 @@ export function useFactory() {
       expiry: BigNumber,
       isPut: boolean,
     ) => {
-      if (!factory) return toast('No wallet connected')
+      if (!factory) return toast.error('No wallet connected')
       ReactGA.event({ category: 'factory', action: 'createOtoken' })
       await factory.methods
         .createOtoken(underlying, strike, collateral, strikePrice.toString(), expiry.toString(), isPut)
@@ -50,7 +49,10 @@ export function useFactory() {
       expiry: BigNumber,
       isPut: boolean,
     ): Promise<boolean> => {
-      if (!factory) return toast('No wallet connected')
+      if (!factory) {
+        toast.error('No wallet connected')
+        return false
+      }
       const deployedAddress = await factory.methods
         .getOtoken(underlying, strike, collateral, strikePrice.toString(), expiry.toString(), isPut)
         .call()
@@ -69,7 +71,7 @@ export function useFactory() {
       expiry: BigNumber,
       isPut: boolean,
     ) => {
-      if (!factory) return toast('No wallet connected')
+      if (!factory) return toast.error('No wallet connected')
       const targetAddress = await factory.methods
         .getTargetOtokenAddress(underlying, strike, collateral, strikePrice.toString(), expiry.toString(), isPut)
         .call()

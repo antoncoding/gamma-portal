@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { DataView, useToast, TransactionBadge } from '@aragon/ui'
+import { DataView, TransactionBadge } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
 
 import { useConnectedWallet } from '../../../contexts/wallet'
@@ -18,17 +18,18 @@ import { SubgraphVaultAction } from '../../../types'
 import useAsyncMemo from '../../../hooks/useAsyncMemo'
 
 import { VAULT_HISTORY } from '../../../constants/dataviewContents'
+import { useCustomToast } from '../../../hooks'
 
 export default function VaultHistory() {
   const [isLoading, setIsLoading] = useState(true)
 
   const { networkId } = useConnectedWallet()
   const { owner, vaultId } = useParams()
-  const toast = useToast()
+  const toast = useCustomToast()
 
   const history = useAsyncMemo(
     async () => {
-      const historyData = await getVaultHistory(networkId, owner, vaultId, toast)
+      const historyData = await getVaultHistory(networkId, owner, vaultId, toast.error)
       if (historyData === null) {
         setIsLoading(false)
         return []

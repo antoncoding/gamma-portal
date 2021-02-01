@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import ReactGA from 'react-ga'
-import { Header, DataView, DropDown, useToast, Tag, Help } from '@aragon/ui'
+import { Header, DataView, DropDown, Tag, Help } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
 import LabelText from '../../../components/LabelText'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
@@ -14,6 +14,7 @@ import { SubgraphPriceEntry } from '../../../types'
 import { pricerMap } from './config'
 import { ZERO_ADDR } from '../../../constants/addresses'
 import { PRICE_SUBMISSION } from '../../../constants/dataviewContents'
+import { useCustomToast } from '../../../hooks'
 
 export default function Oracle() {
   const { networkId } = useConnectedWallet()
@@ -22,14 +23,14 @@ export default function Oracle() {
     ReactGA.pageview('/protocol/oracle/')
   }, [])
 
-  const toast = useToast()
+  const toast = useCustomToast()
   const [isLoadingHistory, setIsLoadingHistory] = useState(true)
   const [selectedAssetIndex, setSelectedAssetIndex] = useState(-1)
   const [assetHistory, setAssetHistory] = useState<SubgraphPriceEntry[]>([])
 
   const allOracleAssets = useAsyncMemo(
     async () => {
-      const assets = await getOracleAssetsAndPricers(networkId, toast)
+      const assets = await getOracleAssetsAndPricers(networkId, toast.error)
       setIsLoadingHistory(false)
       if (assets && assets.length > 0) setSelectedAssetIndex(0)
       return assets === null ? [] : assets

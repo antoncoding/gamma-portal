@@ -16,6 +16,9 @@ export default function TotalAsset() {
 
   const { networkId, web3 } = useConnectedWallet()
 
+  console.log(`networkid,,`, networkId)
+  console.log(`web3`, web3)
+
   const [assetBalances, setAssetBalances] = useState<{ token: SubgraphToken; balance: BigNumber; price: BigNumber }[]>(
     [],
   )
@@ -53,7 +56,6 @@ export default function TotalAsset() {
   useEffect(() => {
     let cancel = false
     async function syncBalances() {
-      if (!web3) return
       const balances = await Promise.all(
         assets.map(async collateral => {
           const token = new web3.eth.Contract(erc20Abi, collateral.id)

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import ReactGA from 'react-ga'
-import { Button, DataView, TextInput, Header, useToast, Tag } from '@aragon/ui'
+import { Button, DataView, TextInput, Header, Tag } from '@aragon/ui'
 import { useParams } from 'react-router-dom'
 
 import { useConnectedWallet } from '../../../contexts/wallet'
@@ -12,6 +12,7 @@ import { knownOperators } from '../../../constants/addresses'
 import { OPERATORS } from '../../../constants/dataviewContents'
 import { isEOA } from '../../../utils/others'
 import { useController } from '../../../hooks/useController'
+import { useCustomToast } from '../../../hooks'
 
 export default function OperatorSection() {
   const { account } = useParams()
@@ -23,13 +24,13 @@ export default function OperatorSection() {
   const [isLoading, setIsLoading] = useState(true)
   const { networkId, user } = useConnectedWallet()
 
-  const toast = useToast()
+  const toast = useCustomToast()
 
   // fetch account data, check if each operator is EOA
   const operators = useAsyncMemo(
     async () => {
       if (!account) return []
-      const accountData = await getAccount(networkId, account, toast)
+      const accountData = await getAccount(networkId, account, toast.error)
       const operatorsRelations = accountData ? accountData.operators : []
       const operatorsWithExtraInfo = await Promise.all(
         operatorsRelations.map(async relation => {

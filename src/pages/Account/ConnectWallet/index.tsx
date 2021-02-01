@@ -1,18 +1,19 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import ReactGA from 'react-ga'
 import { useHistory } from 'react-router-dom'
-import { TextInput, DataView, Button, LinkBase, EthIdenticon, useToast, Header } from '@aragon/ui'
+import { TextInput, DataView, Button, LinkBase, EthIdenticon, Header } from '@aragon/ui'
 import { getPreference, checkAddressAndAddToStorage } from '../../../utils/storage'
 
 import Comment from '../../../components/Comment'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { isAddress } from '../../../utils/math'
 import { resolveENS } from '../../../utils/others'
+import { useCustomToast } from '../../../hooks'
 
 function Login() {
-  const { user, networkId } = useConnectedWallet()
+  const { user, setUser, networkId } = useConnectedWallet()
   const history = useHistory()
-  const toast = useToast()
+  const toast = useCustomToast()
   const [InAddress, setAddress] = useState('')
   const [addrs, setAddrLisrt] = useState([])
 
@@ -69,7 +70,8 @@ function Login() {
                   <LinkBase
                     onClick={() => {
                       checkAddressAndAddToStorage(address)
-                      goToAccount(address)
+                      setUser(address)
+                      // goToAccount(address)
                     }}
                   >
                     {/* <IdentityBadge entity={address} /> */}
@@ -89,14 +91,16 @@ function Login() {
             onClick={async () => {
               if (isAddress(InAddress)) {
                 checkAddressAndAddToStorage(InAddress)
-                goToAccount(InAddress)
+                setUser(InAddress)
+                // goToAccount(InAddress)
               } else {
                 try {
                   const address = await resolveENS(InAddress, networkId)
                   checkAddressAndAddToStorage(address)
-                  goToAccount(address)
+                  setUser(address)
+                  // goToAccount(address)
                 } catch (error) {
-                  toast('Invalid Address')
+                  toast.error('Invalid Address')
                 }
               }
             }}

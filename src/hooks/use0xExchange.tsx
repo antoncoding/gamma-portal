@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from 'react'
 import ReactGA from 'react-ga'
 import BigNumber from 'bignumber.js'
-import { useToast } from '@aragon/ui'
 import { useConnectedWallet } from '../contexts/wallet'
 import { addresses, ZeroXEndpoint, SupportedNetworks } from '../constants'
 import { useNotify } from './useNotify'
 import { SignedOrder } from '../types'
 import { useGasPrice } from './useGasPrice'
+import { useCustomToast } from './useCustomToast'
 import { zx_exchange, ZEROX_PROTOCOL_FEE_KEY, FeeTypes } from '../constants'
 import { assetDataUtils, signatureUtils, SupportedProvider } from '@0x/order-utils'
 import { MetamaskSubprovider } from '@0x/subproviders'
@@ -20,7 +20,7 @@ const abi = require('../constants/abis/0xExchange.json')
 export function use0xExchange() {
   const payWithWeth = useMemo(() => getPreference(ZEROX_PROTOCOL_FEE_KEY, FeeTypes.ETH) === FeeTypes.WETH, [])
 
-  const toast = useToast()
+  const toast = useCustomToast()
   const { networkId, web3, user } = useConnectedWallet()
 
   const track = useCallback(
@@ -67,7 +67,6 @@ export function use0xExchange() {
       expiry: number,
       takerAddress?: string,
     ) => {
-      if (!web3) return toast('No Wallet Connected')
       const exchangeAddress = zx_exchange[networkId]
       const salt = BigNumber.random(20)
         .times(new BigNumber(10).pow(new BigNumber(20)))
@@ -95,13 +94,12 @@ export function use0xExchange() {
       return signatureUtils.ecSignOrderAsync(provider, order, user)
       // return order;
     },
-    [networkId, user, web3, toast, track],
+    [networkId, user, web3, track],
   )
 
   const fillOrders = useCallback(
     async (orders: SignedOrder[], amounts: BigNumber[]) => {
-      if (!web3) return toast('No wallet detected')
-      if (!orders.length) return toast('No Orders selected')
+      if (!orders.length) return toast.error('No Orders selected')
       const exchange = new web3.eth.Contract(abi, addresses[networkId].zeroxExchange)
 
       const signatures = orders.map(order => order.signature)
@@ -126,7 +124,6 @@ export function use0xExchange() {
 
   const fillOrder = useCallback(
     async (order: SignedOrder, amount: BigNumber) => {
-      if (!web3) return toast('No wallet detected')
       const exchange = new web3.eth.Contract(abi, addresses[networkId].zeroxExchange)
 
       const signature = order.signature
@@ -145,7 +142,7 @@ export function use0xExchange() {
         .on('transactionHash', notifyCallback)
       track('fill-order')
     },
-    [networkId, getProtocolFee, getGasPriceForOrders, notifyCallback, toast, user, web3, track, payWithWeth],
+    [networkId, getProtocolFee, getGasPriceForOrders, notifyCallback, user, web3, track, payWithWeth],
   )
 
   const broadcastOrder = useCallback(
@@ -158,16 +155,15 @@ export function use0xExchange() {
         },
         body: JSON.stringify([order]),
       })
-      if (res.status === 200) return toast('Order successfully broadcasted')
+      if (res.status === 200) return toast.success('Order successfully broadcasted')
       const jsonRes = await res.json()
-      toast(jsonRes.validationErrors[0].reason)
+      toast.error(jsonRes.validationErrors[0].reason)
     },
     [httpEndpoint, toast],
   )
 
   const cancelOrders = useCallback(
     async (orders: SignedOrder[], callback: Function) => {
-      if (!web3) return toast('No wallet detected')
       const exchange = new web3.eth.Contract(abi, addresses[networkId].zeroxExchange)
 
       await exchange.methods
@@ -179,7 +175,7 @@ export function use0xExchange() {
       track('cancel-order')
       callback()
     },
-    [web3, notifyCallback, toast, networkId, track, user],
+    [web3, notifyCallback, networkId, track, user],
   )
 
   return { getProtocolFee, fillOrders, fillOrder, createOrder, broadcastOrder, cancelOrders }

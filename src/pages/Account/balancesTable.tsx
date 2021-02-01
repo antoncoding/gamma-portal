@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 import { useHistory } from 'react-router-dom'
-import { DataView, Button, useToast, Split, Tag } from '@aragon/ui'
+import { DataView, Button, Split, Tag } from '@aragon/ui'
 import SectionTitle from '../../components/SectionHeader'
 import OpynTokenAmount from '../../components/OpynTokenAmount'
 import { useOTokenBalances } from '../../hooks/useOTokenBalances'
@@ -16,11 +16,12 @@ import { useController } from '../../hooks/useController'
 import { getOracleAssetsAndPricers } from '../../utils/graph'
 import useAsyncMemo from '../../hooks/useAsyncMemo'
 import { green, secondary } from '../Trade/OrderBookTrade/StyleDiv'
+import { useCustomToast } from '../../hooks'
 
 export default function AccountBalances({ account }: { account: string }) {
   const { networkId, user } = useConnectedWallet()
 
-  const toast = useToast()
+  const toast = useCustomToast()
 
   const history = useHistory()
 
@@ -28,7 +29,7 @@ export default function AccountBalances({ account }: { account: string }) {
 
   const allOracleAssets = useAsyncMemo(
     async () => {
-      const assets = await getOracleAssetsAndPricers(networkId, toast)
+      const assets = await getOracleAssetsAndPricers(networkId, toast.error)
       return assets === null ? [] : assets
     },
     [],
@@ -39,7 +40,7 @@ export default function AccountBalances({ account }: { account: string }) {
 
   const redeemToken = useCallback(
     async (token: string, amount: BigNumber) => {
-      if (user !== account) return toast('Connected account is not the owner.')
+      if (user !== account) return toast.error('Connected account is not the owner.')
 
       await redeemBatch(user, [token], [amount])
     },
@@ -65,7 +66,7 @@ export default function AccountBalances({ account }: { account: string }) {
   )
 
   const redeemAll = useCallback(async () => {
-    if (user !== account) return toast('Connected account is not the owner.')
+    if (user !== account) return toast.error('Connected account is not the owner.')
     const tokens = tokensToRedeem.map(t => t.token.id)
     const amounts = tokensToRedeem.map(b => b.balance)
     await redeemBatch(user, tokens, amounts)

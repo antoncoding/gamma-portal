@@ -168,7 +168,7 @@ export default function LimitTicket({
       expiry,
     )
 
-    await broadcastOrder(order)
+    if (order) await broadcastOrder(order as any)
   }, [
     finalDeadlineUnit,
     createOrder,

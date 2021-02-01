@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react'
 import { assetDataUtils } from '@0x/order-utils'
-import { DataView, Timer, useToast, Button, LoadingRing } from '@aragon/ui'
+import { DataView, Timer, Button, LoadingRing } from '@aragon/ui'
 import { SubgraphOToken, OrderWithMetaData } from '../../../types'
 import { useOrderbook } from '../../../contexts/orderbook'
 import { getAskPrice, getBidPrice, getRemainingAmounts } from '../../../utils/0x-utils'
@@ -11,6 +11,7 @@ import { simplifyOTokenSymbol } from '../../../utils/others'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { getUSDC } from '../../../constants'
 import { use0xExchange } from '../../../hooks/use0xExchange'
+import { useCustomToast } from '../../../hooks'
 
 type OrderbookProps = {
   selectedOToken: SubgraphOToken | null
@@ -66,7 +67,7 @@ export default function UserOrders({ selectedOToken }: OrderbookProps) {
     setSelected(indexes)
   }, [])
 
-  const toast = useToast()
+  const toast = useCustomToast()
 
   const cancel = useCallback(async () => {
     setIsCancelling(true)
@@ -78,7 +79,7 @@ export default function UserOrders({ selectedOToken }: OrderbookProps) {
       })
     } catch (error) {
       setIsCancelling(false)
-      toast(error.message)
+      toast.error(error.message)
     }
   }, [cancelOrders, toast, entries, selectedIdxs])
 
