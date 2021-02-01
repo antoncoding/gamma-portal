@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect } from 'react'
 
-import { useToast } from '@aragon/ui'
 import { OTokenTrade } from '../types'
 import { getOTokenTrades } from '../utils/graph'
 import { useConnectedWallet } from '../contexts/wallet'
+import { useCustomToast } from './useCustomToast'
 
 export function useOTokenTrades(
   token: string,
@@ -13,7 +13,7 @@ export function useOTokenTrades(
 
   const [refreshCount, setRefreshCount] = useState(0)
   const [isLoading, setIsLoadig] = useState(true)
-  const toast = useToast()
+  const toast = useCustomToast()
 
   const { networkId } = useConnectedWallet()
 
@@ -23,7 +23,7 @@ export function useOTokenTrades(
 
   useEffect(() => {
     async function fetchTrades() {
-      const trades = await getOTokenTrades(networkId, token, toast)
+      const trades = await getOTokenTrades(networkId, token, toast.error)
       if (trades === null) return
       setIsLoadig(false)
       setTrades(trades)

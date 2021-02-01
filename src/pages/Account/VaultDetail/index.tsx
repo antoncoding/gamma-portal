@@ -6,7 +6,6 @@ import {
   TextInput,
   Button,
   DataView,
-  useToast,
   Tag,
   Header,
   IconCirclePlus,
@@ -32,6 +31,7 @@ import { isExpired, isSettlementAllowed } from '../../../utils/others'
 import { ZERO_ADDR, tokens } from '../../../constants/addresses'
 import { SubgraphOToken } from '../../../types'
 import { useController } from '../../../hooks/useController'
+import { useCustomToast } from '../../../hooks'
 
 export default function VaultDetail() {
   useEffect(() => {
@@ -58,7 +58,7 @@ export default function VaultDetail() {
 
   const { networkId, user } = useConnectedWallet()
   const { owner, vaultId } = useParams()
-  const toast = useToast()
+  const toast = useCustomToast()
 
   const [fetchCount, setFetchCount] = useState(0)
   const refetch = useCallback(() => {
@@ -67,7 +67,7 @@ export default function VaultDetail() {
 
   const vaultDetail = useAsyncMemo(
     async () => {
-      const result = await getVault(networkId, owner, vaultId, toast)
+      const result = await getVault(networkId, owner, vaultId, toast.error)
       setIsLoading(false)
       return result
     },
@@ -158,7 +158,7 @@ export default function VaultDetail() {
 
   const pushAddCollateral = useCallback(() => {
     if (collateralToken.id === ZERO_ADDR) {
-      toast('Select collateral asset first')
+      toast.info('Select collateral asset first')
       return
     }
     controller.pushAddCollateralArg(
@@ -174,7 +174,7 @@ export default function VaultDetail() {
 
   const pushRemoveCollateral = useCallback(() => {
     if (collateralToken.id === ZERO_ADDR) {
-      toast('Select collateral asset first')
+      toast.info('Select collateral asset first')
       return
     }
     controller.pushRemoveCollateralArg(
@@ -190,7 +190,7 @@ export default function VaultDetail() {
 
   const pushAddLong = useCallback(() => {
     if (!longOtoken) {
-      toast('No long token selected')
+      toast.info('No long token selected')
       return
     }
     const oToken = vaultDetail && vaultDetail.longOToken ? vaultDetail.longOToken.id : longOtoken.id
@@ -201,7 +201,7 @@ export default function VaultDetail() {
 
   const pushRemoveLong = useCallback(() => {
     if (!longOtoken) {
-      toast('No long token selected')
+      toast.info('No long token selected')
       return
     }
     const oToken = vaultDetail && vaultDetail.longOToken ? vaultDetail.longOToken.id : longOtoken.id
@@ -212,7 +212,7 @@ export default function VaultDetail() {
 
   const pushMint = useCallback(() => {
     if (!shortOtoken) {
-      toast('No short token selected')
+      toast.info('No short token selected')
       return
     }
     const oToken = vaultDetail && vaultDetail.shortOToken ? vaultDetail.shortOToken.id : shortOtoken.id
@@ -223,7 +223,7 @@ export default function VaultDetail() {
 
   const pushBurn = useCallback(async () => {
     if (!shortOtoken) {
-      toast('No short token selected')
+      toast.info('No short token selected')
       return
     }
     const oToken = vaultDetail && vaultDetail.shortOToken ? vaultDetail.shortOToken.id : shortOtoken.id

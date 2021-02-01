@@ -9,7 +9,6 @@ import {
   LinkBase,
   TextCopy,
   EthIdenticon,
-  useToast,
   LoadingRing,
 } from '@aragon/ui'
 import { SubgraphOToken } from '../../../types'
@@ -32,6 +31,7 @@ import TokenBalanceEntry from '../../../components/TokenBalanceEntry'
 import LabelText from '../../../components/LabelText'
 import SectionHeader from '../../../components/SectionHeader'
 import Comment from '../../../components/Comment'
+import { useCustomToast } from '../../../hooks'
 
 type TradeDetailProps = {
   oTokenBalance: BigNumber
@@ -41,7 +41,7 @@ type TradeDetailProps = {
 
 export default function MakeOrderDetail({ selectedOToken, usdcBalance, oTokenBalance }: TradeDetailProps) {
   const { networkId } = useConnectedWallet()
-  const toast = useToast()
+  const toast = useCustomToast()
   const [action, setAction] = useState<TradeAction>(TradeAction.Buy)
 
   const [inputTokenAmount, setInputTokenAmount] = useState<BigNumber>(new BigNumber(0))
@@ -217,7 +217,7 @@ export default function MakeOrderDetail({ selectedOToken, usdcBalance, oTokenBal
     const objJsonStr = JSON.stringify(order)
     const encodedOrder = Buffer.from(objJsonStr).toString('base64')
     setSignedOrder(encodedOrder)
-    toast('Order successfully created 🎉')
+    toast.success('Order successfully created')
   }, [
     toast,
     finalDeadlineUnit,

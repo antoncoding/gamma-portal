@@ -1,20 +1,20 @@
 import { useState } from 'react'
-import { useToast } from '@aragon/ui'
 
 import { useConnectedWallet } from '../contexts/wallet'
 import { getLiveOTokens, getLiveOTokensIsSeries } from '../utils/graph'
 import { useAsyncMemo } from '../hooks/useAsyncMemo'
+import { useCustomToast } from './useCustomToast'
 
 export function useLiveOTokens() {
   const { networkId } = useConnectedWallet()
-  const toast = useToast()
+  const toast = useCustomToast()
 
   const [isLoading, setIsLoading] = useState(true)
 
   const allOtokens = useAsyncMemo(
     async () => {
       try {
-        const result = await getLiveOTokens(networkId, toast)
+        const result = await getLiveOTokens(networkId, toast.error)
         setIsLoading(false)
         return result ? result : []
       } catch (error) {
@@ -31,7 +31,7 @@ export function useLiveOTokens() {
 
 export function useOTokenInSeries(underlying: string | undefined, strike: string | undefined) {
   const { networkId } = useConnectedWallet()
-  const toast = useToast()
+  const toast = useCustomToast()
 
   const [isLoading, setIsLoading] = useState(true)
 
@@ -40,8 +40,8 @@ export function useOTokenInSeries(underlying: string | undefined, strike: string
       try {
         const result =
           underlying && strike
-            ? await getLiveOTokensIsSeries(networkId, underlying, strike, toast)
-            : await getLiveOTokens(networkId, toast)
+            ? await getLiveOTokensIsSeries(networkId, underlying, strike, toast.error)
+            : await getLiveOTokens(networkId, toast.error)
         setIsLoading(false)
         return result ? result : []
       } catch (error) {

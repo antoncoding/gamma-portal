@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
-import { useToast } from '@aragon/ui'
 import { useConnectedWallet } from '../contexts/wallet'
 import { useAsyncMemo } from '../hooks/useAsyncMemo'
 import { getWhitelistedProducts } from '../utils/graph'
 import { SubgraphToken } from '../types'
+import { useCustomToast } from './useCustomToast'
 
 type Product = {
   id: string
@@ -16,11 +16,11 @@ type Product = {
 
 export function useAllProducts(): { allProducts: Product[] } {
   const { networkId } = useConnectedWallet()
-  const toast = useToast()
+  const toast = useCustomToast()
 
   const allProducts = useAsyncMemo(
     async () => {
-      const products = await getWhitelistedProducts(networkId, toast)
+      const products = await getWhitelistedProducts(networkId, toast.error)
       if (products === null) return []
 
       return products.map(product => {

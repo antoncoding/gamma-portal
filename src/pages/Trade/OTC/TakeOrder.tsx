@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react'
-import { TextInput, useToast, Button, Timer, IconUnlock, LoadingRing } from '@aragon/ui'
+import { TextInput, Button, Timer, IconUnlock, LoadingRing } from '@aragon/ui'
 import { assetDataUtils, ERC20AssetData } from '@0x/order-utils'
 import BigNumber from 'bignumber.js'
 import { OTokenBalance, SignedOrder, SubgraphOToken, Token } from '../../../types'
@@ -15,6 +15,7 @@ import { getPreference } from '../../../utils/storage'
 import { use0xExchange } from '../../../hooks/use0xExchange'
 import WarningText from '../../../components/Warning'
 import { useUserAllowance } from '../../../hooks/useAllowance'
+import { useCustomToast } from '../../../hooks'
 
 type TakerOrderProps = {
   oTokenBalances: OTokenBalance[] | null
@@ -30,7 +31,7 @@ export default function TakerOrder({ oTokenBalances, wethBalance, usdcBalance, a
 
   const usdc = useMemo(() => getUSDC(networkId), [networkId])
 
-  const toast = useToast()
+  const toast = useCustomToast()
 
   const [encodedOrder, setEncodedOrder] = useState('')
 
@@ -78,7 +79,7 @@ export default function TakerOrder({ oTokenBalances, wethBalance, usdcBalance, a
       setMakerAsset(makerAsset)
       setTakerAsset(takerAsset)
     } catch (error) {
-      toast('Decode failed 😭')
+      toast.error('Decode order failed')
     }
   }, [encodedOrder, allOtokens, usdcBalance, usdc, toast])
 
@@ -95,7 +96,7 @@ export default function TakerOrder({ oTokenBalances, wethBalance, usdcBalance, a
   ])
 
   const handleFillOrder = useCallback(async () => {
-    if (!order) return toast('No order selected 😭')
+    if (!order) return toast.error('No order selected')
     await fillOrder(order, new BigNumber(order.takerAssetAmount))
   }, [fillOrder, order, toast])
 
@@ -105,12 +106,12 @@ export default function TakerOrder({ oTokenBalances, wethBalance, usdcBalance, a
   )
 
   const approveOToken = useCallback(async () => {
-    if (!order) return toast('No order selected')
+    if (!order) return toast.error('No order selected')
     setIsApproving(true)
     try {
       await approve(new BigNumber(order.takerAssetAmount))
     } catch (error) {
-      toast(error.message)
+      toast.error(error.message)
     } finally {
       setIsApproving(false)
     }

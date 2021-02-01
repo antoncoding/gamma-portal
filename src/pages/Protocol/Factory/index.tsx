@@ -3,17 +3,7 @@ import ReactGA from 'react-ga'
 import { Row, Col } from 'react-grid-system'
 import BigNumber from 'bignumber.js'
 import moment from 'moment'
-import {
-  Header,
-  TextInput,
-  Button,
-  DropDown,
-  useToast,
-  LoadingRing,
-  AddressField,
-  Help,
-  SyncIndicator,
-} from '@aragon/ui'
+import { Header, TextInput, Button, DropDown, LoadingRing, AddressField, Help, SyncIndicator } from '@aragon/ui'
 import LabelText from '../../../components/LabelText'
 import Warning from '../../../components/Warning'
 import { getNextFriday, fromTokenAmount } from '../../../utils/math'
@@ -23,6 +13,7 @@ import { ZERO_ADDR } from '../../../constants/addresses'
 import WarningText from '../../../components/Warning'
 import { useFactory } from '../../../hooks/useFactory'
 import { useAllProducts } from '../../../hooks/useAllProducts'
+import { useCustomToast } from '../../../hooks'
 
 export default function CreateOption() {
   const factory = useFactory()
@@ -31,7 +22,7 @@ export default function CreateOption() {
     ReactGA.pageview('/protocol/factory/')
   }, [])
 
-  const toast = useToast()
+  const toast = useCustomToast()
   const [selectedProductIndex, setSelectedProductIndex] = useState(-1)
 
   const [strikePriceReadable, setStrikePriceReadable] = useState<BigNumber>(new BigNumber(500))
@@ -59,7 +50,7 @@ export default function CreateOption() {
 
   const createOToken = useCallback(async () => {
     if (selectedProductIndex === -1) {
-      toast('Please select a product')
+      toast.info('Please select a product')
       return
     }
     const underlying = allProducts[selectedProductIndex].underlying

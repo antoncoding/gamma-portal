@@ -2,7 +2,6 @@ import { useCallback, useState, useMemo, useEffect } from 'react'
 import ReactGA from 'react-ga'
 import BigNumber from 'bignumber.js'
 import { useConnectedWallet } from '../contexts/wallet'
-import { useToast } from '@aragon/ui'
 
 import { addresses } from '../constants/addresses'
 import { actionArg, ActionType } from '../types'
@@ -12,12 +11,13 @@ import { MAX_UINT } from '../constants/others'
 import * as util from '../utils/controller'
 import { useNotify } from './useNotify'
 import { SupportedNetworks } from '../constants'
+import { useCustomToast } from './useCustomToast'
 
 const abi = require('../constants/abis/controller.json')
 const erc20Abi = require('../constants/abis/erc20.json')
 
 export function useController() {
-  const toast = useToast()
+  const toast = useCustomToast()
 
   const { networkId, user, web3 } = useConnectedWallet()
 
@@ -55,12 +55,12 @@ export function useController() {
 
   const operate = useCallback(
     async (args: actionArg[]) => {
-      if (!controller) return toast('No wallet connected')
+      if (!controller) return toast.error('No wallet connected')
       try {
         await controller.methods.operate(args).send({ from: user }).on('transactionHash', notifyCallback)
       } catch (error) {
         const message = error.message ? error.message : error.toString()
-        toast(message)
+        toast.error(message)
       }
     },
     [notifyCallback, controller, user, toast],
@@ -74,7 +74,7 @@ export function useController() {
 
   const openVault = useCallback(
     async account => {
-      if (!controller) return toast('No wallet connected')
+      if (!controller) return toast.error('No wallet connected')
       const counter = await controller.methods.getAccountVaultCounter(account).call()
       const newVulatId = new BigNumber(counter).plus(1)
       const openArg = util.createOpenVaultArg(account, newVulatId)
@@ -141,7 +141,7 @@ export function useController() {
 
   const settleBatch = useCallback(
     async (account: string, vaultIds: number[], to: string) => {
-      if (!web3) return toast('No wallet connected')
+      if (!web3) return toast.error('No wallet connected')
       const args = vaultIds.map(id => util.createSettleArg(account, to, new BigNumber(id)))
       track('settle-batch')
       await operate(args)
@@ -155,7 +155,7 @@ export function useController() {
       for (let i = 0; i < tokens.length; i++) {
         args.push(util.createRedeemArg(tokens[i], amounts[i].toString(), to))
       }
-      if (args.length === 0) return toast('No tokens to redeem.')
+      if (args.length === 0) return toast.error('No tokens to redeem.')
       track('redeem-batch')
       await operate(args)
     },
@@ -163,7 +163,7 @@ export function useController() {
   )
 
   const refreshConfig = useCallback(async () => {
-    if (controller === null) return toast('No wallet connected')
+    if (controller === null) return toast.error('No wallet connected')
     await controller.methods.refreshConfiguration().send({ from: user }).on('transactionHash', notifyCallback)
   }, [notifyCallback, user, controller, toast])
 
@@ -186,7 +186,7 @@ export function useController() {
       // check allowance to add long
       if (!controller) {
         onError()
-        return toast('No wallet connected')
+        return toast.error('No wallet connected')
       }
       const addLongAction = actions.find(action => action.actionType === ActionType.DepositLongOption)
       if (addLongAction !== undefined) {
@@ -206,7 +206,7 @@ export function useController() {
           actions.unshift(util.createOpenVaultArg(user, new BigNumber(actionVaultId)))
         } else if (actionVaultId > latestVaultId + 1) {
           onError()
-          return toast(`Cannot operate on vault id > ${latestVaultId + 1} `)
+          return toast.error(`Cannot operate on vault id > ${latestVaultId + 1} `)
         }
       }
 
@@ -219,7 +219,7 @@ export function useController() {
           .on('error', onError)
         setActions([])
       } catch (error) {
-        toast(error.message)
+        toast.error(error.message)
         onError()
       }
 
@@ -234,7 +234,7 @@ export function useController() {
 
   const updateOperator = useCallback(
     async (operator: string, isOperator: boolean) => {
-      if (!controller) return toast('No wallet connected')
+      if (!controller) return toast.error('No wallet connected')
       track('update-operator')
       await controller.methods
         .setOperator(operator, isOperator)

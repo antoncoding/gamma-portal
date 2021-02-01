@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react'
 import ReactGA from 'react-ga'
 import { useHistory, useParams } from 'react-router-dom'
-import { Button, DataView, useToast, Header, Tag, Help } from '@aragon/ui'
+import { Button, DataView, Header, Tag, Help } from '@aragon/ui'
 import useAsyncMemo from '../../../hooks/useAsyncMemo'
 import { getAccount } from '../../../utils/graph'
 
@@ -13,6 +13,7 @@ import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 import { VAULTS } from '../../../constants/dataviewContents'
 import { useController } from '../../../hooks/useController'
 import { isSettlementAllowed } from '../../../utils/others'
+import { useCustomToast } from '../../../hooks'
 
 export default function AccountVaults() {
   const { networkId, user } = useConnectedWallet()
@@ -22,12 +23,12 @@ export default function AccountVaults() {
   }, [])
   const [isLoading, setIsLoading] = useState(true)
 
-  const toast = useToast()
+  const toast = useCustomToast()
 
   const vaults = useAsyncMemo(
     async () => {
       if (!account) return
-      const result = await getAccount(networkId, account, toast)
+      const result = await getAccount(networkId, account, toast.error)
       setIsLoading(false)
       return result ? result.vaults.sort((v1, v2) => (Number(v1.vaultId) > Number(v2.vaultId) ? 1 : -1)) : []
     },
