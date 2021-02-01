@@ -8,6 +8,7 @@ import { TokenAmount, LinkBase, Modal, AddressField } from '@aragon/ui'
 import ETH from '../../imgs/ETH.png'
 import WBTC from '../../imgs/WBTC.png'
 import oETH from '../../imgs/oETH.svg'
+import oBTC from '../../imgs/oBTC.png'
 import USDC from '../../imgs/USDC.png'
 import { simplifyOTokenSymbol } from '../../utils/others'
 
@@ -32,6 +33,8 @@ export default function OpynTokenAmount({ token, amount, chainId }: TokenAmountP
       : (token as SubgraphOToken).underlyingAsset
       ? (token as SubgraphOToken).underlyingAsset.symbol === 'WETH'
         ? oETH
+        : (token as SubgraphOToken).underlyingAsset.symbol === 'WBTC'
+        ? oBTC
         : null
       : null
   }, [token])
