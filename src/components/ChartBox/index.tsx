@@ -11,7 +11,7 @@ type CharBoxProps = {
 
 export function ChartBox({ title, description, children, onClickDescription = () => {} }: CharBoxProps) {
   return (
-    <LinkBase>
+    <LinkBase style={{ width: '100%', paddingBottom: 20 }}>
       <Box>
         <div style={{ fontSize: 18, paddingBottom: 20 }}>{title}</div>
         {children}
