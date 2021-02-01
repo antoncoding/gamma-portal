@@ -21,7 +21,6 @@ export const useTokenBalance = (token: string, account: string, refetchIntervalS
     async function updateBalance() {
       if (!token) return
       if (!account) return
-      if (!web3) return
       const price = await getBalance(web3, token, account)
       if (!isCancelled) setBalance(price)
     }

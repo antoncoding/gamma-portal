@@ -42,7 +42,6 @@ export function useUserAllowance(token: string, spender: Spenders) {
   )
 
   useEffect(() => {
-    if (!web3) return
     if (user === '') return
     const erc = new web3.eth.Contract(abi, token)
     erc.methods

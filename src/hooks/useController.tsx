@@ -34,7 +34,6 @@ export function useController() {
   const { notifyCallback } = useNotify()
 
   const controller = useMemo(() => {
-    if (!web3) return null
     const address = addresses[networkId].controller
     return new web3.eth.Contract(abi, address)
   }, [networkId, web3])
@@ -131,22 +130,20 @@ export function useController() {
 
   const pushBurnArg = useCallback(
     (account: string, vaultId: BigNumber, from: string, asset: string, amount: BigNumber) => {
-      if (!web3) return
       const arg = util.createBurnShortArg(account, from, vaultId, asset, amount)
       pushAction(arg)
       track('burn-short')
     },
-    [pushAction, web3, track],
+    [pushAction, track],
   )
 
   const settleBatch = useCallback(
     async (account: string, vaultIds: number[], to: string) => {
-      if (!web3) return toast.error('No wallet connected')
       const args = vaultIds.map(id => util.createSettleArg(account, to, new BigNumber(id)))
       track('settle-batch')
       await operate(args)
     },
-    [operate, web3, toast, track],
+    [operate, track],
   )
 
   const redeemBatch = useCallback(
@@ -169,7 +166,6 @@ export function useController() {
 
   const checkAndIncreaseAllowance = useCallback(
     async (erc20: string, from: string, amount: string) => {
-      if (!web3) return
       const pool = addresses[networkId].pool
       const token = new web3.eth.Contract(erc20Abi, erc20)
       const allowance = await token.methods.allowance(from, pool).call()

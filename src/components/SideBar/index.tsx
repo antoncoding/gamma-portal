@@ -19,7 +19,7 @@ export default function SideBar() {
     setSelectedSubButton(locationToSubButtomId(location))
   })
 
-  const { user, readOnlyUser } = useConnectedWallet()
+  const { user } = useConnectedWallet()
 
   const defaultSelectedTab = locationToTabId(history.location)
 
@@ -61,7 +61,7 @@ export default function SideBar() {
         <SubButton
           title="Operators"
           onClick={() => {
-            history.push(`/account/${user ? user : readOnlyUser}/operators/`)
+            history.push(`/account/${user}/operators/`)
           }}
           isSelected={selectedTab === 2 && subSelected === 'operators'}
           shown={selectedTab === 2}
@@ -69,7 +69,7 @@ export default function SideBar() {
         <SubButton
           title="Vaults"
           onClick={() => {
-            history.push(`/account/${user ? user : readOnlyUser}/vaults/`)
+            history.push(`/account/${user}/vaults/`)
           }}
           isSelected={selectedTab === 2 && subSelected === 'vaults'}
           shown={selectedTab === 2}

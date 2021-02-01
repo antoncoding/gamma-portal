@@ -67,7 +67,6 @@ export function use0xExchange() {
       expiry: number,
       takerAddress?: string,
     ) => {
-      if (!web3) return toast.error('No Wallet Connected')
       const exchangeAddress = zx_exchange[networkId]
       const salt = BigNumber.random(20)
         .times(new BigNumber(10).pow(new BigNumber(20)))
@@ -95,12 +94,11 @@ export function use0xExchange() {
       return signatureUtils.ecSignOrderAsync(provider, order, user)
       // return order;
     },
-    [networkId, user, web3, toast, track],
+    [networkId, user, web3, track],
   )
 
   const fillOrders = useCallback(
     async (orders: SignedOrder[], amounts: BigNumber[]) => {
-      if (!web3) return toast.error('No wallet detected')
       if (!orders.length) return toast.error('No Orders selected')
       const exchange = new web3.eth.Contract(abi, addresses[networkId].zeroxExchange)
 
@@ -126,7 +124,6 @@ export function use0xExchange() {
 
   const fillOrder = useCallback(
     async (order: SignedOrder, amount: BigNumber) => {
-      if (!web3) return toast.error('No wallet detected')
       const exchange = new web3.eth.Contract(abi, addresses[networkId].zeroxExchange)
 
       const signature = order.signature
@@ -145,7 +142,7 @@ export function use0xExchange() {
         .on('transactionHash', notifyCallback)
       track('fill-order')
     },
-    [networkId, getProtocolFee, getGasPriceForOrders, notifyCallback, toast, user, web3, track, payWithWeth],
+    [networkId, getProtocolFee, getGasPriceForOrders, notifyCallback, user, web3, track, payWithWeth],
   )
 
   const broadcastOrder = useCallback(
@@ -167,7 +164,6 @@ export function use0xExchange() {
 
   const cancelOrders = useCallback(
     async (orders: SignedOrder[], callback: Function) => {
-      if (!web3) return toast.error('No wallet detected')
       const exchange = new web3.eth.Contract(abi, addresses[networkId].zeroxExchange)
 
       await exchange.methods
@@ -179,7 +175,7 @@ export function use0xExchange() {
       track('cancel-order')
       callback()
     },
-    [web3, notifyCallback, toast, networkId, track, user],
+    [web3, notifyCallback, networkId, track, user],
   )
 
   return { getProtocolFee, fillOrders, fillOrder, createOrder, broadcastOrder, cancelOrders }

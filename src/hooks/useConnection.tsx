@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { getPreference, storePreference } from '../utils/storage'
 import Onboard from 'bnc-onboard'
 import Web3 from 'web3'
+import { SupportedNetworks } from '../constants'
 
 const INFURA_KEY = process.env.REACT_APP_INFURA_KEY
 const BLOCKNATIVE_KEY = process.env.REACT_APP_BLOCKNATIVE_KEY
@@ -9,11 +10,11 @@ const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY
 
 export const useConnection = () => {
   const [user, setUser] = useState<string>('')
-  const [readOnlyUser, setReadOnlyUser] = useState<string>('')
-  const [web3, setWeb3] = useState<Web3 | null>(null)
+
+  const [web3, setWeb3] = useState<Web3>(new Web3(`https://mainnet.infura.io/v3/${INFURA_KEY}`))
 
   const storedNetwork = Number(getPreference('gamma-networkId', '1'))
-  const [networkId, setNetworkId] = useState<number>(storedNetwork)
+  const [networkId, setNetworkId] = useState<SupportedNetworks>(storedNetwork)
 
   // function for block native sdk when address is updated
   const setAddressCallback = useCallback((address: string | undefined) => {
@@ -76,7 +77,7 @@ export const useConnection = () => {
     setUser('')
   }, [onboard])
 
-  return { networkId, user, setUser, web3, connect, disconnect, readOnlyUser, setReadOnlyUser }
+  return { networkId, user, setUser, web3, connect, disconnect }
 }
 
 export const initOnboard = (addressChangeCallback, walletChangeCallback, networkChangeCallback, networkId) => {

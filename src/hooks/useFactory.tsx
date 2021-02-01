@@ -17,7 +17,6 @@ export function useFactory() {
   const { notifyCallback } = useNotify()
 
   const factory = useMemo(() => {
-    if (!web3) return null
     const address = addresses[networkId].factory
     return new web3.eth.Contract(abi, address)
   }, [networkId, web3])

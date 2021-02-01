@@ -11,7 +11,7 @@ import { resolveENS } from '../../../utils/others'
 import { useCustomToast } from '../../../hooks'
 
 function Login() {
-  const { user, networkId } = useConnectedWallet()
+  const { user, setUser, networkId } = useConnectedWallet()
   const history = useHistory()
   const toast = useCustomToast()
   const [InAddress, setAddress] = useState('')
@@ -70,7 +70,8 @@ function Login() {
                   <LinkBase
                     onClick={() => {
                       checkAddressAndAddToStorage(address)
-                      goToAccount(address)
+                      setUser(address)
+                      // goToAccount(address)
                     }}
                   >
                     {/* <IdentityBadge entity={address} /> */}
@@ -90,12 +91,14 @@ function Login() {
             onClick={async () => {
               if (isAddress(InAddress)) {
                 checkAddressAndAddToStorage(InAddress)
-                goToAccount(InAddress)
+                setUser(InAddress)
+                // goToAccount(InAddress)
               } else {
                 try {
                   const address = await resolveENS(InAddress, networkId)
                   checkAddressAndAddToStorage(address)
-                  goToAccount(address)
+                  setUser(address)
+                  // goToAccount(address)
                 } catch (error) {
                   toast.error('Invalid Address')
                 }
