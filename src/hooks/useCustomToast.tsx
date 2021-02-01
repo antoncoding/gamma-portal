@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useToast, GU } from '@aragon/ui'
 
 export function useCustomToast() {
@@ -47,9 +47,13 @@ export function useCustomToast() {
     [toast],
   )
 
-  return {
-    error,
-    info,
-    success,
-  }
+  const state = useMemo(() => {
+    return {
+      success,
+      error,
+      info,
+    }
+  }, [success, info, error])
+
+  return state
 }
