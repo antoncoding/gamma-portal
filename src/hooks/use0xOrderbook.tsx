@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useReducer } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
-import { ZeroXEndpoint, OrderType, SupportedNetworks } from '../constants'
+import { ZeroXEndpoint, OrderType } from '../constants'
 import { useConnectedWallet } from '../contexts/wallet'
 import { OrderWithMetaData, SubgraphOToken, OTokenOrderBook } from '../types'
 import { categorizeOrder, getBasePairAskAndBids, sortBids, sortAsks, isValidBid, isValidAsk } from '../utils/0x-utils'
@@ -127,19 +127,10 @@ export function use0xOrderBooks(oTokens: SubgraphOToken[], completeCallback?: an
   useEffect(() => {
     // subscribe to order changes
     if (readyState === ReadyState.OPEN) return
-    let config: any = {
+    const config: any = {
       type: 'subscribe',
       channel: 'orders',
       requestId: Date.now().toString(),
-    }
-    if (networkId === SupportedNetworks.Mainnet) {
-      config = {
-        ...config,
-        payload: {
-          makerAssetProxyId: '0xf47261b0',
-          takerAssetProxyId: '0xf47261b0',
-        },
-      }
     }
     sendMessage(JSON.stringify(config))
   }, [readyState, sendMessage, networkId])
