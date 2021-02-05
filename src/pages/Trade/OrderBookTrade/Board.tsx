@@ -2,7 +2,7 @@ import React, { useMemo, useCallback, useState } from 'react'
 
 import { DataView, Radio, SyncIndicator } from '@aragon/ui'
 import { SubgraphOToken } from '../../../types'
-import { OTOKENS_BOARD } from '../../../constants/dataviewContents'
+import { OTOKENS_BOARD, OTOKENS_BOARD_FILTERED } from '../../../constants/dataviewContents'
 import { SHOW_EMPTY } from '../../../constants'
 import { toTokenAmount } from '../../../utils/math'
 import { useOrderbook } from '../../../contexts/orderbook'
@@ -233,7 +233,7 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken, spot
           'iv',
           'amt',
         ]}
-        emptyState={OTOKENS_BOARD}
+        emptyState={showEmpty ? OTOKENS_BOARD : OTOKENS_BOARD_FILTERED}
         entries={rowsWithGreeks}
         renderEntry={renderRow}
       />

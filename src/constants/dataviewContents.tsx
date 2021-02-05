@@ -48,6 +48,18 @@ export const OTOKENS_BOARD = {
   },
 }
 
+export const OTOKENS_BOARD_FILTERED = {
+  default: {
+    title: 'No Liquidity',
+    subtitle: 'Try checking "show empty" to see all availabe oTokens',
+    illustration: EmptyState,
+  },
+  loading: {
+    title: 'Loading',
+    subtitle: 'Fetching oTokens ',
+  },
+}
+
 export const OTOKENS = {
   default: {
     title: 'No oTokens',

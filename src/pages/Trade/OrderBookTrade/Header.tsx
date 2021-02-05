@@ -30,12 +30,13 @@ export default function TradeHeadBar({ underlying, spotPrice, setOTokens, setSel
 
   const uniqueExpiries = useMemo(() => {
     return allOToken
+      .filter(o => o.underlyingAsset.id === series?.underlying.id)
       .reduce((prev: string[], curr) => {
         if (!prev.includes(curr.expiryTimestamp)) return [...prev, curr.expiryTimestamp]
         return prev
       }, [])
       .sort((a, b) => (Number(a) > Number(b) ? 1 : -1))
-  }, [allOToken])
+  }, [allOToken, series])
 
   const expiry = useMemo(() => (uniqueExpiries.length === 0 ? null : uniqueExpiries[expiryId]), [
     uniqueExpiries,
