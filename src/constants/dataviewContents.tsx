@@ -21,16 +21,16 @@ export const generateNoUserOrderContent = (symbol: string) => {
   }
 }
 
-export const generateNoOrderContent = (type: 'bids' | 'asks', symbol: string) => {
+export const generateNoOrderContent = (symbol: string) => {
   return {
     default: {
-      title: `No ${type} 🥺`,
-      subtitle: `No ${type} orders for ${symbol}`,
+      title: `No orders 🥺`,
+      subtitle: `No orders for ${symbol}`,
       illustration: null,
     },
     loading: {
       title: 'Loading',
-      subtitle: `Fetching ${type}`,
+      subtitle: `Fetching 0x orders`,
       illustration: null,
     },
   }

@@ -323,7 +323,11 @@ export const broadcastOrders = async (networkId: 1 | 42, orders: SignedOrder[]) 
 /**
  * Calculate the price of a bid order
  */
-export const getBidPrice = (bid: SignedOrder, makerAssetDecimals: number, takerAssetDecimals: number): BigNumber => {
+export const getBidPrice = (
+  bid: SignedOrder,
+  makerAssetDecimals: number = 6,
+  takerAssetDecimals: number = 8,
+): BigNumber => {
   const makerAssetAmount = toTokenAmount(new BigNumber(bid.makerAssetAmount), makerAssetDecimals)
   const takerAssetAmount = toTokenAmount(new BigNumber(bid.takerAssetAmount), takerAssetDecimals)
   return makerAssetAmount.div(takerAssetAmount)
@@ -357,7 +361,11 @@ export const sortAsks = (a: OrderWithMetaData, b: OrderWithMetaData): 1 | -1 => 
  * takerAssetAmount 100 weth
  * makerAssetAmount 1 oToken
  */
-export const getAskPrice = (ask: SignedOrder, makerAssetDecimals: number, takerAssetDecimals: number): BigNumber => {
+export const getAskPrice = (
+  ask: SignedOrder,
+  makerAssetDecimals: number = 8,
+  takerAssetDecimals: number = 6,
+): BigNumber => {
   const makerAssetAmount = toTokenAmount(new BigNumber(ask.makerAssetAmount), makerAssetDecimals)
   const takerAssetAmount = toTokenAmount(new BigNumber(ask.takerAssetAmount), takerAssetDecimals)
   return takerAssetAmount.div(makerAssetAmount)

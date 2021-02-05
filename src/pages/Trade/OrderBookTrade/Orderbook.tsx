@@ -1,4 +1,5 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useCallback, useState, useMemo } from 'react'
+import { assetDataUtils } from '@0x/order-utils'
 
 import { DataView, Timer } from '@aragon/ui'
 import { SubgraphOToken, OrderWithMetaData } from '../../../types'
@@ -7,20 +8,20 @@ import { getAskPrice, getBidPrice, getRemainingAmounts } from '../../../utils/0x
 import { green, red } from './StyleDiv'
 import { toTokenAmount } from '../../../utils/math'
 import { generateNoOrderContent, NO_TOKEN_SELECTED } from '../../../constants/dataviewContents'
-import { TradeAction } from '../../../constants'
+import { TradeAction, getUSDC } from '../../../constants'
 import { simplifyOTokenSymbol } from '../../../utils/others'
+import { useConnectedWallet } from '../../../contexts/wallet'
 
 type OrderbookProps = {
   selectedOToken: SubgraphOToken | null
   action: TradeAction
-  showBoth: boolean
 }
 
-export default function Orderbook({ showBoth, selectedOToken, action }: OrderbookProps) {
-  const [askPage, setAskPage] = useState(0)
-  const [bidPage, setBidPage] = useState(0)
+export default function Orderbook({ selectedOToken, action }: OrderbookProps) {
+  const [page, setPage] = useState(0)
 
   const { orderbooks } = useOrderbook()
+  const { networkId } = useConnectedWallet()
 
   const [bids, setBids] = useState<OrderWithMetaData[]>([])
   const [asks, setAsks] = useState<OrderWithMetaData[]>([])
@@ -36,60 +37,47 @@ export default function Orderbook({ showBoth, selectedOToken, action }: Orderboo
     }
   }, [selectedOToken, orderbooks])
 
-  const renderAskRow = useCallback(
-    (order: OrderWithMetaData) => [
-      red(getAskPrice(order.order, 8, 6).toFixed(4)),
-      toTokenAmount(getRemainingAmounts(order).remainingMakerAssetAmount, 8).toFixed(2),
-      <Timer format="ms" showIcon end={new Date(Number(order.order.expirationTimeSeconds) * 1000)} />,
-    ],
-    [],
+  const usdc = useMemo(() => getUSDC(networkId), [networkId])
+
+  const renderRow = useCallback(
+    (order: OrderWithMetaData) => {
+      const isBid = assetDataUtils.encodeERC20AssetData(usdc.id) === order.order.makerAssetData
+
+      const remainingAmounts = isBid
+        ? toTokenAmount(order.metaData.remainingFillableTakerAssetAmount, 8).toFixed(2)
+        : toTokenAmount(getRemainingAmounts(order).remainingMakerAssetAmount, 8).toFixed(2)
+
+      const price = isBid
+        ? green(getBidPrice(order.order, 6, 8).toFixed(4))
+        : red(getAskPrice(order.order, 8, 6).toFixed(4))
+
+      return [
+        price,
+        remainingAmounts,
+        <Timer format="ms" showIcon end={new Date(Number(order.order.expirationTimeSeconds) * 1000)} />,
+      ]
+    },
+    [usdc],
   )
 
-  const renderBidRow = useCallback(
-    (order: OrderWithMetaData) => [
-      green(getBidPrice(order.order, 6, 8).toFixed(4)),
-      toTokenAmount(order.metaData.remainingFillableTakerAssetAmount, 8).toFixed(2),
-      <Timer format="ms" showIcon end={new Date(Number(order.order.expirationTimeSeconds) * 1000)} />,
-    ],
-    [],
-  )
+  const allEntries = useMemo(() => {
+    const askReversed = asks.sort((a, b) => (getAskPrice(a.order).gt(getAskPrice(b.order)) ? -1 : 1))
+    return askReversed.concat(bids)
+  }, [bids, asks])
 
   return (
-    <div>
-      {(action === TradeAction.Buy || showBoth) && (
-        <DataView
-          emptyState={
-            selectedOToken
-              ? generateNoOrderContent('asks', simplifyOTokenSymbol(selectedOToken?.symbol))
-              : NO_TOKEN_SELECTED
-          }
-          entriesPerPage={6}
-          page={askPage}
-          onPageChange={setAskPage}
-          entries={asks}
-          tableRowHeight={40}
-          renderSelectionCount={x => `${x} Orders Selected`}
-          fields={['ask price', 'amount', 'expiration']}
-          renderEntry={renderAskRow}
-        />
-      )}
-      {(action === TradeAction.Sell || showBoth) && (
-        <DataView
-          emptyState={
-            selectedOToken
-              ? generateNoOrderContent('bids', simplifyOTokenSymbol(selectedOToken?.symbol))
-              : NO_TOKEN_SELECTED
-          }
-          entriesPerPage={6}
-          page={bidPage}
-          onPageChange={setBidPage}
-          entries={bids}
-          tableRowHeight={40}
-          renderSelectionCount={x => `${x} Orders Selected`}
-          fields={['bid price', 'amount', 'expiration']}
-          renderEntry={renderBidRow}
-        />
-      )}
-    </div>
+    <DataView
+      emptyState={
+        selectedOToken ? generateNoOrderContent(simplifyOTokenSymbol(selectedOToken?.symbol)) : NO_TOKEN_SELECTED
+      }
+      entriesPerPage={12}
+      page={page}
+      onPageChange={setPage}
+      entries={allEntries}
+      tableRowHeight={36}
+      renderSelectionCount={x => `${x} Orders Selected`}
+      fields={['price', 'amount', 'expiration']}
+      renderEntry={renderRow}
+    />
   )
 }

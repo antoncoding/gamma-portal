@@ -11,7 +11,7 @@ import PriceChart from './PriceChart'
 
 import CheckBoxWithLabel from '../../../components/CheckBoxWithLabel'
 import { SubgraphOToken } from '../../../types'
-import { TradeAction, SHOW_BOTH_KEY, SHOW_MINE_KEY } from '../../../constants'
+import { TradeAction, SHOW_MINE_KEY } from '../../../constants'
 import { useTokenPrice } from '../../../hooks'
 import { emptyToken } from '../../../constants/addresses'
 import { getPreference } from '../../../utils/storage'
@@ -25,7 +25,6 @@ export default function TradePage() {
   const [oTokens, setOTokens] = useState<SubgraphOToken[]>([])
   const [action, setAction] = useState<TradeAction>(TradeAction.Buy)
 
-  const [showBoth, setShowBoth] = useState(getPreference(SHOW_BOTH_KEY, 'false') === 'true')
   const [showMyOrder, setShowMyOrder] = useState(getPreference(SHOW_MINE_KEY, 'false') === 'true')
 
   const [mintPanelOpened, setMintPanelOpened] = useState(false)
@@ -48,15 +47,9 @@ export default function TradePage() {
       />
       <Row style={{ display: 'flex', paddingTop: '15px' }}>
         <Col sm={12} md={4}>
-          <Orderbook selectedOToken={selectedOToken} action={action} showBoth={showBoth} />
+          <Orderbook selectedOToken={selectedOToken} action={action} />
           {showMyOrder && <UserOrders selectedOToken={selectedOToken} />}
           <div style={{ display: 'flex' }}>
-            <CheckBoxWithLabel
-              checked={showBoth}
-              setChecked={setShowBoth}
-              storageKey={SHOW_BOTH_KEY}
-              label={`Show ${action === TradeAction.Buy ? 'bids' : 'asks'}`}
-            />
             <CheckBoxWithLabel
               checked={showMyOrder}
               setChecked={setShowMyOrder}
