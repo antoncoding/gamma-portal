@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react'
 import { assetDataUtils } from '@0x/order-utils'
-import { DataView, Timer, Button, LoadingRing } from '@aragon/ui'
+import { DataView, Timer, Button, LoadingRing, CircleGraph } from '@aragon/ui'
 import { SubgraphOToken, OrderWithMetaData } from '../../../types'
 import { useOrderbook } from '../../../contexts/orderbook'
 import { getAskPrice, getBidPrice, getRemainingAmounts } from '../../../utils/0x-utils'
@@ -12,6 +12,7 @@ import { useConnectedWallet } from '../../../contexts/wallet'
 import { getUSDC } from '../../../constants'
 import { use0xExchange } from '../../../hooks/use0xExchange'
 import { useCustomToast } from '../../../hooks'
+import BigNumber from 'bignumber.js'
 
 type OrderbookProps = {
   selectedOToken: SubgraphOToken | null
@@ -45,17 +46,21 @@ export default function UserOrders({ selectedOToken }: OrderbookProps) {
   const renderRow = useCallback(
     (order: OrderWithMetaData) => {
       const usdcAssetData = assetDataUtils.encodeERC20AssetData(usdc.id)
+      const filled =
+        1 - new BigNumber(order.metaData.remainingFillableTakerAssetAmount).div(order.order.takerAssetAmount).toNumber()
       if (order.order.makerAssetData === usdcAssetData) {
         // bid
         return [
           green(getBidPrice(order.order, 6, 8).toFixed(4)),
           toTokenAmount(order.metaData.remainingFillableTakerAssetAmount, 8).toFixed(2),
+          <CircleGraph value={filled} size={30} strokeWidth={3} />,
           <Timer format="ms" showIcon end={new Date(Number(order.order.expirationTimeSeconds) * 1000)} />,
         ]
       } else {
         return [
           red(getAskPrice(order.order, 8, 6).toFixed(4)),
           toTokenAmount(getRemainingAmounts(order).remainingMakerAssetAmount, 8).toFixed(2),
+          <CircleGraph value={filled} size={30} strokeWidth={3} />,
           <Timer format="ms" showIcon end={new Date(Number(order.order.expirationTimeSeconds) * 1000)} />,
         ]
       }
@@ -101,7 +106,7 @@ export default function UserOrders({ selectedOToken }: OrderbookProps) {
             onSelectEntries={onSelectEntries}
             selection={selectedIdxs}
             renderSelectionCount={x => `${x} Orders Selected`}
-            fields={['My Orders', 'amount', 'expiration']}
+            fields={['My Orders', 'amount', 'filled', 'expiration']}
             renderEntry={renderRow}
           />
           {selectedIdxs.length > 0 && (
