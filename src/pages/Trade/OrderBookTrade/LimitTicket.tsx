@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import { Row, Col } from 'react-grid-system'
-import { Button, TextInput, IconArrowRight, IconUnlock } from '@aragon/ui'
+import { Button, TextInput, IconArrowRight, IconUnlock, LoadingRing } from '@aragon/ui'
 import EditOrderDeadlineModal from './EditOrderDeadlineModal'
 import { SubgraphOToken, OTokenBalance } from '../../../types'
 
@@ -71,16 +71,21 @@ export default function LimitTicket({
   ])
 
   const [needApprove, setNeedApprove] = useState(true)
+  const [isApproving, setIsApproving] = useState(false)
+
   const { allowance: usdcAllowance, approve: approveUSDC } = useUserAllowance(paymentToken.id, Spenders.ZeroXERC20Proxy)
   const { allowance: oTokenAllowance, approve: approveOToken } = useUserAllowance(
     selectedOToken.id,
     Spenders.ZeroXERC20Proxy,
   )
 
-  const approve = useCallback(() => {
+  const approve = useCallback(async () => {
     const rawInputAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals)
-    if (action === TradeAction.Buy) approveUSDC(rawInputAmount)
-    else approveOToken(rawInputAmount)
+    setIsApproving(true)
+    if (action === TradeAction.Buy) await approveUSDC(rawInputAmount)
+    else await approveOToken(rawInputAmount)
+
+    setIsApproving(false)
   }, [inputTokenAmount, inputToken, action, approveUSDC, approveOToken])
 
   const inputIcon = useMemo(
@@ -245,7 +250,14 @@ export default function LimitTicket({
           mode={action === TradeAction.Buy ? 'positive' : 'negative'}
           onClick={createAndPost}
         />
-        {needApprove && <Button label="approve" icon={<IconUnlock />} display="icon" onClick={approve} />}
+        {needApprove && (
+          <Button
+            label="approve"
+            icon={isApproving ? <LoadingRing /> : <IconUnlock />}
+            display="icon"
+            onClick={approve}
+          />
+        )}
       </div>
     </>
   )

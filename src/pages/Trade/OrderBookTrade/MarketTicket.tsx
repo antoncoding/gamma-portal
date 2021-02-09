@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import { Row, Col } from 'react-grid-system'
 import BigNumber from 'bignumber.js'
-import { Button, TextInput, IconArrowRight, IconUnlock, Timer } from '@aragon/ui'
+import { Button, TextInput, IconArrowRight, IconUnlock, Timer, LoadingRing } from '@aragon/ui'
 import { SubgraphOToken, SignedOrder, OTokenBalance } from '../../../types'
 
 import { calculateOrderInput, calculateOrderOutput } from '../../../utils/0x-utils'
@@ -92,16 +92,20 @@ export default function MarketTicket({
   ])
 
   const [needApprove, setNeedApprove] = useState(true)
+  const [isApproving, setIsApproving] = useState(false)
+
   const { allowance: usdcAllowance, approve: approveUSDC } = useUserAllowance(paymentToken.id, Spenders.ZeroXERC20Proxy)
   const { allowance: oTokenAllowance, approve: approveOToken } = useUserAllowance(
     selectedOToken.id,
     Spenders.ZeroXERC20Proxy,
   )
 
-  const approve = useCallback(() => {
+  const approve = useCallback(async () => {
+    setIsApproving(true)
     const rawInputAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals)
-    if (action === TradeAction.Buy) approveUSDC(rawInputAmount)
-    else approveOToken(rawInputAmount)
+    if (action === TradeAction.Buy) await approveUSDC(rawInputAmount)
+    else await approveOToken(rawInputAmount)
+    setIsApproving(false)
   }, [inputTokenAmount, inputToken, action, approveUSDC, approveOToken])
 
   const inputIcon = useMemo(
@@ -118,12 +122,19 @@ export default function MarketTicket({
     return getProtocolFee(ordersToFill)
   }, [getProtocolFee, ordersToFill])
 
+  const [isApprovingWeth, setIsApprovingWeth] = useState(false)
   const { allowance: wethAllowance, approve: approveWeth } = useUserAllowance(weth.id, Spenders.ZeroXStaking)
   const needApproveWeth = useMemo(() => payFeeWithWeth && toTokenAmount(wethAllowance, 18).lt(protocolFee), [
     protocolFee,
     wethAllowance,
     payFeeWithWeth,
   ])
+
+  const handleClickUnlockWeth = useCallback(async () => {
+    setIsApprovingWeth(true)
+    await approveWeth()
+    setIsApprovingWeth(false)
+  }, [approveWeth])
 
   const hasEnoughWeth = useMemo(() => protocolFee.lte(toTokenAmount(wethBalance, 18)), [protocolFee, wethBalance])
 
@@ -286,8 +297,22 @@ export default function MarketTicket({
           mode={action === TradeAction.Buy ? 'positive' : 'negative'}
           onClick={fill}
         />
-        {needApprove && <Button label="approve" icon={<IconUnlock />} display="icon" onClick={approve} />}
-        {needApproveWeth && <Button label="approve" icon={<IconUnlock />} display="icon" onClick={approveWeth} />}
+        {needApprove && (
+          <Button
+            label="approve"
+            icon={isApproving ? <LoadingRing /> : <IconUnlock />}
+            display="icon"
+            onClick={approve}
+          />
+        )}
+        {needApproveWeth && (
+          <Button
+            label="approve"
+            icon={isApprovingWeth ? <LoadingRing /> : <IconUnlock />}
+            display="icon"
+            onClick={handleClickUnlockWeth}
+          />
+        )}
       </div>
     </>
   )

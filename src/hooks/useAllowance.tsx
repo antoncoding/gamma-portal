@@ -25,12 +25,12 @@ export function useUserAllowance(token: string, spender: Spenders) {
   const { notifyCallback } = useNotify()
 
   const approve = useCallback(
-    async (amount: BigNumber) => {
+    async (amount?: BigNumber) => {
       if (!web3 || !user) return
       const approveMode = getPreference('unlimited', 'normal')
-      console.log(`approveMode`, approveMode)
+
       const erc = new web3.eth.Contract(abi, token)
-      const approveAmount = approveMode === 'normal' ? amount.toString() : MAX_UINT
+      const approveAmount = approveMode === 'normal' && amount ? amount.toString() : MAX_UINT
 
       if (spenderAddess === '') throw new Error('Unkown Spender')
 
