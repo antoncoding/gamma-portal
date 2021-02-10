@@ -61,7 +61,8 @@ export default function Orderbook({ selectedOToken, action }: OrderbookProps) {
   )
 
   const allEntries = useMemo(() => {
-    const askReversed = asks.sort((a, b) => (getAskPrice(a.order).gt(getAskPrice(b.order)) ? -1 : 1))
+    const copy = [...asks]
+    const askReversed = copy.sort((a, b) => (getAskPrice(a.order).gt(getAskPrice(b.order)) ? -1 : 1))
     return askReversed.concat(bids)
   }, [bids, asks])
 
