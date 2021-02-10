@@ -166,6 +166,18 @@ export default function MarketTicket({
     [setOutputTokenAmount],
   )
 
+  const price = useMemo(() => {
+    if (action === TradeAction.Sell) {
+      return inputTokenAmount.isZero() || inputTokenAmount.isNaN()
+        ? new BigNumber(0)
+        : outputTokenAmount.div(inputTokenAmount)
+    } else {
+      return outputTokenAmount.isZero() || outputTokenAmount.isNaN()
+        ? new BigNumber(0)
+        : inputTokenAmount.div(outputTokenAmount)
+    }
+  }, [inputTokenAmount, action, outputTokenAmount])
+
   // update numbers accordingly when 1. orderbook change, 2. user update either intput or output
   useEffect(() => {
     if (id === '') return
@@ -260,6 +272,7 @@ export default function MarketTicket({
         </Col>
       </Row>
       <br />
+      <TokenBalanceEntry label="Avg. Price" amount={price.toFixed(4)} symbol={paymentToken.symbol} />
       <TokenBalanceEntry
         label="Protocol Fee"
         amount={protocolFee.toString()}
