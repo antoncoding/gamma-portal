@@ -77,7 +77,7 @@ export default function OperatorSection() {
           <SectionTitle title="Authorized Operators" />
           <DataView
             status={isLoading ? 'loading' : 'default'}
-            fields={['contract name', 'description', 'author', 'tag', '']}
+            fields={['label', 'description', 'author', 'tag', 'action']}
             emptyState={OPERATORS}
             entries={operators}
             renderEntry={({ address, isEOA }) => {
@@ -148,7 +148,7 @@ function getOperatorDetail(address: string, networkId: SupportedNetworks, isEOA:
   let tagText = 'un-audited'
   let tagColor = '#FFC300'
   let tagBackground = '#FFF8BC'
-  let label = ''
+  let label = 'Unknown'
   let description = ''
   let author = 'Unknown'
   const operatorInfo = knownOperators[networkId].find(info => info.address === address)
