@@ -91,21 +91,33 @@ export const blacklistOTokens = {
   '42': [ZERO_ADDR],
 }
 
+type KnownOperator = {
+  address: string
+  name: string
+  description: string
+  author: string
+  audited: boolean
+}
+
 export const knownOperators: {
-  [key in SupportedNetworks]: { address: string; name: string; audited: boolean }[]
+  [key in SupportedNetworks]: KnownOperator[]
 } = {
   '1': [
     {
       address: '0x8f7dd610c457fc7cb26b0f9db4e77581f94f70ac',
       name: 'PayableProxy',
+      description: 'Proxy contract to help mint calls with ETH instead of WETH',
       audited: true,
+      author: 'Opyn',
     },
   ],
   '42': [
     {
       address: '0x5957a413f5ac4bcf2ba7c5c461a944b548adb1a5',
       name: 'PayableProxy',
+      description: 'Proxy contract to help mint calls with ETH instead of WETH',
       audited: true,
+      author: 'Opyn',
     },
   ],
 }
