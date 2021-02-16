@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import ReactGA from 'react-ga'
+import { Col, Row, Container } from 'react-grid-system'
 import { Button, DataView, TextInput, Header, Tag } from '@aragon/ui'
 import { useParams } from 'react-router-dom'
 
@@ -8,11 +9,13 @@ import { getAccount } from '../../../utils/graph'
 import useAsyncMemo from '../../../hooks/useAsyncMemo'
 import SectionTitle from '../../../components/SectionHeader'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
+import Comment from '../../../components/Comment'
 import { knownOperators } from '../../../constants/addresses'
 import { OPERATORS } from '../../../constants/dataviewContents'
 import { isEOA } from '../../../utils/others'
 import { useController } from '../../../hooks/useController'
 import { useCustomToast } from '../../../hooks'
+import { SupportedNetworks } from '../../../constants'
 
 export default function OperatorSection() {
   const { account } = useParams()
@@ -48,6 +51,11 @@ export default function OperatorSection() {
     [networkId, account],
   )
 
+  const recommendedOperators = useMemo(
+    () => knownOperators[networkId].filter(o => !operators.find(added => added.address === o.address)),
+    [networkId, operators],
+  )
+
   const [newOperatorAddr, setNewOperatorAddr] = useState('')
 
   const controller = useController()
@@ -56,79 +64,114 @@ export default function OperatorSection() {
     await controller.updateOperator(operator, false)
   }
 
-  async function addOperator() {
-    await controller.updateOperator(newOperatorAddr, true)
+  async function addCustomOperator(address: string) {
+    await controller.updateOperator(address, true)
   }
-
-  const addOperatorButton = <Button label="Add" onClick={() => addOperator()} disabled={account !== user} />
 
   return (
     <>
       <Header primary="Operators" />
       Operators are addresses which can manipulate your vaults on your behalf.
-      <SectionTitle title="Authorized Operators" />
-      <DataView
-        status={isLoading ? 'loading' : 'default'}
-        fields={['address', 'label', 'tag', '']}
-        emptyState={OPERATORS}
-        entries={operators}
-        renderEntry={({ address, isEOA }) => {
-          let tag = <> </>
-          let label = ''
-          const operatorInfo = knownOperators[networkId].find(info => info.address === address)
-          if (operatorInfo) {
-            if (!operatorInfo.audited) {
-              label = operatorInfo.name
-              tag = (
-                <Tag color="#FFC300" background="#FFF8BC">
+      {operators.length > 0 && (
+        <>
+          <SectionTitle title="Authorized Operators" />
+          <DataView
+            status={isLoading ? 'loading' : 'default'}
+            fields={['contract name', 'description', 'author', 'tag', '']}
+            emptyState={OPERATORS}
+            entries={operators}
+            renderEntry={({ address, isEOA }) => {
+              const info = getOperatorDetail(address, networkId, isEOA)
+              return [
+                <CustomIdentityBadge shorten={false} entity={address} label={info.label} />,
+                <Comment text={info.description} padding={0} />,
+                info.author,
+                <Tag color={info.tagColor} background={info.tagBackground}>
                   {' '}
-                  unverified{' '}
-                </Tag>
-              )
-            } else {
-              tag = (
-                <Tag color="#006600" background="#c2f0c2">
+                  {info.tagText}{' '}
+                </Tag>,
+                <Button label="revoke" onClick={() => revokeOperator(address)} />,
+              ]
+            }}
+          />
+        </>
+      )}
+      {recommendedOperators.length > 0 && (
+        <>
+          <SectionTitle title="Recommended Operators" />
+          <DataView
+            status={isLoading ? 'loading' : 'default'}
+            fields={['contract name', 'description', 'author', 'tag', '']}
+            entries={recommendedOperators}
+            renderEntry={operator => {
+              const info = getOperatorDetail(operator.address, networkId, false)
+              return [
+                <CustomIdentityBadge shorten={false} entity={operator.address} label={info.label} />,
+                <Comment text={info.description} padding={0} />,
+                info.author,
+                <Tag color={info.tagColor} background={info.tagBackground}>
                   {' '}
-                  audited{' '}
-                </Tag>
-              )
-              label = operatorInfo.name
-            }
-          } else if (isEOA) {
-            tag = (
-              <Tag color="#800000" background="#ffb3b3">
-                {' '}
-                EOA{' '}
-              </Tag>
-            )
-          } else {
-            tag = (
-              <Tag color="#FFC300" background="#FFF8BC">
-                {' '}
-                unknown{' '}
-              </Tag>
-            )
-          }
-          return [
-            <CustomIdentityBadge shorten={false} entity={address} />,
-            label,
-            tag,
-            <Button label="revoke" onClick={() => revokeOperator(address)} />,
-          ]
-        }}
-      />
-      <SectionTitle title="Add Operator" />
-      <TextInput
-        type="text"
-        wide
-        value={newOperatorAddr}
-        onChange={e => {
-          setNewOperatorAddr(e.target.value)
-        }}
-        adornment={addOperatorButton}
-        adornmentPosition="end"
-        readOnly={user !== account}
-      />
+                  {info.tagText}{' '}
+                </Tag>,
+                <Button mode="strong" label="Add" onClick={() => addCustomOperator(operator.address)} />,
+              ]
+            }}
+          />
+        </>
+      )}
+      {/* Add operator */}
+      <Container style={{ padding: 0 }}>
+        <SectionTitle title="Add Custom Operator" />
+
+        <Row>
+          <Col xs={12} md={6} lg={5}>
+            <TextInput
+              type="text"
+              wide
+              value={newOperatorAddr}
+              onChange={e => {
+                setNewOperatorAddr(e.target.value)
+              }}
+              readOnly={user !== account}
+            />
+          </Col>
+          <Col xs={12} md={6} lg={3}>
+            <Button label="Add" onClick={() => addCustomOperator(newOperatorAddr)} disabled={account !== user} />
+          </Col>
+        </Row>
+      </Container>
     </>
   )
+}
+
+function getOperatorDetail(address: string, networkId: SupportedNetworks, isEOA: boolean) {
+  let tagText = 'un-audited'
+  let tagColor = '#FFC300'
+  let tagBackground = '#FFF8BC'
+  let label = ''
+  let description = ''
+  let author = 'Unknown'
+  const operatorInfo = knownOperators[networkId].find(info => info.address === address)
+  if (operatorInfo) {
+    label = operatorInfo.name
+    author = operatorInfo.author
+    description = operatorInfo.description
+    if (operatorInfo.audited) {
+      tagColor = '#006600'
+      tagBackground = '#c2f0c2'
+      tagText = 'audited'
+    }
+  } else if (isEOA) {
+    tagColor = '#800000'
+    tagBackground = '#ffb3b3'
+    tagText = 'EOA'
+  }
+  return {
+    tagText,
+    tagColor,
+    tagBackground,
+    label,
+    description,
+    author,
+  }
 }
