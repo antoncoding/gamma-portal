@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { DataView, Button, Split, Tag } from '@aragon/ui'
 import SectionTitle from '../../components/SectionHeader'
@@ -20,7 +20,7 @@ import { useCustomToast } from '../../hooks'
 
 export default function AccountBalances({ account }: { account: string }) {
   const { networkId, user } = useConnectedWallet()
-
+  const [page, setPage] = useState(0)
   const toast = useCustomToast()
 
   const history = useHistory()
@@ -138,6 +138,8 @@ export default function AccountBalances({ account }: { account: string }) {
         emptyState={OTOKENS}
         entries={entries.sort((a, b) => sortByExpiryThanStrike(a.token, b.token)) || []}
         renderEntry={renderRow}
+        page={page}
+        onPageChange={setPage}
       />
     </>
   )

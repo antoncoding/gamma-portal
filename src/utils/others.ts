@@ -44,7 +44,7 @@ export const isSettlementAllowed = (token: SubgraphOToken) => {
 
 export const isITM = (token: SubgraphOToken, expiryPrice: string) => {
   return (
-    (token.isPut && Number(expiryPrice)) < Number(token.strikePrice) ||
+    (token.isPut && Number(expiryPrice) < Number(token.strikePrice)) ||
     (!token.isPut && Number(expiryPrice) > Number(token.strikePrice))
   )
 }
