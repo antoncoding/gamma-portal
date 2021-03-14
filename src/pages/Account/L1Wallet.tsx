@@ -162,7 +162,7 @@ export default function L1Balances({ account }: { account: string }) {
         storageKey={SHOW_OTM_KEY}
         checked={showOTM}
         setChecked={setShowOTM}
-        label={'Show OTM oTokens'}
+        label={'Show OTM options'}
       />
 
       <DataView

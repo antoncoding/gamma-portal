@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import ReactGA from 'react-ga'
 import { Header } from '@aragon/ui'
 import { useParams } from 'react-router-dom'
-import L1Balances from './balancesTable'
+import L1Balances from './L1Wallet'
 
 export default function Account() {
   const { account } = useParams()
