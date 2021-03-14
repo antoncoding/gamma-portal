@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import BigNumber from 'bignumber.js'
 import { useHistory } from 'react-router-dom'
-import { DataView, Button, Split, Tag } from '@aragon/ui'
+import { DataView, Button, Split, Tag, Timer } from '@aragon/ui'
 
 import SectionTitle from '../../components/SectionHeader'
 import OpynTokenAmount from '../../components/OpynTokenAmount'
@@ -21,6 +21,7 @@ import { getOracleAssetsAndPricers } from '../../utils/graph'
 import useAsyncMemo from '../../hooks/useAsyncMemo'
 import { green, secondary } from '../Trade/OrderBookTrade/StyleDiv'
 import { useCustomToast } from '../../hooks'
+import { toTokenAmount } from '../../utils/math'
 
 const SHOW_OTM_KEY = 'show-otm'
 
@@ -56,15 +57,24 @@ export default function L1Balances({ account }: { account: string }) {
     [user, account, toast, redeemBatch],
   )
 
-  const entries = useMemo(() => {
-    if (!balances) return []
+  const { expiredEntries, nonExpiredEntries } = useMemo(() => {
+    if (!balances) {
+      return {
+        expiredEntries: [],
+        nonExpiredEntries: [],
+      }
+    }
+    const expiredEntries = balances.filter(({ token }) => isExpired(token))
+    const nonExpiredEntries = balances.filter(({ token }) => !isExpired(token))
+    return { nonExpiredEntries, expiredEntries }
+  }, [balances])
+
+  const expiredOTokensToShow = useMemo(() => {
+    if (!expiredEntries) return []
     // don't apply any filter if showOTM is checked
-    if (showOTM) return balances
+    if (showOTM) return expiredEntries
 
-    return balances.filter(({ token }) => {
-      const expired = isExpired(token)
-      if (!expired) return true
-
+    return expiredEntries.filter(({ token }) => {
       const asset = allOracleAssets.find(a => a.asset.id === token.underlyingAsset.id)
       if (!asset) return true // show the entry if we don't know the payout status
 
@@ -73,14 +83,14 @@ export default function L1Balances({ account }: { account: string }) {
 
       return isITM(token, expiryPrice)
     })
-  }, [balances, showOTM, allOracleAssets])
+  }, [expiredEntries, showOTM, allOracleAssets])
 
-  const hasExpiredToken = useMemo(() => entries.find(e => isExpired(e.token)), [entries])
+  const hasExpiredToken = useMemo(() => expiredEntries.length > 0, [expiredEntries])
 
   // const tokensExpired = useMemo(() => entries.filter(e => isExpired(e.token)), [entries])
   const tokensToRedeem = useMemo(
     () =>
-      entries
+      expiredEntries
         .filter(e => isSettlementAllowed(e.token))
         // onnly redeem otokens that's ITM
         .filter(({ token }) => {
@@ -88,7 +98,7 @@ export default function L1Balances({ account }: { account: string }) {
           const price = asset && asset.prices.find(p => p.expiry === token.expiryTimestamp)?.price
           return price !== undefined && isITM(token, price)
         }),
-    [entries, allOracleAssets],
+    [expiredEntries, allOracleAssets],
   )
 
   const redeemAll = useCallback(async () => {
@@ -98,79 +108,95 @@ export default function L1Balances({ account }: { account: string }) {
     await redeemBatch(user, tokens, amounts)
   }, [user, account, tokensToRedeem, redeemBatch, toast])
 
-  const renderRow = useCallback(
+  const renderExpiredRow = useCallback(
     ({ token, balance }: OTokenBalance) => {
-      const expired = isExpired(token)
       let hasPrice = false
       let expiredITM = false
-      let payout: null | BigNumber = null
-      if (expired) {
-        const asset = allOracleAssets.find(a => a.asset.id === token.underlyingAsset.id)
-        if (asset) {
-          const expiryPrice = asset && asset.prices.find(p => p.expiry === token.expiryTimestamp)?.price
-          hasPrice = expiryPrice !== undefined
-          if (expiryPrice) {
-            expiredITM = isITM(token, expiryPrice)
-            payout = getExpiryPayout(token, balance.toString(), expiryPrice)
-          }
+      let payout: BigNumber = new BigNumber(0)
+      let expiryPrice: string = '0'
+
+      const asset = allOracleAssets.find(a => a.asset.id === token.underlyingAsset.id)
+      if (asset) {
+        expiryPrice = asset.prices.find(p => p.expiry === token.expiryTimestamp)?.price || '0'
+        hasPrice = expiryPrice !== undefined
+        if (expiryPrice) {
+          expiredITM = isITM(token, expiryPrice)
+          payout = getExpiryPayout(token, balance.toString(), expiryPrice)
         }
       }
 
-      const button = expired ? (
+      return [
+        <OpynTokenAmount chainId={networkId} token={token} amount={balance.toString()} />,
+        secondary(`${toTokenAmount(token.strikePrice, 8).integerValue().toString()} USD`),
+        secondary(`${toTokenAmount(expiryPrice, 8).toFixed(4)} USD`),
+        <>
+          {getPayoutText(payout)} {secondary(`${token.collateralAsset.symbol}`)}{' '}
+        </>,
         <Button
           label="Redeem"
           onClick={() => redeemToken(token.id, balance)}
           disabled={!isSettlementAllowed(token) || !hasPrice || !expiredITM}
-        />
-      ) : (
-        <Button label="Trade" onClick={() => history.push(`/trade/swap/${token.id}`)} />
-      )
-      return [
-        <OpynTokenAmount chainId={networkId} token={token} amount={balance.toString()} />,
-        payout !== null ? (
-          <>
-            {getPayoutText(payout)} {secondary(`${token.collateralAsset.symbol}`)}{' '}
-          </>
-        ) : (
-          '-'
-        ),
-        button,
+        />,
       ]
     },
-    [networkId, redeemToken, history, allOracleAssets],
+    [networkId, redeemToken, allOracleAssets],
+  )
+
+  const renderNotExpiredRow = useCallback(
+    ({ token, balance }: OTokenBalance) => {
+      return [
+        <OpynTokenAmount chainId={networkId} token={token} amount={balance.toString()} />,
+        <Timer end={new Date(Number(token.expiryTimestamp) * 1000)} />,
+        <Button label="Trade" onClick={() => history.push(`/trade/swap/${token.id}`)} />,
+      ]
+    },
+    [networkId, history],
   )
 
   return (
     <>
-      <Split
-        primary={<SectionTitle title="My Wallet" />}
-        secondary={
-          hasExpiredToken && (
-            <div style={{ float: 'right' }}>
-              <Button onClick={redeemAll} disabled={tokensToRedeem.length === 0}>
-                Redeem Batch
-                <span style={{ paddingLeft: '7px' }}>
-                  <Tag>{tokensToRedeem.length}</Tag>
-                </span>
-              </Button>
-            </div>
-          )
-        }
-      />
-
-      <CheckBoxWithLabel
-        storageKey={SHOW_OTM_KEY}
-        checked={showOTM}
-        setChecked={setShowOTM}
-        label={'Show OTM options'}
-      />
+      {expiredEntries.length > 0 && (
+        <DataView
+          status={isLoadingBalance ? 'loading' : 'default'}
+          heading={
+            <Split
+              primary={<SectionTitle title="Expired oTokens" />}
+              secondary={
+                hasExpiredToken && (
+                  <div style={{ float: 'right' }}>
+                    <Button onClick={redeemAll} disabled={tokensToRedeem.length === 0}>
+                      Redeem Batch
+                      <span style={{ paddingLeft: '7px' }}>
+                        <Tag>{tokensToRedeem.length}</Tag>
+                      </span>
+                    </Button>
+                    <CheckBoxWithLabel
+                      storageKey={SHOW_OTM_KEY}
+                      checked={showOTM}
+                      setChecked={setShowOTM}
+                      label={'Show OTM options'}
+                    />
+                  </div>
+                )
+              }
+            />
+          }
+          fields={['balance', 'strike', 'settlement price', 'Payout', '']}
+          emptyState={OTOKENS}
+          entries={expiredOTokensToShow.sort((a, b) => sortByExpiryThanStrike(a.token, b.token)) || []}
+          renderEntry={renderExpiredRow}
+          page={page}
+          onPageChange={setPage}
+        />
+      )}
 
       <DataView
         status={isLoadingBalance ? 'loading' : 'default'}
-        fields={['balance', 'Payout', '']}
+        heading={<SectionTitle title="oTokens" />}
+        fields={['balance', 'Expiry', '']}
         emptyState={OTOKENS}
-        entries={entries.sort((a, b) => sortByExpiryThanStrike(a.token, b.token)) || []}
-        renderEntry={renderRow}
+        entries={nonExpiredEntries.sort((a, b) => sortByExpiryThanStrike(a.token, b.token)) || []}
+        renderEntry={renderNotExpiredRow}
         page={page}
         onPageChange={setPage}
       />
