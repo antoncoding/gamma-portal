@@ -36,6 +36,7 @@ export async function getAccount(
           expiryTimestamp
           underlyingAsset {
             symbol
+            id
           }
         }
         shortAmount
@@ -46,6 +47,7 @@ export async function getAccount(
           expiryTimestamp
           underlyingAsset {
             symbol
+            id
           }
         }
         longAmount
@@ -202,6 +204,11 @@ export async function getVault(
           symbol
           decimals
         }
+        underlyingAsset{
+          id
+          symbol
+          decimals
+        }
       }
       shortAmount
       collateralAsset {
@@ -216,6 +223,11 @@ export async function getVault(
         decimals
         expiryTimestamp
         collateralAsset {
+          id
+          symbol
+          decimals
+        }
+        underlyingAsset{
           id
           symbol
           decimals

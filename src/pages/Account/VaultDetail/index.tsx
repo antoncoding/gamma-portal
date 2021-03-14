@@ -25,7 +25,7 @@ import { useOTokenBalances } from '../../../hooks/useOTokenBalances'
 import { useTokenBalance } from '../../../hooks/useTokenBalance'
 import { useLiveOTokens } from '../../../hooks/useOTokens'
 
-import { getVault } from '../../../utils/graph'
+import { getVault, getOracleAssetsAndPricers } from '../../../utils/graph'
 import { toTokenAmount, fromTokenAmount } from '../../../utils/math'
 import { isExpired, isSettlementAllowed } from '../../../utils/others'
 import { ZERO_ADDR, tokens } from '../../../constants/addresses'
@@ -64,6 +64,16 @@ export default function VaultDetail() {
   const refetch = useCallback(() => {
     setFetchCount(c => c + 1)
   }, [setFetchCount])
+
+  // get oracle data to determine if a vault is ready to settle
+  const allOracleAssets = useAsyncMemo(
+    async () => {
+      const assets = await getOracleAssetsAndPricers(networkId, toast.error)
+      return assets === null ? [] : assets
+    },
+    [],
+    [],
+  )
 
   const vaultDetail = useAsyncMemo(
     async () => {
@@ -245,12 +255,12 @@ export default function VaultDetail() {
   const settleAllowed = useMemo(() => {
     if (!vaultDetail) return false
 
-    if (vaultDetail.shortOToken && isSettlementAllowed(vaultDetail.shortOToken)) return true
+    if (vaultDetail.shortOToken && isSettlementAllowed(vaultDetail.shortOToken, allOracleAssets)) return true
 
-    if (vaultDetail.longOToken && isSettlementAllowed(vaultDetail.longOToken)) return true
+    if (vaultDetail.longOToken && isSettlementAllowed(vaultDetail.longOToken, allOracleAssets)) return true
 
     return false
-  }, [vaultDetail])
+  }, [vaultDetail, allOracleAssets])
 
   const simpleSettle = useCallback(async () => {
     await controller.settleBatch(user, [vaultId], user)

@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 import ENS from 'ethereum-ens'
-import { SubgraphOToken } from '../types'
+import { SubgraphOToken, SubgraphOracleAsset } from '../types'
 import { WAITINT_PERIOD } from '../constants'
 import { toTokenAmount } from './math'
 import BigNumber from 'bignumber.js'
@@ -38,7 +38,11 @@ export const isExpired = (token: SubgraphOToken) => {
   return Number(token.expiryTimestamp) < Date.now() / 1000
 }
 
-export const isSettlementAllowed = (token: SubgraphOToken) => {
+export const isSettlementAllowed = (token: SubgraphOToken, allOracleData: SubgraphOracleAsset[]) => {
+  const pricesForUnderlying = allOracleData.find(data => data.asset.id === token.underlyingAsset.id)
+  if (!pricesForUnderlying) return false
+  const hasPriceForExpiry = pricesForUnderlying.prices.find(priceData => priceData.expiry === token.expiryTimestamp)
+  if (!hasPriceForExpiry) return false
   return Number(token.expiryTimestamp) + WAITINT_PERIOD < Date.now() / 1000
 }
 

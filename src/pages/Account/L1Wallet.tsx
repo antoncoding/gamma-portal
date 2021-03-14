@@ -92,7 +92,7 @@ export default function L1Balances({ account }: { account: string }) {
   const tokensToRedeem = useMemo(
     () =>
       expiredEntries
-        .filter(e => isSettlementAllowed(e.token))
+        .filter(e => isSettlementAllowed(e.token, allOracleAssets))
         // onnly redeem otokens that's ITM
         .filter(({ token }) => {
           const asset = allOracleAssets.find(a => a.asset.id === token.underlyingAsset.id)
@@ -136,7 +136,7 @@ export default function L1Balances({ account }: { account: string }) {
         <Button
           label="Redeem"
           onClick={() => redeemToken(token.id, balance)}
-          disabled={!isSettlementAllowed(token) || !hasPrice || !expiredITM}
+          disabled={!isSettlementAllowed(token, allOracleAssets) || !hasPrice || !expiredITM}
         />,
       ]
     },

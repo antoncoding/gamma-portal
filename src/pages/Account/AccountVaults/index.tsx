@@ -3,7 +3,7 @@ import ReactGA from 'react-ga'
 import { useHistory, useParams } from 'react-router-dom'
 import { Button, DataView, Header, Tag, Help } from '@aragon/ui'
 import useAsyncMemo from '../../../hooks/useAsyncMemo'
-import { getAccount } from '../../../utils/graph'
+import { getAccount, getOracleAssetsAndPricers } from '../../../utils/graph'
 
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { SubgraphVault } from '../../../types'
@@ -36,17 +36,27 @@ export default function AccountVaults() {
     [networkId, account],
   )
 
+  // get oracle data to determine if a vault is ready to settle
+  const allOracleAssets = useAsyncMemo(
+    async () => {
+      const assets = await getOracleAssetsAndPricers(networkId, toast.error)
+      return assets === null ? [] : assets
+    },
+    [],
+    [],
+  )
+
   // for batch settle
   const vaultsToSettle = useMemo(() => {
     if (!vaults) return []
     return vaults.filter(vault => {
       return vault.shortOToken
-        ? isSettlementAllowed(vault.shortOToken)
+        ? isSettlementAllowed(vault.shortOToken, allOracleAssets)
         : vault.longOToken
-        ? isSettlementAllowed(vault.longOToken)
+        ? isSettlementAllowed(vault.longOToken, allOracleAssets)
         : false
     })
-  }, [vaults])
+  }, [vaults, allOracleAssets])
 
   const { settleBatch, latestVaultId } = useController()
 
