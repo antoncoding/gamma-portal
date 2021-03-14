@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import ReactGA from 'react-ga'
 import { Header } from '@aragon/ui'
 import { useParams } from 'react-router-dom'
-import BalanceDataView from './balancesTable'
+import L1Balances from './balancesTable'
 
 export default function Account() {
   const { account } = useParams()
@@ -12,7 +12,7 @@ export default function Account() {
   return (
     <>
       <Header primary="Account Overview" />
-      <BalanceDataView account={account} />
+      <L1Balances account={account} />
     </>
   )
 }

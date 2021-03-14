@@ -1,27 +1,36 @@
 import React, { useCallback, useMemo, useState } from 'react'
+import BigNumber from 'bignumber.js'
 import { useHistory } from 'react-router-dom'
 import { DataView, Button, Split, Tag } from '@aragon/ui'
+
 import SectionTitle from '../../components/SectionHeader'
 import OpynTokenAmount from '../../components/OpynTokenAmount'
+import CheckBoxWithLabel from '../../components/CheckBoxWithLabel'
+
 import { useOTokenBalances } from '../../hooks/useOTokenBalances'
 
 import { useConnectedWallet } from '../../contexts/wallet'
 import { OTokenBalance } from '../../types'
 import { sortByExpiryThanStrike, isExpired, isSettlementAllowed, isITM, getExpiryPayout } from '../../utils/others'
+import { getPreference } from '../../utils/storage'
 
 import { OTOKENS } from '../../constants/dataviewContents'
 
-import BigNumber from 'bignumber.js'
 import { useController } from '../../hooks/useController'
 import { getOracleAssetsAndPricers } from '../../utils/graph'
 import useAsyncMemo from '../../hooks/useAsyncMemo'
 import { green, secondary } from '../Trade/OrderBookTrade/StyleDiv'
 import { useCustomToast } from '../../hooks'
 
-export default function AccountBalances({ account }: { account: string }) {
+const SHOW_OTM_KEY = 'show-otm'
+
+export default function L1Balances({ account }: { account: string }) {
   const { networkId, user } = useConnectedWallet()
   const [page, setPage] = useState(0)
   const toast = useCustomToast()
+
+  // whether to show OTM expired oTokens
+  const [showOTM, setShowOTM] = useState(getPreference(SHOW_OTM_KEY, 'false') === 'true')
 
   const history = useHistory()
 
@@ -47,7 +56,24 @@ export default function AccountBalances({ account }: { account: string }) {
     [user, account, toast, redeemBatch],
   )
 
-  const entries = useMemo(() => (balances ? balances : []), [balances])
+  const entries = useMemo(() => {
+    if (!balances) return []
+    // don't apply any filter if showOTM is checked
+    if (showOTM) return balances
+
+    return balances.filter(({ token }) => {
+      const expired = isExpired(token)
+      if (!expired) return true
+
+      const asset = allOracleAssets.find(a => a.asset.id === token.underlyingAsset.id)
+      if (!asset) return true // show the entry if we don't know the payout status
+
+      const expiryPrice = asset && asset.prices.find(p => p.expiry === token.expiryTimestamp)?.price
+      if (!expiryPrice) return true
+
+      return isITM(token, expiryPrice)
+    })
+  }, [balances, showOTM, allOracleAssets])
 
   const hasExpiredToken = useMemo(() => entries.find(e => isExpired(e.token)), [entries])
 
@@ -117,7 +143,7 @@ export default function AccountBalances({ account }: { account: string }) {
   return (
     <>
       <Split
-        primary={<SectionTitle title="Balances" />}
+        primary={<SectionTitle title="My Wallet" />}
         secondary={
           hasExpiredToken && (
             <div style={{ float: 'right' }}>
@@ -130,6 +156,13 @@ export default function AccountBalances({ account }: { account: string }) {
             </div>
           )
         }
+      />
+
+      <CheckBoxWithLabel
+        storageKey={SHOW_OTM_KEY}
+        checked={showOTM}
+        setChecked={setShowOTM}
+        label={'Show OTM oTokens'}
       />
 
       <DataView
