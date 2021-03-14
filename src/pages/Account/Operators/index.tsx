@@ -165,6 +165,7 @@ function getOperatorDetail(address: string, networkId: SupportedNetworks, isEOA:
     tagColor = '#800000'
     tagBackground = '#ffb3b3'
     tagText = 'EOA'
+    author = '-'
   }
   return {
     tagText,

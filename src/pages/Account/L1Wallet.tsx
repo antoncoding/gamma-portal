@@ -27,7 +27,8 @@ const SHOW_OTM_KEY = 'show-otm'
 
 export default function L1Balances({ account }: { account: string }) {
   const { networkId, user } = useConnectedWallet()
-  const [page, setPage] = useState(0)
+  const [expiredOtokenPage, setExpiredOTokenPage] = useState(0)
+  const [otokenPage, setOTokenPage] = useState(0)
   const toast = useCustomToast()
 
   // whether to show OTM expired oTokens
@@ -120,7 +121,6 @@ export default function L1Balances({ account }: { account: string }) {
         expiryPrice = asset.prices.find(p => p.expiry === token.expiryTimestamp)?.price
         hasPrice = expiryPrice !== undefined
         if (expiryPrice !== undefined) {
-          console.log(`expiryPrice`, expiryPrice)
           expiredITM = isITM(token, expiryPrice)
           payout = getExpiryPayout(token, balance.toString(), expiryPrice)
         }
@@ -188,8 +188,8 @@ export default function L1Balances({ account }: { account: string }) {
           entries={expiredOTokensToShow.sort((a, b) => sortByExpiryThanStrike(a.token, b.token)) || []}
           renderEntry={renderExpiredRow}
           entriesPerPage={5}
-          page={page}
-          onPageChange={setPage}
+          page={expiredOtokenPage}
+          onPageChange={setExpiredOTokenPage}
         />
       )}
 
@@ -201,8 +201,8 @@ export default function L1Balances({ account }: { account: string }) {
         entries={nonExpiredEntries.sort((a, b) => sortByExpiryThanStrike(a.token, b.token)) || []}
         renderEntry={renderNotExpiredRow}
         entriesPerPage={5}
-        page={page}
-        onPageChange={setPage}
+        page={otokenPage}
+        onPageChange={setOTokenPage}
       />
     </>
   )

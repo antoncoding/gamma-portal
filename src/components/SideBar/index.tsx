@@ -108,7 +108,6 @@ export default function SideBar() {
             history.push('/trade/')
           }}
           isSelected={selectedTab === 4}
-          tag="new"
         />
 
         <SubButton
