@@ -17,8 +17,7 @@ import { getPreference } from '../../utils/storage'
 import { OTOKENS } from '../../constants/dataviewContents'
 
 import { useController } from '../../hooks/useController'
-import { getOracleAssetsAndPricers } from '../../utils/graph'
-import useAsyncMemo from '../../hooks/useAsyncMemo'
+import { useExpiryPriceData } from '../../hooks/useExpiryPriceData'
 import { green, secondary } from '../Trade/OrderBookTrade/StyleDiv'
 import { useCustomToast } from '../../hooks'
 import { toTokenAmount } from '../../utils/math'
@@ -38,14 +37,7 @@ export default function L1Balances({ account }: { account: string }) {
 
   const { balances, isLoading: isLoadingBalance } = useOTokenBalances(account, networkId)
 
-  const allOracleAssets = useAsyncMemo(
-    async () => {
-      const assets = await getOracleAssetsAndPricers(networkId, toast.error)
-      return assets === null ? [] : assets
-    },
-    [],
-    [],
-  )
+  const { allOracleAssets } = useExpiryPriceData()
 
   const { redeemBatch } = useController()
 

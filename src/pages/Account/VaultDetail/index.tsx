@@ -24,8 +24,9 @@ import { useTokenByAddress } from '../../../hooks/useToken'
 import { useOTokenBalances } from '../../../hooks/useOTokenBalances'
 import { useTokenBalance } from '../../../hooks/useTokenBalance'
 import { useLiveOTokens } from '../../../hooks/useOTokens'
+import { useExpiryPriceData } from '../../../hooks/useExpiryPriceData'
 
-import { getVault, getOracleAssetsAndPricers } from '../../../utils/graph'
+import { getVault } from '../../../utils/graph'
 import { toTokenAmount, fromTokenAmount } from '../../../utils/math'
 import { isExpired, isSettlementAllowed } from '../../../utils/others'
 import { ZERO_ADDR, tokens } from '../../../constants/addresses'
@@ -66,14 +67,7 @@ export default function VaultDetail() {
   }, [setFetchCount])
 
   // get oracle data to determine if a vault is ready to settle
-  const allOracleAssets = useAsyncMemo(
-    async () => {
-      const assets = await getOracleAssetsAndPricers(networkId, toast.error)
-      return assets === null ? [] : assets
-    },
-    [],
-    [],
-  )
+  const { allOracleAssets } = useExpiryPriceData()
 
   const vaultDetail = useAsyncMemo(
     async () => {

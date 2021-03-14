@@ -3,7 +3,7 @@ import ReactGA from 'react-ga'
 import { useHistory, useParams } from 'react-router-dom'
 import { Button, DataView, Header, Tag, Help } from '@aragon/ui'
 import useAsyncMemo from '../../../hooks/useAsyncMemo'
-import { getAccount, getOracleAssetsAndPricers } from '../../../utils/graph'
+import { getAccount } from '../../../utils/graph'
 
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { SubgraphVault } from '../../../types'
@@ -12,6 +12,7 @@ import OpynTokenAmount from '../../../components/OpynTokenAmount'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 import { VAULTS } from '../../../constants/dataviewContents'
 import { useController } from '../../../hooks/useController'
+import { useExpiryPriceData } from '../../../hooks/useExpiryPriceData'
 import { isSettlementAllowed } from '../../../utils/others'
 import { useCustomToast } from '../../../hooks'
 
@@ -37,14 +38,7 @@ export default function AccountVaults() {
   )
 
   // get oracle data to determine if a vault is ready to settle
-  const allOracleAssets = useAsyncMemo(
-    async () => {
-      const assets = await getOracleAssetsAndPricers(networkId, toast.error)
-      return assets === null ? [] : assets
-    },
-    [],
-    [],
-  )
+  const { allOracleAssets } = useExpiryPriceData()
 
   // for batch settle
   const vaultsToSettle = useMemo(() => {

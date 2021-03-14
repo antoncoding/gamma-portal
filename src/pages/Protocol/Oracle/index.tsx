@@ -4,40 +4,26 @@ import { Header, DataView, DropDown, Tag, Help } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
 import LabelText from '../../../components/LabelText'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
-import { useConnectedWallet } from '../../../contexts/wallet'
-import { useAsyncMemo } from '../../../hooks/useAsyncMemo'
+
 import { expiryToDate, toTokenAmount } from '../../../utils/math'
-import { getOracleAssetsAndPricers } from '../../../utils/graph'
+
 import SectionTitle from '../../../components/SectionHeader'
 
 import { SubgraphPriceEntry } from '../../../types'
 import { pricerMap } from './config'
 import { ZERO_ADDR } from '../../../constants/addresses'
 import { PRICE_SUBMISSION } from '../../../constants/dataviewContents'
-import { useCustomToast } from '../../../hooks'
+import { useExpiryPriceData } from '../../../hooks/useExpiryPriceData'
 
 export default function Oracle() {
-  const { networkId } = useConnectedWallet()
-
   useEffect(() => {
     ReactGA.pageview('/protocol/oracle/')
   }, [])
 
-  const toast = useCustomToast()
-  const [isLoadingHistory, setIsLoadingHistory] = useState(true)
   const [selectedAssetIndex, setSelectedAssetIndex] = useState(-1)
   const [assetHistory, setAssetHistory] = useState<SubgraphPriceEntry[]>([])
 
-  const allOracleAssets = useAsyncMemo(
-    async () => {
-      const assets = await getOracleAssetsAndPricers(networkId, toast.error)
-      setIsLoadingHistory(false)
-      if (assets && assets.length > 0) setSelectedAssetIndex(0)
-      return assets === null ? [] : assets
-    },
-    [],
-    [],
-  )
+  const { allOracleAssets, isLoading } = useExpiryPriceData()
 
   const haveValidSelection = useMemo(() => allOracleAssets.length > 0 && selectedAssetIndex !== -1, [
     allOracleAssets,
@@ -98,7 +84,7 @@ export default function Oracle() {
       </div>
       <SectionTitle title="Price Submissions" />
       <DataView
-        status={isLoadingHistory ? 'loading' : 'default'}
+        status={isLoading ? 'loading' : 'default'}
         fields={['Expiry', 'Price', 'Submitted Timestamp', 'Submitted By']}
         emptyState={PRICE_SUBMISSION}
         entriesPerPage={8}
