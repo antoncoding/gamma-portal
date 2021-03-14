@@ -113,13 +113,14 @@ export default function L1Balances({ account }: { account: string }) {
       let hasPrice = false
       let expiredITM = false
       let payout: BigNumber = new BigNumber(0)
-      let expiryPrice: string = '0'
+      let expiryPrice: string | undefined = undefined
 
       const asset = allOracleAssets.find(a => a.asset.id === token.underlyingAsset.id)
       if (asset) {
-        expiryPrice = asset.prices.find(p => p.expiry === token.expiryTimestamp)?.price || '0'
+        expiryPrice = asset.prices.find(p => p.expiry === token.expiryTimestamp)?.price
         hasPrice = expiryPrice !== undefined
-        if (expiryPrice) {
+        if (expiryPrice !== undefined) {
+          console.log(`expiryPrice`, expiryPrice)
           expiredITM = isITM(token, expiryPrice)
           payout = getExpiryPayout(token, balance.toString(), expiryPrice)
         }
@@ -128,7 +129,7 @@ export default function L1Balances({ account }: { account: string }) {
       return [
         <OpynTokenAmount chainId={networkId} token={token} amount={balance.toString()} />,
         secondary(`${toTokenAmount(token.strikePrice, 8).integerValue().toString()} USD`),
-        secondary(`${toTokenAmount(expiryPrice, 8).toFixed(4)} USD`),
+        secondary(expiryPrice ? `${toTokenAmount(expiryPrice, 8).toFixed(4)} USD` : '-'),
         <>
           {getPayoutText(payout)} {secondary(`${token.collateralAsset.symbol}`)}{' '}
         </>,
@@ -186,6 +187,7 @@ export default function L1Balances({ account }: { account: string }) {
           emptyState={OTOKENS}
           entries={expiredOTokensToShow.sort((a, b) => sortByExpiryThanStrike(a.token, b.token)) || []}
           renderEntry={renderExpiredRow}
+          entriesPerPage={5}
           page={page}
           onPageChange={setPage}
         />
@@ -198,6 +200,7 @@ export default function L1Balances({ account }: { account: string }) {
         emptyState={OTOKENS}
         entries={nonExpiredEntries.sort((a, b) => sortByExpiryThanStrike(a.token, b.token)) || []}
         renderEntry={renderNotExpiredRow}
+        entriesPerPage={5}
         page={page}
         onPageChange={setPage}
       />
