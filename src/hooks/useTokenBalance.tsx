@@ -38,7 +38,7 @@ export const useTokenBalance = (token: string, account: string, refetchIntervalS
 }
 
 async function getBalance(web3: Web3, token: string, account: string) {
-  if (token === ZERO_ADDR) return new BigNumber(0)
+  if (token === ZERO_ADDR) return new BigNumber(await web3.eth.getBalance(account))
   const erc20 = new web3.eth.Contract(erc20Abi, token)
   const t = await erc20.methods.balanceOf(account).call()
   return new BigNumber(t.toString())

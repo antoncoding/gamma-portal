@@ -13,14 +13,14 @@ import CheckBoxWithLabel from '../../../components/CheckBoxWithLabel'
 import { SubgraphOToken } from '../../../types'
 import { TradeAction, SHOW_MINE_KEY } from '../../../constants'
 import { useTokenPrice } from '../../../hooks'
-import { emptyToken } from '../../../constants/addresses'
+import { eth } from '../../../constants/addresses'
 import { getPreference } from '../../../utils/storage'
 
 export default function TradePage() {
   useEffect(() => {
     ReactGA.pageview('trade/orderbook/')
   }, [])
-  const [selectedUnderlying, setSelectedUnderlying] = useState(emptyToken)
+  const [selectedUnderlying, setSelectedUnderlying] = useState(eth)
   const [selectedOToken, setSelectedOToken] = useState<SubgraphOToken | null>(null)
   const [oTokens, setOTokens] = useState<SubgraphOToken[]>([])
   const [action, setAction] = useState<TradeAction>(TradeAction.Buy)
