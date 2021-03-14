@@ -146,7 +146,8 @@ export default function L1Balances({ account }: { account: string }) {
     ({ token, balance }: OTokenBalance) => {
       return [
         <OpynTokenAmount chainId={networkId} token={token} amount={balance.toString()} />,
-        <Timer end={new Date(Number(token.expiryTimestamp) * 1000)} />,
+        secondary(`${toTokenAmount(token.strikePrice, 8).integerValue().toString()} USD`),
+        <Timer end={new Date(Number(token.expiryTimestamp) * 1000)} format="Mdhm" />,
         <Button label="Trade" onClick={() => history.push(`/trade/swap/${token.id}`)} />,
       ]
     },
@@ -193,7 +194,7 @@ export default function L1Balances({ account }: { account: string }) {
       <DataView
         status={isLoadingBalance ? 'loading' : 'default'}
         heading={<SectionTitle title="oTokens" />}
-        fields={['balance', 'Expiry', '']}
+        fields={['balance', 'strike', 'Expiry', '']}
         emptyState={OTOKENS}
         entries={nonExpiredEntries.sort((a, b) => sortByExpiryThanStrike(a.token, b.token)) || []}
         renderEntry={renderNotExpiredRow}

@@ -8,7 +8,7 @@ import {
   OTokenOrderBook,
   OTokenOrderBookWithDetail,
 } from '../types'
-import { ZeroXEndpoint, getUSDC, zx_exchange, OrderType, Errors, MIN_BID, MAX_ASK } from '../constants'
+import { ZeroXEndpoint, getUSDC, zx_exchange, OrderType, Errors, MIN_BID, MAX_ASK, ZERO_ADDR } from '../constants'
 import { sleep } from '../utils/others'
 import { toTokenAmount } from './math'
 const Promise = require('bluebird')
@@ -222,9 +222,10 @@ export const isValidAsk = (entry: OrderWithMetaData) => {
  */
 const isValid = (entry: OrderWithMetaData) => {
   const FILL_BUFFER = 35
+  const open = entry.order.takerAddress === ZERO_ADDR
   const notExpired = parseInt(entry.order.expirationTimeSeconds, 10) > Date.now() / 1000 + FILL_BUFFER
   const notDust = getOrderFillRatio(entry).gt(5) // got at least 5% unfill
-  return notExpired && notDust
+  return notExpired && notDust && open
 }
 
 export const getOrderFillRatio = (order: OrderWithMetaData) =>
