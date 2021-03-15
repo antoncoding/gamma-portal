@@ -85,7 +85,6 @@ export function useController() {
     (account: string, vaultId: BigNumber, from: string, asset: string, amount: BigNumber) => {
       let finalAsset = asset
       if (from === getPayableProxyAddr(networkId).address) {
-        console.log(`is payalbe proxy!`)
         finalAsset = getWeth(networkId).id
         setUsePayableProxy(true)
         setOperateValue(amount)
@@ -101,10 +100,8 @@ export function useController() {
     (account: string, vaultId: BigNumber, to: string, asset: string, amount: BigNumber) => {
       let finalAsset = asset
       if (to === getPayableProxyAddr(networkId).address) {
-        console.log(`is payalbe proxy!`)
         finalAsset = getWeth(networkId).id
         setUsePayableProxy(true)
-        setOperateValue(amount)
       }
       const arg = util.createWithdrawCollateralArg(account, to, vaultId, finalAsset, amount)
       pushAction(arg)
@@ -219,7 +216,6 @@ export function useController() {
         }
       }
 
-      console.log(`operateValue.toString()`, operateValue.toString())
       // const contract = usePayableProxy ? payableProxy : controller
       try {
         if (usePayableProxy) {

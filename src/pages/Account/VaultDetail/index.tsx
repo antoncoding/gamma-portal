@@ -31,7 +31,7 @@ import { useAuthorizedOperators } from '../../../hooks/useAuthorizedOperators'
 import { getVault } from '../../../utils/graph'
 import { toTokenAmount, fromTokenAmount } from '../../../utils/math'
 import { isExpired, isSettlementAllowed } from '../../../utils/others'
-import { ZERO_ADDR, tokens, getPayableProxyAddr } from '../../../constants/addresses'
+import { ZERO_ADDR, tokens, getPayableProxyAddr, getWeth } from '../../../constants/addresses'
 import { SubgraphOToken } from '../../../types'
 import { useController } from '../../../hooks/useController'
 import { useCustomToast } from '../../../hooks'
@@ -100,7 +100,7 @@ export default function VaultDetail() {
   )
 
   const collateralToken = useTokenByAddress(
-    vaultDetail && vaultDetail.collateralAsset
+    vaultDetail && vaultDetail.collateralAsset && vaultDetail.collateralAsset.symbol !== 'WETH'
       ? vaultDetail.collateralAsset.id
       : collateralTokens[selectedCollateralIndex].id,
     networkId,
@@ -323,28 +323,49 @@ export default function VaultDetail() {
         </div>
       )
 
+      const weth = getWeth(networkId)
+      const ethIdx = collateralTokens.findIndex(t => t.id === ZERO_ADDR)
+      const wethIdx = collateralTokens.findIndex(t => t.id === weth.id)
+      const assetOrDropDwon = asset ? (
+        asset === weth.id && hasAuthorizedPayalbeProxy ? (
+          <div>
+            <Button
+              onClick={() => {
+                setSelectedCollateralIndex(wethIdx)
+              }}
+              mode={selectedCollateralIndex === wethIdx ? 'positive' : 'normal'}
+            >
+              {' '}
+              WETH{' '}
+            </Button>
+            <Button
+              onClick={() => {
+                setSelectedCollateralIndex(ethIdx)
+              }}
+              mode={selectedCollateralIndex === ethIdx ? 'positive' : 'normal'}
+            >
+              {' '}
+              ETH{' '}
+            </Button>
+          </div>
+        ) : (
+          <CustomIdentityBadge shorten={true} entity={asset} label={symbol} />
+        )
+      ) : (
+        <DropDown
+          disabled={dropdownItems.length === 0}
+          placeholder={dropdownItems.length === 0 ? 'No Asset available' : 'Select an item'}
+          items={dropdownItems}
+          selected={dropdownSelected}
+          onChange={dropdownOnChange}
+        />
+      )
+
       return [
         <div style={{ opacity: 0.8 }}> {label} </div>,
-        asset ? (
-          <CustomIdentityBadge shorten={true} entity={asset} label={symbol} />
-        ) : (
-          <DropDown
-            disabled={dropdownItems.length === 0}
-            placeholder={dropdownItems.length === 0 ? 'No Asset available' : 'Select an item'}
-            items={dropdownItems}
-            selected={dropdownSelected}
-            onChange={dropdownOnChange}
-          />
-        ),
+        assetOrDropDwon,
         // balanceToDisplay,
-        <LinkBase
-          onClick={() => {
-            onInputChange(toTokenAmount(balance, decimals))
-          }}
-        >
-          {' '}
-          {balanceToDisplay}{' '}
-        </LinkBase>,
+        <LinkBase onClick={() => onInputChange(toTokenAmount(balance, decimals))}> {balanceToDisplay} </LinkBase>,
         amountToDisplay,
         <>
           <TextInput
@@ -358,7 +379,7 @@ export default function VaultDetail() {
         </>,
       ]
     },
-    [expired],
+    [expired, hasAuthorizedPayalbeProxy, networkId, selectedCollateralIndex, collateralTokens],
   )
 
   const onClickOperate = useCallback(() => {
