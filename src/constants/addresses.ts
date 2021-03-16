@@ -7,16 +7,16 @@ type TokensTyps = {
 
 export const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 
-export const emptyToken: Token = {
-  name: 'No Token',
+export const eth: Token = {
+  name: 'Ether',
   id: ZERO_ADDR,
-  symbol: 'N/A',
+  symbol: 'ETH',
   decimals: 18,
 }
 
 export const tokens: TokensTyps = {
   '1': [
-    emptyToken,
+    eth,
     {
       name: 'USDC',
       id: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
@@ -31,7 +31,7 @@ export const tokens: TokensTyps = {
     },
   ],
   '42': [
-    emptyToken,
+    eth,
     {
       name: 'USDC',
       id: '0xb7a4f3e9097c08da09517b5ab877f7a917224ede',
@@ -128,9 +128,13 @@ export const zx_exchange = {
 }
 
 export const getUSDC = (networkId: SupportedNetworks) => {
-  return tokens[networkId].find(t => t.symbol === 'USDC') || emptyToken
+  return tokens[networkId].find(t => t.symbol === 'USDC') || eth
 }
 
 export const getWeth = (networkId: SupportedNetworks) => {
   return tokens[networkId].find(t => t.symbol === 'WETH') as Token
+}
+
+export const getPayableProxyAddr = (networkId: SupportedNetworks) => {
+  return knownOperators[networkId].find(o => o.name === 'PayableProxy') as KnownOperator
 }

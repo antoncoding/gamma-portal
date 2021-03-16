@@ -3,7 +3,7 @@ import ReactGA from 'react-ga'
 import BigNumber from 'bignumber.js'
 import { useConnectedWallet } from '../contexts/wallet'
 
-import { addresses } from '../constants/addresses'
+import { addresses, ZERO_ADDR, getPayableProxyAddr, getWeth } from '../constants/addresses'
 import { actionArg, ActionType } from '../types'
 import { getPreference } from '../utils/storage'
 import { MAX_UINT } from '../constants/others'
@@ -13,7 +13,8 @@ import { useNotify } from './useNotify'
 import { SupportedNetworks } from '../constants'
 import { useCustomToast } from './useCustomToast'
 
-const abi = require('../constants/abis/controller.json')
+const controllerAbi = require('../constants/abis/controller.json')
+const payableProxyAbi = require('../constants/abis/payableProxy.json')
 const erc20Abi = require('../constants/abis/erc20.json')
 
 export function useController() {
@@ -31,11 +32,20 @@ export function useController() {
     [networkId],
   )
 
+  const [usePayableProxy, setUsePayableProxy] = useState(false)
+
+  const [operateValue, setOperateValue] = useState(new BigNumber(0))
+
   const { notifyCallback } = useNotify()
 
   const controller = useMemo(() => {
     const address = addresses[networkId].controller
-    return new web3.eth.Contract(abi, address)
+    return new web3.eth.Contract(controllerAbi, address)
+  }, [networkId, web3])
+
+  const payableProxy = useMemo(() => {
+    const address = getPayableProxyAddr(networkId).address
+    return new web3.eth.Contract(payableProxyAbi, address)
   }, [networkId, web3])
 
   const updateVaultId = useCallback(() => {
@@ -71,34 +81,33 @@ export function useController() {
     setActions(actions => [...actions, newEntry])
   }, [])
 
-  const openVault = useCallback(
-    async account => {
-      if (!controller) return toast.error('No wallet connected')
-      const counter = await controller.methods.getAccountVaultCounter(account).call()
-      const newVulatId = new BigNumber(counter).plus(1)
-      const openArg = util.createOpenVaultArg(account, newVulatId)
-      track('open-vault')
-      await operate([openArg])
-    },
-    [operate, controller, toast, track],
-  )
-
   const pushAddCollateralArg = useCallback(
     (account: string, vaultId: BigNumber, from: string, asset: string, amount: BigNumber) => {
-      const arg = util.createDepositCollateralArg(account, from, vaultId, asset, amount)
+      let finalAsset = asset
+      if (from === getPayableProxyAddr(networkId).address) {
+        finalAsset = getWeth(networkId).id
+        setUsePayableProxy(true)
+        setOperateValue(amount)
+      }
+      const arg = util.createDepositCollateralArg(account, from, vaultId, finalAsset, amount)
       pushAction(arg)
       track('add-collateral')
     },
-    [pushAction, track],
+    [pushAction, track, networkId],
   )
 
   const pushRemoveCollateralArg = useCallback(
     (account: string, vaultId: BigNumber, to: string, asset: string, amount: BigNumber) => {
-      const arg = util.createWithdrawCollateralArg(account, to, vaultId, asset, amount)
+      let finalAsset = asset
+      if (to === getPayableProxyAddr(networkId).address) {
+        finalAsset = getWeth(networkId).id
+        setUsePayableProxy(true)
+      }
+      const arg = util.createWithdrawCollateralArg(account, to, vaultId, finalAsset, amount)
       pushAction(arg)
       track('remove-collateral')
     },
-    [pushAction, track],
+    [pushAction, track, networkId],
   )
 
   const pushAddLongArg = useCallback(
@@ -166,6 +175,7 @@ export function useController() {
 
   const checkAndIncreaseAllowance = useCallback(
     async (erc20: string, from: string, amount: string) => {
+      if (erc20 === ZERO_ADDR) return
       const pool = addresses[networkId].pool
       const token = new web3.eth.Contract(erc20Abi, erc20)
       const allowance = await token.methods.allowance(from, pool).call()
@@ -206,14 +216,27 @@ export function useController() {
         }
       }
 
+      // const contract = usePayableProxy ? payableProxy : controller
       try {
-        await controller.methods
-          .operate(actions)
-          .send({ from: user })
-          .on('transactionHash', notifyCallback)
-          .on('receipt', callback)
-          .on('error', onError)
+        if (usePayableProxy) {
+          await payableProxy.methods
+            .operate(actions, user)
+            .send({ from: user, value: operateValue.toString() })
+            .on('transactionHash', notifyCallback)
+            .on('receipt', callback)
+            .on('error', onError)
+        } else {
+          await controller.methods
+            .operate(actions)
+            .send({ from: user })
+            .on('transactionHash', notifyCallback)
+            .on('receipt', callback)
+            .on('error', onError)
+        }
+
         setActions([])
+        setUsePayableProxy(false)
+        setOperateValue(new BigNumber(0))
       } catch (error) {
         toast.error(error.message)
         onError()
@@ -221,7 +244,19 @@ export function useController() {
 
       updateVaultId()
     },
-    [controller, toast, actions, checkAndIncreaseAllowance, notifyCallback, user, updateVaultId, latestVaultId],
+    [
+      controller,
+      toast,
+      actions,
+      checkAndIncreaseAllowance,
+      notifyCallback,
+      user,
+      updateVaultId,
+      latestVaultId,
+      operateValue,
+      usePayableProxy,
+      payableProxy,
+    ],
   )
 
   const cleanActionCache = useCallback(() => {
@@ -242,7 +277,6 @@ export function useController() {
 
   return {
     actions,
-    openVault,
     pushAddCollateralArg,
     pushRemoveCollateralArg,
     pushAddLongArg,

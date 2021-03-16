@@ -5,16 +5,15 @@ import { Button, DataView, TextInput, Header, Tag } from '@aragon/ui'
 import { useParams } from 'react-router-dom'
 
 import { useConnectedWallet } from '../../../contexts/wallet'
-import { getAccount } from '../../../utils/graph'
-import useAsyncMemo from '../../../hooks/useAsyncMemo'
+import { useAuthorizedOperators } from '../../../hooks/useAuthorizedOperators'
 import SectionTitle from '../../../components/SectionHeader'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 import Comment from '../../../components/Comment'
 import { knownOperators } from '../../../constants/addresses'
 import { OPERATORS } from '../../../constants/dataviewContents'
-import { isEOA } from '../../../utils/others'
+
 import { useController } from '../../../hooks/useController'
-import { useCustomToast } from '../../../hooks'
+
 import { SupportedNetworks } from '../../../constants'
 
 export default function OperatorSection() {
@@ -24,32 +23,9 @@ export default function OperatorSection() {
     ReactGA.pageview('/account/operators/')
   }, [])
 
-  const [isLoading, setIsLoading] = useState(true)
   const { networkId, user } = useConnectedWallet()
 
-  const toast = useCustomToast()
-
-  // fetch account data, check if each operator is EOA
-  const operators = useAsyncMemo(
-    async () => {
-      if (!account) return []
-      const accountData = await getAccount(networkId, account, toast.error)
-      const operatorsRelations = accountData ? accountData.operators : []
-      const operatorsWithExtraInfo = await Promise.all(
-        operatorsRelations.map(async relation => {
-          const isEOAAddress = await isEOA(relation.operator.id, networkId)
-          return {
-            address: relation.operator.id,
-            isEOA: isEOAAddress,
-          }
-        }),
-      )
-      setIsLoading(false)
-      return operatorsWithExtraInfo
-    },
-    [],
-    [networkId, account],
-  )
+  const { operators, isLoading } = useAuthorizedOperators(user)
 
   const recommendedOperators = useMemo(
     () => knownOperators[networkId].filter(o => !operators.find(added => added.address === o.address)),

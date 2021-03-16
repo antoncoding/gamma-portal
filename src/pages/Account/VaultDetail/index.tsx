@@ -13,6 +13,7 @@ import {
   IconTrash,
   DropDown,
   LoadingRing,
+  LinkBase,
 } from '@aragon/ui'
 import History from './history'
 
@@ -25,11 +26,12 @@ import { useOTokenBalances } from '../../../hooks/useOTokenBalances'
 import { useTokenBalance } from '../../../hooks/useTokenBalance'
 import { useLiveOTokens } from '../../../hooks/useOTokens'
 import { useExpiryPriceData } from '../../../hooks/useExpiryPriceData'
+import { useAuthorizedOperators } from '../../../hooks/useAuthorizedOperators'
 
 import { getVault } from '../../../utils/graph'
 import { toTokenAmount, fromTokenAmount } from '../../../utils/math'
 import { isExpired, isSettlementAllowed } from '../../../utils/others'
-import { ZERO_ADDR, tokens } from '../../../constants/addresses'
+import { ZERO_ADDR, tokens, getPayableProxyAddr, getWeth } from '../../../constants/addresses'
 import { SubgraphOToken } from '../../../types'
 import { useController } from '../../../hooks/useController'
 import { useCustomToast } from '../../../hooks'
@@ -90,10 +92,17 @@ export default function VaultDetail() {
     else return vaultDetail.owner.operators.map(o => o.operator.id).includes(user)
   }, [vaultDetail, owner, user])
 
+  const { hasAuthorizedPayalbeProxy } = useAuthorizedOperators(user)
+
+  const collateralTokens = useMemo(
+    () => (hasAuthorizedPayalbeProxy ? tokens[networkId] : tokens[networkId].filter(t => t.symbol !== 'ETH')),
+    [hasAuthorizedPayalbeProxy, networkId],
+  )
+
   const collateralToken = useTokenByAddress(
-    vaultDetail && vaultDetail.collateralAsset
+    vaultDetail && vaultDetail.collateralAsset && vaultDetail.collateralAsset.symbol !== 'WETH'
       ? vaultDetail.collateralAsset.id
-      : tokens[networkId][selectedCollateralIndex].id,
+      : collateralTokens[selectedCollateralIndex].id,
     networkId,
   )
 
@@ -121,26 +130,29 @@ export default function VaultDetail() {
     return target ? target.balance : new BigNumber(0)
   }, [balances, shortOtoken])
 
+  // set collateral type when short or long is selected first
   useEffect(() => {
     if (shortOtoken) {
       setVaultExpiry(shortOtoken.expiryTimestamp)
-      const collateralIdx = tokens[networkId].findIndex(token => token.id === shortOtoken.collateralAsset.id)
+      const collateralIdx = collateralTokens.findIndex(token => token.id === shortOtoken.collateralAsset.id)
       setSelectedCollateralIndex(collateralIdx)
     } else if (longOtoken) {
       setVaultExpiry(longOtoken.expiryTimestamp)
-      const collateralIdx = tokens[networkId].findIndex(token => token.id === longOtoken.collateralAsset.id)
+      const collateralIdx = collateralTokens.findIndex(token => token.id === longOtoken.collateralAsset.id)
       setSelectedCollateralIndex(collateralIdx)
     } else {
       setVaultExpiry('0')
     }
-  }, [networkId, shortOtoken, longOtoken, setVaultExpiry])
+  }, [networkId, shortOtoken, longOtoken, setVaultExpiry, collateralTokens])
 
   // short tokens to be shown in dropdown
   const allShorts = useMemo(() => {
     if (!allOtokens) return []
 
     const sameCollateral = allOtokens.filter(
-      o => o.collateralAsset.id === collateralToken.id || collateralToken.id === ZERO_ADDR,
+      o =>
+        o.collateralAsset.id === collateralToken.id ||
+        (collateralToken.id === ZERO_ADDR && o.collateralAsset.symbol === 'WETH'),
     )
 
     const sameExpiry = sameCollateral.filter(o => o.expiryTimestamp === vaultExpiry || vaultExpiry === '0')
@@ -161,36 +173,38 @@ export default function VaultDetail() {
   }, [allOtokens, balances, allShorts])
 
   const pushAddCollateral = useCallback(() => {
+    // if using eth, from address is payable proxy
+    let from = user
     if (collateralToken.id === ZERO_ADDR) {
-      toast.info('Select collateral asset first')
-      return
+      from = getPayableProxyAddr(networkId).address
     }
     controller.pushAddCollateralArg(
       user,
       vaultId,
-      user,
+      from,
       collateralToken.id,
       fromTokenAmount(changeCollateralAmount, collateralToken.decimals),
     )
+
     setChangeCollateralAmount(new BigNumber(0))
     setPendingCollateralAmount(` + ${changeCollateralAmount.toString()}`)
-  }, [collateralToken, controller, user, vaultId, changeCollateralAmount, toast])
+  }, [collateralToken, controller, user, vaultId, changeCollateralAmount, networkId])
 
   const pushRemoveCollateral = useCallback(() => {
+    let to = user
     if (collateralToken.id === ZERO_ADDR) {
-      toast.info('Select collateral asset first')
-      return
+      to = getPayableProxyAddr(networkId).address
     }
     controller.pushRemoveCollateralArg(
       user,
       vaultId,
-      user,
+      to,
       collateralToken.id,
       fromTokenAmount(changeCollateralAmount, collateralToken.decimals),
     )
     setChangeCollateralAmount(new BigNumber(0))
     setPendingCollateralAmount(` - ${changeCollateralAmount.toString()}`)
-  }, [controller, user, vaultId, collateralToken.id, collateralToken.decimals, changeCollateralAmount, toast])
+  }, [controller, user, vaultId, collateralToken.id, collateralToken.decimals, changeCollateralAmount, networkId])
 
   const pushAddLong = useCallback(() => {
     if (!longOtoken) {
@@ -280,7 +294,7 @@ export default function VaultDetail() {
       const amountToDisplay = amount ? (
         <div>
           {' '}
-          {toTokenAmount(new BigNumber(amount), decimals).toString()}{' '}
+          {toTokenAmount(new BigNumber(amount), decimals).toFixed(6)}{' '}
           <span style={{ opacity: 0.5 }}> {pendingAmount} </span>{' '}
         </div>
       ) : (
@@ -292,36 +306,71 @@ export default function VaultDetail() {
       const balanceToDisplay = (
         <div>
           {' '}
-          {toTokenAmount(balance, decimals).toString()} <span style={{ opacity: 0.5 }}> {pendingBalance} </span>{' '}
+          {toTokenAmount(balance, decimals).toFixed(6)} <span style={{ opacity: 0.5 }}> {pendingBalance} </span>{' '}
         </div>
+      )
+
+      const weth = getWeth(networkId)
+      const ethIdx = collateralTokens.findIndex(t => t.id === ZERO_ADDR)
+      const wethIdx = collateralTokens.findIndex(t => t.id === weth.id)
+      const assetOrDropDwon = asset ? (
+        asset === weth.id && hasAuthorizedPayalbeProxy ? (
+          <div>
+            <Button
+              onClick={() => {
+                setSelectedCollateralIndex(wethIdx)
+              }}
+              mode={selectedCollateralIndex === wethIdx ? 'positive' : 'normal'}
+            >
+              {' '}
+              WETH{' '}
+            </Button>
+            <Button
+              onClick={() => {
+                setSelectedCollateralIndex(ethIdx)
+              }}
+              mode={selectedCollateralIndex === ethIdx ? 'positive' : 'normal'}
+            >
+              {' '}
+              ETH{' '}
+            </Button>
+          </div>
+        ) : (
+          <CustomIdentityBadge shorten={true} entity={asset} label={symbol} />
+        )
+      ) : (
+        <DropDown
+          disabled={dropdownItems.length === 0}
+          placeholder={dropdownItems.length === 0 ? 'No Asset available' : 'Select an item'}
+          items={dropdownItems}
+          selected={dropdownSelected}
+          onChange={dropdownOnChange}
+        />
       )
 
       return [
         <div style={{ opacity: 0.8 }}> {label} </div>,
-        asset ? (
-          <CustomIdentityBadge shorten={true} entity={asset} label={symbol} />
-        ) : (
-          <DropDown
-            disabled={dropdownItems.length === 0}
-            placeholder={dropdownItems.length === 0 ? 'No Asset available' : 'Select an item'}
-            items={dropdownItems}
-            selected={dropdownSelected}
-            onChange={dropdownOnChange}
-          />
-        ),
-        balanceToDisplay,
+        assetOrDropDwon,
+        // balanceToDisplay,
+        <LinkBase onClick={() => onInputChange(toTokenAmount(balance, decimals))}> {balanceToDisplay} </LinkBase>,
         amountToDisplay,
         <>
-          <TextInput type="number" disabled={expired} onChange={onInputChange} value={inputValue} />
+          <TextInput
+            type="number"
+            disabled={expired}
+            onChange={event => onInputChange(event.target.value)}
+            value={inputValue}
+          />
           <Button label="Add" disabled={expired} display="icon" icon={<IconCirclePlus />} onClick={onClickAdd} />
           <Button label="Remove" disabled={expired} display="icon" icon={<IconCircleMinus />} onClick={onClickMinus} />
         </>,
       ]
     },
-    [expired],
+    [expired, hasAuthorizedPayalbeProxy, networkId, selectedCollateralIndex, collateralTokens],
   )
 
   const onClickOperate = useCallback(() => {
+    console.log(`onClickOperate, triggered`)
     setIsSendingTx(true)
     controller.operateCache(
       () => {
@@ -377,7 +426,12 @@ export default function VaultDetail() {
                 disabled={controller.actions.length === 0}
                 display="icon"
                 icon={<IconTrash />}
-                onClick={controller.cleanActionCache}
+                onClick={() => {
+                  controller.cleanActionCache()
+                  setPendingCollateralAmount('')
+                  setPendingLongAmount('')
+                  setPendingShortAmount('')
+                }}
               />
             </div>
           )
@@ -396,15 +450,13 @@ export default function VaultDetail() {
             amount: vaultDetail?.collateralAmount,
             pendingAmount: pendingCollateralAmount,
             inputValue: changeCollateralAmount,
-            onInputChange: e =>
-              e.target.value
-                ? setChangeCollateralAmount(new BigNumber(e.target.value))
-                : setChangeCollateralAmount(new BigNumber(0)),
+            onInputChange: value =>
+              value ? setChangeCollateralAmount(new BigNumber(value)) : setChangeCollateralAmount(new BigNumber(0)),
             onClickAdd: pushAddCollateral,
             onClickMinus: pushRemoveCollateral,
             dropdownSelected: selectedCollateralIndex,
             dropdownOnChange: setSelectedCollateralIndex,
-            dropdownItems: tokens[networkId]?.map(o => o.symbol),
+            dropdownItems: collateralTokens.map(o => o.symbol),
             balance: collateralBalance,
           },
           {
@@ -415,10 +467,8 @@ export default function VaultDetail() {
             amount: vaultDetail?.longAmount,
             pendingAmount: pendingLongAmount,
             inputValue: changeLongAmount,
-            onInputChange: e =>
-              e.target.value
-                ? setChangeLongAmount(new BigNumber(e.target.value))
-                : setChangeLongAmount(new BigNumber(0)),
+            onInputChange: value =>
+              value ? setChangeLongAmount(new BigNumber(value)) : setChangeLongAmount(new BigNumber(0)),
             onClickAdd: pushAddLong,
             onClickMinus: pushRemoveLong,
             dropdownSelected: longOtoken ? allLongs.findIndex(o => o.id === longOtoken.id) : -1,
@@ -437,10 +487,8 @@ export default function VaultDetail() {
             amount: vaultDetail?.shortAmount,
             pendingAmount: pendingShortAmount,
             inputValue: changeShortAmount,
-            onInputChange: e =>
-              e.target.value
-                ? setChangeShortAmount(new BigNumber(e.target.value))
-                : setChangeShortAmount(new BigNumber(0)),
+            onInputChange: value =>
+              value ? setChangeShortAmount(new BigNumber(value)) : setChangeShortAmount(new BigNumber(0)),
             onClickAdd: pushMint,
             onClickMinus: pushBurn,
             dropdownSelected: shortOtoken ? allShorts.findIndex(o => o.id === shortOtoken.id) : -1,
