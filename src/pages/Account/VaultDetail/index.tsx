@@ -191,10 +191,6 @@ export default function VaultDetail() {
   }, [collateralToken, controller, user, vaultId, changeCollateralAmount, networkId])
 
   const pushRemoveCollateral = useCallback(() => {
-    if (collateralToken.id === ZERO_ADDR) {
-      toast.info('Select collateral asset first')
-      return
-    }
     let to = user
     if (collateralToken.id === ZERO_ADDR) {
       to = getPayableProxyAddr(networkId).address
@@ -208,16 +204,7 @@ export default function VaultDetail() {
     )
     setChangeCollateralAmount(new BigNumber(0))
     setPendingCollateralAmount(` - ${changeCollateralAmount.toString()}`)
-  }, [
-    controller,
-    user,
-    vaultId,
-    collateralToken.id,
-    collateralToken.decimals,
-    changeCollateralAmount,
-    toast,
-    networkId,
-  ])
+  }, [controller, user, vaultId, collateralToken.id, collateralToken.decimals, changeCollateralAmount, networkId])
 
   const pushAddLong = useCallback(() => {
     if (!longOtoken) {
@@ -439,7 +426,12 @@ export default function VaultDetail() {
                 disabled={controller.actions.length === 0}
                 display="icon"
                 icon={<IconTrash />}
-                onClick={controller.cleanActionCache}
+                onClick={() => {
+                  controller.cleanActionCache()
+                  setPendingCollateralAmount('')
+                  setPendingLongAmount('')
+                  setPendingShortAmount('')
+                }}
               />
             </div>
           )
