@@ -61,6 +61,7 @@ type SystemAddresses = {
     controller: string
     factory: string
     addressBook: string
+    whitelist: string
     pool: string
     zeroxExchange: string
     zeroxERCProxy: string
@@ -74,6 +75,7 @@ export const addresses: SystemAddresses = {
     factory: isPublic ? '0x7C06792Af1632E77cb27a558Dc0885338F4Bdf8E' : '0xE21127f47B365d3b1467746804f32BF8dCf47e26',
     addressBook: isPublic ? '0x1E31F2DCBad4dc572004Eae6355fB18F9615cBe4' : '0x57ADe7D5E9D2F45A07f8039Da7228ACC305fbeaF',
     pool: isPublic ? '0x5934807cC0654d46755eBd2848840b616256C6Ef' : '0x0Cb5BDBf1726f7CC720B21EA910ACeda9FdDf680',
+    whitelist: isPublic ? '0xa5EA18ac6865f315ff5dD9f1a7fb1d41A30a6779' : '0x2244364c94a9FCb6f9ae3A4cF38f279706011882',
     zeroxExchange: '0x61935cbdd02287b511119ddb11aeb42f1593b7ef',
     zeroxERCProxy: '0x95e6f48254609a6ee006f7d493c8e5fb97094cef',
     zeroxStaking: '0xa26e80e7dea86279c6d778d702cc413e6cffa777',
@@ -83,6 +85,7 @@ export const addresses: SystemAddresses = {
     factory: isPublic ? '0xb9d17ab06e27f63d0fd75099d5874a194ee623e2' : '0x32b5a18238BAdF23F8E88669de2bD3671ff7BF83',
     addressBook: isPublic ? '0x8812f219f507e8cfe9d2f1e790164714c5e06a73' : '0x4163Bf53878B2169Ea9E404b9E840FA010DbF949',
     pool: isPublic ? '0x8c7c60d766951c5c570bbb7065c993070061b795' : '0xFf7a2BD21f6dAb62948Bb7545266E9a6b2a0bEb2',
+    whitelist: isPublic ? '0x9164eB40a1b59512F1803aB4C2d1dE4B89627A93' : '0xc990BB199c0ed8CEE305bD1A4c50A87029AdfAE3',
     zeroxExchange: '0x4eacd0af335451709e1e7b570b8ea68edec8bc97',
     zeroxERCProxy: '0xf1ec01d6236d3cd881a0bf0130ea25fe4234003e',
     zeroxStaking: '0xbab9145f1d57cd4bb0c9aa2d1ece0a5b6e734d34',

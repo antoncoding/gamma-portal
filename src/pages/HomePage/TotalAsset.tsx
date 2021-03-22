@@ -10,6 +10,7 @@ import { SubgraphToken } from '../../types'
 import { toTokenAmount } from '../../utils/math'
 
 const erc20Abi = require('../../constants/abis/erc20.json')
+const whitelistAbi = require('../../constants/abis/whitelist.json')
 
 export default function TotalAsset() {
   const { assets } = useProtocolAssets()
@@ -56,13 +57,27 @@ export default function TotalAsset() {
       const balances = await Promise.all(
         assets.map(async collateral => {
           const token = new web3.eth.Contract(erc20Abi, collateral.id)
+          const whitelistContract = new web3.eth.Contract(whitelistAbi, addresses[networkId].whitelist)
+          const isWhitelisted = await whitelistContract.methods.isWhitelistedCollateral(collateral.id).call()
           const price = collateral.symbol === 'USDC' ? new BigNumber(1) : await getTokenPriceCoingecko(collateral.id)
           const rawBalance: string = await token.methods.balanceOf(poolAddress).call()
           const balance = toTokenAmount(rawBalance, collateral.decimals)
-          return { token: collateral, balance, price }
+          return { token: collateral, balance, price, isWhitelisted }
         }),
       )
-      setAssetBalances(balances)
+      setAssetBalances(
+        balances
+          .filter(b => b.isWhitelisted)
+          .reduce((prev: { token: SubgraphToken; balance: BigNumber; price: BigNumber }[], curr) => {
+            const target = prev.find(entry => entry.token.symbol === curr.token.symbol)
+            if (target !== undefined) {
+              target.balance = target.balance.plus(curr.balance)
+              return [...prev]
+            } else {
+              return [...prev, curr]
+            }
+          }, []),
+      )
     }
     if (!cancel) syncBalances()
 
