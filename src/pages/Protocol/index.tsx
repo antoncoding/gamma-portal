@@ -8,6 +8,8 @@ import { Header, IconCoin, useTheme } from '@aragon/ui'
 import Comment from '../../components/Comment'
 import factoryBlack from '../../imgs/icons/factory-black.png'
 import factoryWhite from '../../imgs/icons/factory-white.png'
+import dripBlack from '../../imgs/icons/drip-black.png'
+import dripWhite from '../../imgs/icons/drip-white.png'
 
 function ProtocolPage() {
   const theme = useTheme()
@@ -43,7 +45,17 @@ function ProtocolPage() {
             }}
           />
         </Col>
-        <div style={{ width: '30%', marginLeft: '3%' }}></div>
+
+        <Col sm={12} md={6} lg={4}>
+          <BoxButton
+            title="Faucet"
+            description="Mint testnet tokens"
+            icon={<img style={{ height: 55 }} src={theme._name === 'dark' ? dripWhite : dripBlack} alt="faucet" />}
+            onClick={() => {
+              history.push('/protocol/faucet/')
+            }}
+          />
+        </Col>
       </Row>
     </Container>
   )
