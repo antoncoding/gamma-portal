@@ -22,7 +22,7 @@ export default function Faucet() {
           You're currently on mainnet. Switch network in your wallet to testnet to get faucet tokens and start testing!{' '}
         </Info>
       ) : (
-        <Info title="Note"> These tokens are for testing purpose only, and is only guranteed to work with Opyn </Info>
+        <Info title="Note"> These tokens are for testing purpose only, and are only guranteed to work with Opyn </Info>
       )}
 
       {mintableTokens.map((token, i) => {
