@@ -12,8 +12,6 @@ export default function Faucet() {
 
   const mintableTokens = useMemo(() => tokens[networkId].filter(token => token.canMint), [networkId])
 
-  console.log(`mintableTokens`, mintableTokens)
-
   return (
     <>
       <Header primary={'Token Faucet'} />
@@ -27,8 +25,8 @@ export default function Faucet() {
         <Info title="Note"> These tokens are for testing purpose only, and is only guranteed to work with Opyn </Info>
       )}
 
-      {mintableTokens.map(token => {
-        return <MintToken token={token} />
+      {mintableTokens.map((token, i) => {
+        return <MintToken token={token} key={i} />
       })}
     </>
   )
