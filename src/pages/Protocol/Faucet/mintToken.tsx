@@ -29,7 +29,7 @@ export default function MintToken({ token }: { token: Token }) {
     setIsMinting(true)
     try {
       await contract.methods
-        .mint(user, mintAmount)
+        .mint(user, mintAmount.toString())
         .send({ from: user })
         .on('transactionHash', notifyCallback)
         .on('confirmation', () => setIsMinting(false))
