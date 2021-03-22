@@ -11,6 +11,7 @@ import NavBar from './components/NavBar'
 import SideBar from './components/SideBar'
 
 import Factory from './pages/Protocol/Factory'
+import Faucet from './pages/Protocol/Faucet'
 import ProtocolHome from './pages/Protocol'
 import Account from './pages/Account'
 import AccountVault from './pages/Account/AccountVaults'
@@ -117,6 +118,11 @@ function App() {
                   <Route path="/vault/:owner/:vaultId">
                     <Layout>
                       <Vault />
+                    </Layout>
+                  </Route>
+                  <Route path="/protocol/faucet">
+                    <Layout>
+                      <Faucet />
                     </Layout>
                   </Route>
                   <Route path="/protocol/oracle">

@@ -6,7 +6,6 @@ type TokensTyps = {
 }
 
 const isPublic = process.env.REACT_APP_PUBLIC === 'true'
-console.log(`isPublic`, isPublic)
 export const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 
 export const eth: Token = {
@@ -36,9 +35,10 @@ export const tokens: TokensTyps = {
     eth,
     {
       name: 'USDC',
-      id: '0xb7a4f3e9097c08da09517b5ab877f7a917224ede',
+      id: '0xf5cb5408b40e819e7db5347664be03b52accac9d',
       symbol: 'USDC',
       decimals: 6,
+      canMint: true,
     },
     {
       name: 'Wrapped Ether',
@@ -48,9 +48,10 @@ export const tokens: TokensTyps = {
     },
     {
       name: 'Wrapped Bitcoin',
-      id: '0xd3a691c852cdb01e281545a27064741f0b7f6825',
+      id: '0xd7c8c2f7b6ebdbc88e5ab0101dd24ed5aca58b0f',
       symbol: 'WBTC',
       decimals: 8,
+      canMint: true,
     },
   ],
 }
