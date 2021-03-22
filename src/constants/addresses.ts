@@ -36,9 +36,10 @@ export const tokens: TokensTyps = {
     eth,
     {
       name: 'USDC',
-      id: '0xb7a4f3e9097c08da09517b5ab877f7a917224ede',
+      id: '0xf5cb5408b40e819e7db5347664be03b52accac9d',
       symbol: 'USDC',
       decimals: 6,
+      canMint: true,
     },
     {
       name: 'Wrapped Ether',

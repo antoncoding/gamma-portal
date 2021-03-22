@@ -7,6 +7,7 @@ export type Token = {
   name: string
   symbol: string
   decimals: number
+  canMint?: boolean // if we can provide faucet
 }
 
 export type Product = {

@@ -100,6 +100,14 @@ export default function SideBar() {
           isSelected={selectedTab === 3 && subSelected === 'oracle'}
           shown={selectedTab === 3}
         />
+        <SubButton
+          title="Faucet"
+          onClick={() => {
+            history.push(`/protocol/faucet/`)
+          }}
+          isSelected={selectedTab === 3 && subSelected === 'faucet'}
+          shown={selectedTab === 3}
+        />
 
         <SidebarTitle
           title="Trade"
@@ -174,6 +182,8 @@ function locationToSubButtomId(location) {
     ? 'vaults'
     : location.pathname.includes('/factory/')
     ? 'factory'
+    : location.pathname.includes('/faucet/')
+    ? 'faucet'
     : location.pathname.includes('/oracle/')
     ? 'oracle'
     : location.pathname.includes('/swap/')
