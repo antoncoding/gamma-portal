@@ -61,6 +61,7 @@ export default function TotalAsset() {
           const isWhitelisted = await whitelistContract.methods.isWhitelistedCollateral(collateral.id).call()
           const price = collateral.symbol === 'USDC' ? new BigNumber(1) : await getTokenPriceCoingecko(collateral.id)
           const rawBalance: string = await token.methods.balanceOf(poolAddress).call()
+
           const balance = toTokenAmount(rawBalance, collateral.decimals)
           return { token: collateral, balance, price, isWhitelisted }
         }),
