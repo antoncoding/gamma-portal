@@ -64,7 +64,9 @@ function HomePage() {
             title="Opyn.co"
             description="Trade the most capital efficient defi options"
             icon={<img height={50} src={opynLogo} alt={'opyn official'} />}
-            onClick={() => {}}
+            onClick={() => {
+              window.location.href = 'https://opyn.co'
+            }}
           />
         </Col>
 
