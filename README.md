@@ -18,6 +18,12 @@
 
 This is an open-sourced alternative front end to interact with [Gamma protocol](https://github.com/opynfinance/GammaProtocol), or, Opyn V2.
 
+We encourage everyone to open discussions / feature requests or pull requests to help this project boom 😉. 
+
+`
+Opyn is currently launching a grant program, and developers who wants to build on top of Gamma portal can also apply the grants and get paid 😋 Please reach out to learn more about the details.
+`
+
 ## Features
 
 ### Portal
