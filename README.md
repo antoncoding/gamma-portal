@@ -18,11 +18,9 @@
 
 This is an open-sourced alternative front end to interact with [Gamma protocol](https://github.com/opynfinance/GammaProtocol), or, Opyn V2.
 
-We encourage everyone to open discussions / feature requests or pull requests to help this project boom 😉. 
+We encourage everyone to open discussions / feature requests or pull requests to help this project boom 😉.
 
-`
-Opyn is currently launching a grant program, and developers who wants to build on top of Gamma portal can also apply the grants and get paid 😋 Please reach out to learn more about the details.
-`
+`Opyn is currently launching a grant program, and developers who wants to build on top of Gamma portal can also apply the grants and get paid 😋 Please reach out to learn more about the details.`
 
 ## Features
 
@@ -32,16 +30,13 @@ This webpage serves as the portal to all applications built with Gamma portocol.
 
 ![apps](https://i.imgur.com/PjJXa6h.png)
 
-
-### Vault Management 
+### Vault Management
 
 Manage your short position directly with the protocol: Adjust collateral, mint / burn oTokens, or create spreads!
 
 ![vault list](https://i.imgur.com/4GdVRC1.png)
 
-
 ![detail](https://i.imgur.com/hDsSk3P.png)
-
 
 ### Operator Management
 
@@ -53,11 +48,11 @@ Manage all **operators** you have authorized. We will also recommand new operato
 
 Trade your oToken OTC or via an open orderbook!
 
-![](https://i.imgur.com/SRiPG89.png)
+![trade](https://i.imgur.com/SRiPG89.png)
 
 ## Contribute
 
-You can contribute to the this repo by helping resolve any existing issues, feature request or just refactor our code 😎. 
+You can contribute to the this repo by helping resolve any existing issues, feature request or just refactor our code 😎.
 Also feel free to open any feature request that you want to see on Gamma Portal!
 
 Opyn is currently launching a grant program, and developers who wants to build on top of Gamma portal can also apply the grants and get paid 😋 Please reach out to learn more about the details.
