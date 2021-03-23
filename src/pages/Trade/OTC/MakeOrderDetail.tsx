@@ -19,7 +19,7 @@ import { TradeAction, Errors, DeadlineUnit, Spenders } from '../../../constants'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { getUSDC, ZERO_ADDR } from '../../../constants/addresses'
 
-import oETHIcon from '../../../imgs/oETH.svg'
+import OTokenIcon from '../../../components/OTokenIcon'
 import USDCIcon from '../../../imgs/USDC.png'
 import { use0xExchange } from '../../../hooks/use0xExchange'
 import { useUserAllowance } from '../../../hooks/useAllowance'
@@ -132,13 +132,23 @@ export default function MakeOrderDetail({ selectedOToken, usdcBalance, oTokenBal
   }, [inputTokenAmount, inputToken, approveOTokenZX])
 
   const inputIcon = useMemo(
-    () => <img alt="inputtoken" width={25} src={action === TradeAction.Buy ? USDCIcon : oETHIcon} />,
-    [action],
+    () =>
+      action === TradeAction.Buy ? (
+        <img alt="inputtoken" width={25} src={USDCIcon} />
+      ) : (
+        <OTokenIcon otoken={selectedOToken} width={25} />
+      ),
+    [action, selectedOToken],
   )
 
   const outputIcon = useMemo(
-    () => <img alt="outputtoken" width={25} src={action === TradeAction.Buy ? oETHIcon : USDCIcon} />,
-    [action],
+    () =>
+      action === TradeAction.Buy ? (
+        <OTokenIcon otoken={selectedOToken} width={25} />
+      ) : (
+        <img alt="outputtoken" width={25} src={USDCIcon} />
+      ),
+    [action, selectedOToken],
   )
 
   const handleInputChange = useCallback(

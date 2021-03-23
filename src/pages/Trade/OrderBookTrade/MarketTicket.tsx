@@ -11,8 +11,8 @@ import { TradeAction, Errors, Spenders, getWeth, ZEROX_PROTOCOL_FEE_KEY, FeeType
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { getUSDC } from '../../../constants/addresses'
 
-import oETHIcon from '../../../imgs/oETH.svg'
-import USDCIcon from '../../../imgs/USDC.png'
+import OTokenIcon from '../../../components/OTokenIcon'
+import USDCImgUrl from '../../../imgs/USDC.png'
 import { useOrderbook } from '../../../contexts/orderbook'
 import { use0xExchange } from '../../../hooks/use0xExchange'
 import { useUserAllowance } from '../../../hooks/useAllowance'
@@ -109,13 +109,23 @@ export default function MarketTicket({
   }, [inputTokenAmount, inputToken, action, approveUSDC, approveOToken])
 
   const inputIcon = useMemo(
-    () => <img alt="inputtoken" width={25} src={action === TradeAction.Buy ? USDCIcon : oETHIcon} />,
-    [action],
+    () =>
+      action === TradeAction.Buy ? (
+        <img alt="inputtoken" width={25} src={USDCImgUrl} />
+      ) : (
+        <OTokenIcon otoken={selectedOToken} width={25} />
+      ),
+    [action, selectedOToken],
   )
 
   const outputIcon = useMemo(
-    () => <img alt="outputtoken" width={25} src={action === TradeAction.Buy ? oETHIcon : USDCIcon} />,
-    [action],
+    () =>
+      action === TradeAction.Buy ? (
+        <OTokenIcon otoken={selectedOToken} width={25} />
+      ) : (
+        <img alt="outputtoken" width={25} src={USDCImgUrl} />
+      ),
+    [action, selectedOToken],
   )
 
   const protocolFee = useMemo(() => {

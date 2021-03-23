@@ -11,8 +11,9 @@ import { TradeAction, Errors, DeadlineUnit, Spenders } from '../../../constants'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { getUSDC } from '../../../constants/addresses'
 
-import oETHIcon from '../../../imgs/oETH.svg'
-import USDCIcon from '../../../imgs/USDC.png'
+import USDCImgUrl from '../../../imgs/USDC.png'
+import OTokenIcon from '../../../components/OTokenIcon'
+
 import { use0xExchange } from '../../../hooks/use0xExchange'
 import { useUserAllowance } from '../../../hooks/useAllowance'
 import { simplifyOTokenSymbol } from '../../../utils/others'
@@ -89,13 +90,23 @@ export default function LimitTicket({
   }, [inputTokenAmount, inputToken, action, approveUSDC, approveOToken])
 
   const inputIcon = useMemo(
-    () => <img alt="inputtoken" width={25} src={action === TradeAction.Buy ? USDCIcon : oETHIcon} />,
-    [action],
+    () =>
+      action === TradeAction.Buy ? (
+        <img alt="inputtoken" width={25} src={USDCImgUrl} />
+      ) : (
+        <OTokenIcon otoken={selectedOToken} width={25} />
+      ),
+    [action, selectedOToken],
   )
 
   const outputIcon = useMemo(
-    () => <img alt="outputtoken" width={25} src={action === TradeAction.Buy ? oETHIcon : USDCIcon} />,
-    [action],
+    () =>
+      action === TradeAction.Buy ? (
+        <OTokenIcon otoken={selectedOToken} width={25} />
+      ) : (
+        <img alt="outputtoken" width={25} src={USDCImgUrl} />
+      ),
+    [action, selectedOToken],
   )
 
   const handleInputChange = useCallback(
