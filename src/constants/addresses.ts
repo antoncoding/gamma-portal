@@ -16,7 +16,7 @@ export const eth: Token = {
 }
 
 export const tokens: TokensTyps = {
-  '1': [
+  [SupportedNetworks.Mainnet]: [
     eth,
     {
       name: 'USDC',
@@ -31,7 +31,7 @@ export const tokens: TokensTyps = {
       decimals: 18,
     },
   ],
-  '42': [
+  [SupportedNetworks.Kovan]: [
     eth,
     {
       name: 'USDC',
@@ -70,7 +70,7 @@ type SystemAddresses = {
 }
 
 export const addresses: SystemAddresses = {
-  '1': {
+  [SupportedNetworks.Mainnet]: {
     controller: isPublic ? '0x4ccc2339F87F6c59c6893E1A678c2266cA58dC72' : '0xde158Fa7022f11707d4a3570eec4621B35d83829',
     factory: isPublic ? '0x7C06792Af1632E77cb27a558Dc0885338F4Bdf8E' : '0xE21127f47B365d3b1467746804f32BF8dCf47e26',
     addressBook: isPublic ? '0x1E31F2DCBad4dc572004Eae6355fB18F9615cBe4' : '0x57ADe7D5E9D2F45A07f8039Da7228ACC305fbeaF',
@@ -80,7 +80,7 @@ export const addresses: SystemAddresses = {
     zeroxERCProxy: '0x95e6f48254609a6ee006f7d493c8e5fb97094cef',
     zeroxStaking: '0xa26e80e7dea86279c6d778d702cc413e6cffa777',
   },
-  '42': {
+  [SupportedNetworks.Kovan]: {
     controller: isPublic ? '0xdee7d0f8ccc0f7ac7e45af454e5e7ec1552e8e4e' : '0xa84cff11957a0a08a3e1d568ed1caaf47626c1f3',
     factory: isPublic ? '0xb9d17ab06e27f63d0fd75099d5874a194ee623e2' : '0x32b5a18238BAdF23F8E88669de2bD3671ff7BF83',
     addressBook: isPublic ? '0x8812f219f507e8cfe9d2f1e790164714c5e06a73' : '0x4163Bf53878B2169Ea9E404b9E840FA010DbF949',
@@ -93,8 +93,8 @@ export const addresses: SystemAddresses = {
 }
 
 export const blacklistOTokens = {
-  '1': [ZERO_ADDR],
-  '42': [ZERO_ADDR],
+  [SupportedNetworks.Mainnet]: [ZERO_ADDR],
+  [SupportedNetworks.Kovan]: [ZERO_ADDR],
 }
 
 type KnownOperator = {
@@ -108,7 +108,7 @@ type KnownOperator = {
 export const knownOperators: {
   [key in SupportedNetworks]: KnownOperator[]
 } = {
-  '1': [
+  [SupportedNetworks.Mainnet]: [
     {
       address: isPublic ? '0x8f7dd610c457fc7cb26b0f9db4e77581f94f70ac' : '0xa05157b27b7db2eb63bb0c11412b71e7de027f89',
       name: 'PayableProxy',
@@ -117,7 +117,7 @@ export const knownOperators: {
       author: 'Opyn',
     },
   ],
-  '42': [
+  [SupportedNetworks.Kovan]: [
     {
       address: isPublic ? '0x5957a413f5ac4bcf2ba7c5c461a944b548adb1a5' : '0xe501e882f6e5f049899e02b7e48d89f223cb2a4f',
       name: 'PayableProxy',
@@ -129,8 +129,8 @@ export const knownOperators: {
 }
 
 export const zx_exchange = {
-  '1': '0x61935cbdd02287b511119ddb11aeb42f1593b7ef',
-  '42': '0x4eacd0af335451709e1e7b570b8ea68edec8bc97',
+  [SupportedNetworks.Mainnet]: '0x61935cbdd02287b511119ddb11aeb42f1593b7ef',
+  [SupportedNetworks.Kovan]: '0x4eacd0af335451709e1e7b570b8ea68edec8bc97',
 }
 
 export const getUSDC = (networkId: SupportedNetworks) => {

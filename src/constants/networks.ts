@@ -4,11 +4,11 @@ export enum SupportedNetworks {
 }
 
 export const networkIdToTxUrl = {
-  '1': 'https://etherscan.io/tx',
-  '42': 'https://kovan.etherscan.io/tx',
+  [SupportedNetworks.Mainnet]: 'https://etherscan.io/tx',
+  [SupportedNetworks.Kovan]: 'https://kovan.etherscan.io/tx',
 }
 
 export const networkIdToAddressUrl = {
-  '1': 'https://etherscan.io/address',
-  '42': 'https://kovan.etherscan.io/address',
+  [SupportedNetworks.Mainnet]: 'https://etherscan.io/address',
+  [SupportedNetworks.Kovan]: 'https://kovan.etherscan.io/address',
 }

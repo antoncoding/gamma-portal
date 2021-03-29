@@ -7,10 +7,10 @@ type graphEndPointType = {
 const isPublic = process.env.REACT_APP_PUBLIC === 'true'
 
 export const subgraph: graphEndPointType = {
-  '1': isPublic
+  [SupportedNetworks.Mainnet]: isPublic
     ? 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-mainnet'
     : 'https://api.thegraph.com/subgraphs/name/opynfinance/playground',
-  '42': isPublic
+  [SupportedNetworks.Kovan]: isPublic
     ? 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-kovan'
     : 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-internal-kovan',
 }
