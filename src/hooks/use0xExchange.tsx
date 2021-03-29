@@ -147,17 +147,19 @@ export function use0xExchange() {
 
   const broadcastOrder = useCallback(
     async (order: SignedOrder) => {
-      const url = `${httpEndpoint}sra/v3/orders`
+      const url = `${httpEndpoint}sra/v3/order`
       const res = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify([order]),
+        body: JSON.stringify(order),
       })
       if (res.status === 200) return toast.success('Order successfully broadcasted')
       const jsonRes = await res.json()
-      toast.error(jsonRes.validationErrors[0].reason)
+      if (jsonRes.validationErrors) return toast.error(jsonRes.validationErrors[0].reason)
+
+      toast.error(JSON.stringify(jsonRes))
     },
     [httpEndpoint, toast],
   )

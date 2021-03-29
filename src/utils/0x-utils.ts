@@ -302,26 +302,6 @@ export const createOrder = (
 }
 
 /**
- * Send orders to the mesh node
- * @param {number} networkId
- * @param {SignedOrder[]} orders
- */
-export const broadcastOrders = async (networkId: 1 | 42, orders: SignedOrder[]) => {
-  const endpoint = ZeroXEndpoint[networkId].http
-  const url = `${endpoint}sra/v3/orders`
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(orders),
-  })
-  if (res.status === 200) return
-  const jsonRes = await res.json()
-  throw jsonRes.validationErrors[0].reason
-}
-
-/**
  * Calculate the price of a bid order
  */
 export const getBidPrice = (
