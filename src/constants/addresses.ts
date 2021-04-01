@@ -153,7 +153,7 @@ export const knownOperators: {
   ],
   [SupportedNetworks.Ropsten]: [
     {
-      address: '0x7173D861Ce9304ED62B7d3Fbfb3A79C51b566614',
+      address: '0x0da6280d0837292b7a1f27fc602c7e0bd3ce0b66',
       name: 'PayableProxy',
       description: 'Proxy contract to help mint calls with ETH instead of WETH',
       audited: true,

@@ -115,7 +115,7 @@ export function use0xExchange() {
 
       // change to batch Fill when it's live
       await exchange.methods
-        .fillLimitOrder(orders[0], signatures[0], amountsStr[0])
+        .batchFillLimitOrders(orders, signatures, amountsStr, false)
         .send({
           from: user,
           value: web3.utils.toWei(feeInEth, 'ether'),
