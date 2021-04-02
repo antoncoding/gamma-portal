@@ -25,7 +25,7 @@ export function useAllProducts(): { allProducts: Product[] } {
 
       return products.map(product => {
         const type = product.isPut ? 'Put' : 'Call'
-        const optionName = `${product.underlying.symbol}-${product.strike.symbol} ${type} ${product.collateral.symbol} Collateral`
+        const optionName = `${product.underlying.symbol}-${product.strike.symbol} ${type}`
         return {
           label: optionName,
           ...product,

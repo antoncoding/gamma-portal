@@ -9,9 +9,10 @@ import LimitTicket from './LimitTicket'
 import { SubgraphOToken } from '../../../types'
 import { simplifyOTokenSymbol } from '../../../utils/others'
 
-import { TradeAction, MarketTypes, getUSDC, getWeth } from '../../../constants'
+import { TradeAction, TradeTypes, getUSDC, getWeth, TRADE_TYPE_KEY } from '../../../constants'
 import { useOTokenBalances, useTokenBalance } from '../../../hooks'
 import { useConnectedWallet } from '../../../contexts/wallet'
+import { getPreference, storePreference } from '../../../utils/storage'
 
 type TradeDetailProps = {
   selectedOToken: SubgraphOToken | null
@@ -22,7 +23,8 @@ type TradeDetailProps = {
 
 export default function TradePanel({ selectedOToken, action, setAction, compact }: TradeDetailProps) {
   const theme = useTheme()
-  const [marketType, setMarketType] = useState(MarketTypes.Market)
+
+  const [tradeType, setTradeType] = useState(getPreference(TRADE_TYPE_KEY, TradeTypes.Market) as TradeTypes)
 
   const { user, networkId } = useConnectedWallet()
 
@@ -46,13 +48,13 @@ export default function TradePanel({ selectedOToken, action, setAction, compact 
       <Row>
         <Visible xs sm md>
           <Col xs={12} style={{ padding: '15px' }}>
-            <TradeType action={action} setAction={setAction} setMarketType={setMarketType} marketType={marketType} />
+            <TradeType action={action} setAction={setAction} setTradeType={setTradeType} tradeType={tradeType} />
           </Col>
         </Visible>
         <Col sm={12} lg={compact ? 6.5 : 8} xl={compact ? 8 : 9}>
           {selectedOToken === null ? (
             <div style={{ color: theme.contentSecondary }}> Select an oToken to proceed </div>
-          ) : marketType === MarketTypes.Market ? (
+          ) : tradeType === TradeTypes.Market ? (
             <MarketTicket
               inputTokenAmount={inputTokenAmount}
               setInputTokenAmount={setInputTokenAmount}
@@ -79,7 +81,7 @@ export default function TradePanel({ selectedOToken, action, setAction, compact 
         </Col>
         <Hidden xs sm md>
           <Col lg={compact ? 5.5 : 4} xl={compact ? 4 : 3}>
-            <TradeType action={action} setAction={setAction} setMarketType={setMarketType} marketType={marketType} />
+            <TradeType action={action} setAction={setAction} setTradeType={setTradeType} tradeType={tradeType} />
           </Col>
         </Hidden>
       </Row>
@@ -90,19 +92,26 @@ export default function TradePanel({ selectedOToken, action, setAction, compact 
 type TradeTypeProps = {
   action: TradeAction
   setAction: any
-  marketType: MarketTypes
-  setMarketType: any
+  tradeType: TradeTypes
+  setTradeType: any
 }
 
-function TradeType({ action, setAction, marketType, setMarketType }: TradeTypeProps) {
+// market buy / market sell / limit buy / limit sell
+function TradeType({ action, setAction, tradeType, setTradeType }: TradeTypeProps) {
   return (
     <div style={{ display: 'flex' }}>
       <Button
         size="small"
-        label={marketType === MarketTypes.Market ? 'Market' : 'Limit'}
-        onClick={() =>
-          marketType === MarketTypes.Market ? setMarketType(MarketTypes.Limit) : setMarketType(MarketTypes.Market)
-        }
+        label={tradeType === TradeTypes.Market ? 'Market' : 'Limit'}
+        onClick={() => {
+          if (tradeType === TradeTypes.Market) {
+            setTradeType(TradeTypes.Limit)
+            storePreference(TRADE_TYPE_KEY, TradeTypes.Limit)
+          } else {
+            setTradeType(TradeTypes.Market)
+            storePreference(TRADE_TYPE_KEY, TradeTypes.Market)
+          }
+        }}
       />
 
       <Button

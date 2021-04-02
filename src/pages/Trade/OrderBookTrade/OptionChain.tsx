@@ -3,7 +3,7 @@ import React, { useMemo, useCallback, useState } from 'react'
 import { DataView, Radio, SyncIndicator } from '@aragon/ui'
 import { SubgraphOToken } from '../../../types'
 import { OTOKENS_BOARD, OTOKENS_BOARD_FILTERED } from '../../../constants/dataviewContents'
-import { SHOW_EMPTY } from '../../../constants'
+import { SHOW_EMPTY, OptionChainMode } from '../../../constants'
 import { toTokenAmount } from '../../../utils/math'
 import { useOrderbook } from '../../../contexts/orderbook'
 import { getOrderBookDetail } from '../../../utils/0x-utils'
@@ -14,14 +14,32 @@ import BigNumber from 'bignumber.js'
 
 const iv = require('implied-volatility')
 
-type BoardRow = {
+type SimpleRow = {
+  strikePrice: string
+  expiry: string
+  option: SubgraphOToken
+}
+
+type SimpleRowWithDetail = SimpleRow & {
+  bid: string
+  bidSize: string
+  ask: string
+  askSize: string
+}
+
+type SimpleRowWithGreeks = SimpleRowWithDetail & {
+  bidIV: string
+  askIV: string
+}
+
+type CompleteRow = {
   strikePrice: string
   expiry: string
   put?: SubgraphOToken
   call?: SubgraphOToken
 }
 
-type RowWithDetail = BoardRow & {
+type CompleteRowWithDetail = CompleteRow & {
   callBid: string
   callBidSize: string
   callAsk: string
@@ -32,28 +50,31 @@ type RowWithDetail = BoardRow & {
   putAskSize: string
 }
 
-type RowWithGreeks = RowWithDetail & {
+type CompleteRowWithGreeks = CompleteRowWithDetail & {
   putbidIV: string
   putAskIV: string
   callbidIV: string
   callAskIV: string
 }
 
-type BoardProps = {
+type OptionChainProps = {
   oTokens: SubgraphOToken[]
   selectedOToken: SubgraphOToken | null
   setSelectedOToken: any
   spotPrice: BigNumber
+  mode: OptionChainMode
 }
 
-export default function Board({ oTokens, selectedOToken, setSelectedOToken, spotPrice }: BoardProps) {
+export default function OptionChain({ oTokens, selectedOToken, setSelectedOToken, spotPrice, mode }: OptionChainProps) {
   const [page, setPage] = useState(0)
   const { isLoading: isLoadingOrderbook, orderbooks } = useOrderbook()
 
   const [showEmpty, setShowEmpty] = useState(getPreference(SHOW_EMPTY, 'false') === 'true')
 
-  const rows = useMemo(() => {
-    let _rows: BoardRow[] = []
+  const completeRows = useMemo(() => {
+    // only return items when "All" is selected.
+    if (mode !== OptionChainMode.All) return []
+    let _rows: CompleteRow[] = []
     const _sortedOTokens = oTokens.sort((a, b) => (Number(a.strikePrice) > Number(b.strikePrice) ? 1 : -1))
     for (const otoken of _sortedOTokens) {
       const target = _rows.find(r => r.strikePrice === otoken.strikePrice)
@@ -73,10 +94,11 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken, spot
       }
     }
     return _rows
-  }, [oTokens])
+  }, [mode, oTokens])
 
+  // only contain items when "All is selected"
   const rowsWithDetail = useMemo(() => {
-    return rows
+    return completeRows
       .map(row => {
         const callbook = orderbooks.find(b => b.id === row.call?.id)
         const putbook = orderbooks.find(b => b.id === row.put?.id)
@@ -112,9 +134,10 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken, spot
         }
       })
       .filter(row => (showEmpty ? true : !row.isEmpty))
-  }, [rows, orderbooks, showEmpty])
+  }, [completeRows, orderbooks, showEmpty])
 
-  const rowsWithGreeks = useMemo(() => {
+  // only contain items when "All" is selected
+  const completeRowsWithGreeks = useMemo(() => {
     return rowsWithDetail.map(row => {
       const t = new BigNumber(Number(row.expiry) - Date.now() / 1000).div(86400).div(365).toNumber()
       const s = spotPrice.toNumber()
@@ -142,8 +165,8 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken, spot
     })
   }, [rowsWithDetail, spotPrice])
 
-  const renderRow = useCallback(
-    (row: RowWithGreeks) => {
+  const renderCompleteRow = useCallback(
+    (row: CompleteRowWithGreeks) => {
       const callOnClick = () => {
         setSelectedOToken(row.call)
       }
@@ -206,37 +229,154 @@ export default function Board({ oTokens, selectedOToken, setSelectedOToken, spot
     [selectedOToken, setSelectedOToken],
   )
 
+  // =====================================================
+  // Rows information when mode "Put or Call" is selected
+  // =====================================================
+
+  const simpleRows = useMemo(() => {
+    // only return items when "Put or Call" is selected.
+    if (mode === OptionChainMode.All) return []
+    const _sortedOTokens = oTokens
+      .filter(o => o.isPut === (mode === OptionChainMode.Put))
+      .sort((a, b) => (Number(a.strikePrice) > Number(b.strikePrice) ? 1 : -1))
+
+    return _sortedOTokens.map(otoken => {
+      return {
+        strikePrice: otoken.strikePrice,
+        option: otoken,
+        expiry: otoken.expiryTimestamp,
+      } as SimpleRow
+    })
+  }, [mode, oTokens])
+
+  // only contain items when "Put or Call" is selected
+  const simpleRowsWithDetail = useMemo(() => {
+    return simpleRows
+      .map(row => {
+        const book = orderbooks.find(b => b.id === row.option.id)
+
+        const { bestBidPrice: bid, totalBidAmt: bidSize, bestAskPrice: ask, totalAskAmt: askSize } = getOrderBookDetail(
+          book,
+        )
+
+        const isEmpty = book === undefined || (book.asks.length === 0 && book.bids.length === 0)
+
+        return {
+          ...row,
+          isEmpty,
+          bid,
+          bidSize,
+          ask,
+          askSize,
+        }
+      })
+      .filter(row => (showEmpty ? true : !row.isEmpty))
+  }, [simpleRows, orderbooks, showEmpty])
+
+  // only contain items when "Put or Call" is selected
+  const simpleRowsWithGreeks = useMemo(() => {
+    const optiontype = mode.toLowerCase() // 'put' or 'call'
+
+    return simpleRowsWithDetail.map(row => {
+      const t = new BigNumber(Number(row.expiry) - Date.now() / 1000).div(86400).div(365).toNumber()
+      const s = spotPrice.toNumber()
+      const initEstimation = 1
+      const interestRate = 0.05
+
+      const k = parseInt(row.strikePrice) / 1e8
+
+      const bidIV = iv.getImpliedVolatility(Number(row.bid), s, k, t, interestRate, optiontype, initEstimation)
+      const askIV = iv.getImpliedVolatility(Number(row.ask), s, k, t, interestRate, optiontype, initEstimation)
+
+      return {
+        ...row,
+        ask: Number(row.ask) === 0 ? '-' : row.ask,
+        bid: Number(row.bid) === 0 ? '-' : row.bid,
+        bidIV: Number(row.bid) === 0 ? '-' : `${(bidIV * 100).toFixed(2)}%`,
+        askIV: Number(row.ask) === 0 ? '-' : `${(askIV * 100).toFixed(2)}%`,
+      }
+    })
+  }, [simpleRowsWithDetail, spotPrice, mode])
+
+  const renderSimpleRow = useCallback(
+    (row: SimpleRowWithGreeks, idx) => {
+      const onClick = () => {
+        if (selectedOToken?.id === row.option.id) {
+          setSelectedOToken(null)
+        } else {
+          setSelectedOToken(row.option)
+        }
+      }
+
+      const bidCell = onclickWrapper(green(row.bid), onClick)
+      const bidSizeCell = onclickWrapper(row.bidSize, onClick)
+      const bidIvCell = secondary(onclickWrapper(row.bidIV, onClick))
+
+      const askCell = onclickWrapper(red(row.ask), onClick)
+      const askSizeCell = onclickWrapper(row.askSize, onClick)
+      const askIvCell = secondary(onclickWrapper(row.askIV, onClick))
+
+      const strike = bold(toTokenAmount(row.strikePrice, 8).toString())
+
+      return [strike, bidCell, bidSizeCell, bidIvCell, askCell, askSizeCell, askIvCell]
+    },
+    [setSelectedOToken, selectedOToken],
+  )
+
+  const selectedIdxs = useMemo(() => {
+    const idx = simpleRowsWithGreeks.findIndex(o => o.option.id === selectedOToken?.id)
+    return idx === -1 ? [] : [idx]
+  }, [simpleRowsWithGreeks, selectedOToken])
+
   return (
     <div style={{ minWidth: 600 }}>
       <SyncIndicator visible={isLoadingOrderbook} children={'Syncing order book... 🍕'} />
       <CheckBoxWithLabel checked={showEmpty} setChecked={setShowEmpty} storageKey={SHOW_EMPTY} label={'Show Empty'} />
-      <DataView
-        page={page}
-        onPageChange={setPage}
-        entriesPerPage={8}
-        tableRowHeight={35}
-        status={isLoadingOrderbook ? 'loading' : 'default'}
-        fields={[
-          'bid ($)',
-          'iv',
-          'amt',
-          'ask ($)',
-          'iv',
-          'amt',
-          bold('call'),
-          'strike',
-          bold('put'),
-          'bid ($)',
-          'iv',
-          'amt',
-          'ask ($)',
-          'iv',
-          'amt',
-        ]}
-        emptyState={showEmpty ? OTOKENS_BOARD : OTOKENS_BOARD_FILTERED}
-        entries={rowsWithGreeks}
-        renderEntry={renderRow}
-      />
+      {mode === OptionChainMode.All ? (
+        // complete data table: shows whole option chain
+        <DataView
+          page={page}
+          onPageChange={setPage}
+          entriesPerPage={8}
+          tableRowHeight={35}
+          status={isLoadingOrderbook ? 'loading' : 'default'}
+          fields={[
+            'bid ($)',
+            'iv',
+            'amt',
+            'ask ($)',
+            'iv',
+            'amt',
+            bold('call'),
+            'strike',
+            bold('put'),
+            'bid ($)',
+            'iv',
+            'amt',
+            'ask ($)',
+            'iv',
+            'amt',
+          ]}
+          emptyState={showEmpty ? OTOKENS_BOARD : OTOKENS_BOARD_FILTERED}
+          entries={completeRowsWithGreeks}
+          renderEntry={renderCompleteRow}
+        />
+      ) : (
+        // simplidied data table: only shows puts or call
+        <DataView
+          page={page}
+          onPageChange={setPage}
+          entriesPerPage={8}
+          tableRowHeight={35}
+          status={isLoadingOrderbook ? 'loading' : 'default'}
+          fields={['strike', 'bid ($)', 'iv', 'amt', 'ask ($)', 'iv', 'amt']}
+          emptyState={showEmpty ? OTOKENS_BOARD : OTOKENS_BOARD_FILTERED}
+          entries={simpleRowsWithGreeks}
+          renderEntry={renderSimpleRow}
+          renderSelectionCount={entry => ``}
+          selection={selectedIdxs}
+        />
+      )}
     </div>
   )
 }

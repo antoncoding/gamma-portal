@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import ReactGA from 'react-ga'
 import { Col, Row } from 'react-grid-system'
 import TradeHeader from './Header'
-import Board from './Board'
+import OptionChain from './OptionChain'
 import MintPanel from './MintPanel'
 import Orderbook from './Orderbook'
 import UserOrders from './UserOrders'
@@ -11,10 +11,9 @@ import PriceChart from './PriceChart'
 
 import CheckBoxWithLabel from '../../../components/CheckBoxWithLabel'
 import { SubgraphOToken } from '../../../types'
-import { TradeAction, SHOW_MINE_KEY } from '../../../constants'
+import { TradeAction, SHOW_MINE_KEY, OC_MODE_KEY, TRADE_ACTION_KEY, OptionChainMode, eth } from '../../../constants'
 import { useTokenPrice } from '../../../hooks'
-import { eth } from '../../../constants/addresses'
-import { getPreference } from '../../../utils/storage'
+import { getPreference, storePreference } from '../../../utils/storage'
 
 export default function TradePage() {
   useEffect(() => {
@@ -23,10 +22,12 @@ export default function TradePage() {
   const [selectedUnderlying, setSelectedUnderlying] = useState(eth)
   const [selectedOToken, setSelectedOToken] = useState<SubgraphOToken | null>(null)
   const [oTokens, setOTokens] = useState<SubgraphOToken[]>([])
-  const [action, setAction] = useState<TradeAction>(TradeAction.Buy)
+  const [action, setAction] = useState<TradeAction>(getPreference(TRADE_ACTION_KEY, TradeAction.Buy) as TradeAction)
 
   const [showMyOrder, setShowMyOrder] = useState(getPreference(SHOW_MINE_KEY, 'false') === 'true')
-
+  const [optionChainMode, setOptionChainMode] = useState<OptionChainMode>(
+    getPreference(OC_MODE_KEY, OptionChainMode.All) as OptionChainMode,
+  )
   const [mintPanelOpened, setMintPanelOpened] = useState(false)
 
   const spotPrice = useTokenPrice(selectedUnderlying.id, 10)
@@ -38,8 +39,11 @@ export default function TradePage() {
         spotPrice={spotPrice}
         setOTokens={setOTokens}
         setSelectedUnderlying={setSelectedUnderlying}
+        optionChainMode={optionChainMode}
+        setOptionChainMode={setOptionChainMode}
       />
-      <Board
+      <OptionChain
+        mode={optionChainMode}
         spotPrice={spotPrice}
         oTokens={oTokens}
         selectedOToken={selectedOToken}
@@ -59,7 +63,15 @@ export default function TradePage() {
           </div>
         </Col>
         <Col sm={12} md={8}>
-          <TradePanel compact={true} selectedOToken={selectedOToken} action={action} setAction={setAction} />
+          <TradePanel
+            compact={true}
+            selectedOToken={selectedOToken}
+            action={action}
+            setAction={(action: TradeAction) => {
+              setAction(action)
+              storePreference(TRADE_ACTION_KEY, action)
+            }}
+          />
           {selectedOToken && <PriceChart selectedOToken={selectedOToken} />}
         </Col>
       </Row>

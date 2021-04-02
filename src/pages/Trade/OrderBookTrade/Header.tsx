@@ -6,15 +6,28 @@ import { useOTokenInSeries } from '../../../hooks/useOTokens'
 import { useAllSeries } from '../../../hooks/useAllProducts'
 import { toUTCDateString } from '../../../utils/others'
 import { Token } from '../../../types'
+import { OptionChainMode, OC_MODE_KEY } from '../../../constants'
+import { storePreference } from '../../../utils/storage'
 
 type HeaderProps = {
   setOTokens: any
   spotPrice: BigNumber
   underlying: Token
   setSelectedUnderlying: React.Dispatch<React.SetStateAction<Token>>
+  optionChainMode: OptionChainMode
+  setOptionChainMode: React.Dispatch<React.SetStateAction<OptionChainMode>>
 }
 
-export default function TradeHeadBar({ underlying, spotPrice, setOTokens, setSelectedUnderlying }: HeaderProps) {
+const modes = [OptionChainMode.All, OptionChainMode.Call, OptionChainMode.Put]
+
+export default function TradeHeadBar({
+  underlying,
+  spotPrice,
+  setOTokens,
+  setSelectedUnderlying,
+  optionChainMode,
+  setOptionChainMode,
+}: HeaderProps) {
   const [seriesId, setSeiresId] = useState(0)
   const [expiryId, setExpiryId] = useState(0)
 
@@ -30,13 +43,14 @@ export default function TradeHeadBar({ underlying, spotPrice, setOTokens, setSel
 
   const uniqueExpiries = useMemo(() => {
     return allOToken
+      .filter(o => optionChainMode === OptionChainMode.All || (optionChainMode === OptionChainMode.Put) === o.isPut)
       .filter(o => o.underlyingAsset.id === series?.underlying.id)
       .reduce((prev: string[], curr) => {
         if (!prev.includes(curr.expiryTimestamp)) return [...prev, curr.expiryTimestamp]
         return prev
       }, [])
       .sort((a, b) => (Number(a) > Number(b) ? 1 : -1))
-  }, [allOToken, series])
+  }, [allOToken, series, optionChainMode])
 
   const expiry = useMemo(() => (uniqueExpiries.length === 0 ? null : uniqueExpiries[expiryId]), [
     uniqueExpiries,
@@ -75,6 +89,15 @@ export default function TradeHeadBar({ underlying, spotPrice, setOTokens, setSel
               disabled={uniqueExpiries.length === 0}
               selected={expiryId}
               onChange={setExpiryId}
+            />
+            <div style={{ padding: '10px' }}></div>
+            <DropDown
+              items={modes}
+              selected={modes.findIndex(i => i === optionChainMode)}
+              onChange={i => {
+                setOptionChainMode(modes[i])
+                storePreference(OC_MODE_KEY, modes[i])
+              }}
             />
           </div>
         }
