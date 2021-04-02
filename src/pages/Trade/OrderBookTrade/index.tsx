@@ -11,9 +11,9 @@ import PriceChart from './PriceChart'
 
 import CheckBoxWithLabel from '../../../components/CheckBoxWithLabel'
 import { SubgraphOToken } from '../../../types'
-import { TradeAction, SHOW_MINE_KEY, OC_MODE_KEY, OptionChainMode, eth } from '../../../constants'
+import { TradeAction, SHOW_MINE_KEY, OC_MODE_KEY, TRADE_ACTION_KEY, OptionChainMode, eth } from '../../../constants'
 import { useTokenPrice } from '../../../hooks'
-import { getPreference } from '../../../utils/storage'
+import { getPreference, storePreference } from '../../../utils/storage'
 
 export default function TradePage() {
   useEffect(() => {
@@ -22,7 +22,7 @@ export default function TradePage() {
   const [selectedUnderlying, setSelectedUnderlying] = useState(eth)
   const [selectedOToken, setSelectedOToken] = useState<SubgraphOToken | null>(null)
   const [oTokens, setOTokens] = useState<SubgraphOToken[]>([])
-  const [action, setAction] = useState<TradeAction>(TradeAction.Buy)
+  const [action, setAction] = useState<TradeAction>(getPreference(TRADE_ACTION_KEY, TradeAction.Buy) as TradeAction)
 
   const [showMyOrder, setShowMyOrder] = useState(getPreference(SHOW_MINE_KEY, 'false') === 'true')
   const [optionChainMode, setOptionChainMode] = useState<OptionChainMode>(
@@ -63,7 +63,15 @@ export default function TradePage() {
           </div>
         </Col>
         <Col sm={12} md={8}>
-          <TradePanel compact={true} selectedOToken={selectedOToken} action={action} setAction={setAction} />
+          <TradePanel
+            compact={true}
+            selectedOToken={selectedOToken}
+            action={action}
+            setAction={(action: TradeAction) => {
+              setAction(action)
+              storePreference(TRADE_ACTION_KEY, action)
+            }}
+          />
           {selectedOToken && <PriceChart selectedOToken={selectedOToken} />}
         </Col>
       </Row>

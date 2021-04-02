@@ -22,7 +22,7 @@ export enum TradeAction {
   Sell = 'sell',
 }
 
-export enum MarketTypes {
+export enum TradeTypes {
   Market = 'market',
   Limit = 'limit',
 }
