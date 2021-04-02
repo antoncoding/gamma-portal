@@ -14,3 +14,6 @@ export const SHOW_EMPTY = 'orderbook-show-empty'
 
 //
 export const SHOW_SIDE_BAR = 'show-side-bar'
+
+// option mode key
+export const OC_MODE_KEY = 'option-chain-mode'

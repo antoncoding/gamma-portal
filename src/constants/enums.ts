@@ -4,6 +4,12 @@ export enum OrderType {
   ASK,
 }
 
+export enum OptionChainMode {
+  All = 'All',
+  Call = 'Call',
+  Put = 'Put',
+}
+
 export enum DeadlineUnit {
   Seconds = 'seconds',
   Minutes = 'minutes',

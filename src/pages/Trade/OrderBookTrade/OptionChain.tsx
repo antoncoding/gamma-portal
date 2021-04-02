@@ -3,7 +3,7 @@ import React, { useMemo, useCallback, useState } from 'react'
 import { DataView, Radio, SyncIndicator } from '@aragon/ui'
 import { SubgraphOToken } from '../../../types'
 import { OTOKENS_BOARD, OTOKENS_BOARD_FILTERED } from '../../../constants/dataviewContents'
-import { SHOW_EMPTY } from '../../../constants'
+import { SHOW_EMPTY, OptionChainMode } from '../../../constants'
 import { toTokenAmount } from '../../../utils/math'
 import { useOrderbook } from '../../../contexts/orderbook'
 import { getOrderBookDetail } from '../../../utils/0x-utils'
@@ -39,14 +39,21 @@ type RowWithGreeks = RowWithDetail & {
   callAskIV: string
 }
 
-type BoardProps = {
+type OptionChainProps = {
   oTokens: SubgraphOToken[]
   selectedOToken: SubgraphOToken | null
   setSelectedOToken: any
   spotPrice: BigNumber
+  mode: OptionChainMode
 }
 
-export default function Board({ oTokens, selectedOToken, setSelectedOToken, spotPrice }: BoardProps) {
+export default function OptionChain({
+  oTokens,
+  selectedOToken,
+  setSelectedOToken,
+  spotPrice,
+  mode: OptionChainMode,
+}: OptionChainProps) {
   const [page, setPage] = useState(0)
   const { isLoading: isLoadingOrderbook, orderbooks } = useOrderbook()
 
