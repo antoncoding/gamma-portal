@@ -299,12 +299,14 @@ export default function OptionChain({ oTokens, selectedOToken, setSelectedOToken
   }, [simpleRowsWithDetail, spotPrice, mode])
 
   const renderSimpleRow = useCallback(
-    (row: SimpleRowWithGreeks) => {
+    (row: SimpleRowWithGreeks, idx) => {
       const onClick = () => {
-        setSelectedOToken(row.option)
+        if (selectedOToken?.id === row.option.id) {
+          setSelectedOToken(null)
+        } else {
+          setSelectedOToken(row.option)
+        }
       }
-
-      const button = <Radio onChange={onClick} checked={selectedOToken && selectedOToken?.id === row.option.id} />
 
       const bidCell = onclickWrapper(green(row.bid), onClick)
       const bidSizeCell = onclickWrapper(row.bidSize, onClick)
@@ -316,10 +318,15 @@ export default function OptionChain({ oTokens, selectedOToken, setSelectedOToken
 
       const strike = bold(toTokenAmount(row.strikePrice, 8).toString())
 
-      return [strike, bidCell, bidSizeCell, bidIvCell, askCell, askSizeCell, askIvCell, button]
+      return [strike, bidCell, bidSizeCell, bidIvCell, askCell, askSizeCell, askIvCell]
     },
-    [selectedOToken, setSelectedOToken],
+    [setSelectedOToken, selectedOToken],
   )
+
+  const selectedIdxs = useMemo(() => {
+    const idx = simpleRowsWithGreeks.findIndex(o => o.option.id === selectedOToken?.id)
+    return idx === -1 ? [] : [idx]
+  }, [simpleRowsWithGreeks, selectedOToken])
 
   return (
     <div style={{ minWidth: 600 }}>
@@ -362,10 +369,12 @@ export default function OptionChain({ oTokens, selectedOToken, setSelectedOToken
           entriesPerPage={8}
           tableRowHeight={35}
           status={isLoadingOrderbook ? 'loading' : 'default'}
-          fields={['strike', 'bid ($)', 'iv', 'amt', 'ask ($)', 'iv', 'amt', '']}
+          fields={['strike', 'bid ($)', 'iv', 'amt', 'ask ($)', 'iv', 'amt']}
           emptyState={showEmpty ? OTOKENS_BOARD : OTOKENS_BOARD_FILTERED}
           entries={simpleRowsWithGreeks}
           renderEntry={renderSimpleRow}
+          renderSelectionCount={entry => ``}
+          selection={selectedIdxs}
         />
       )}
     </div>
