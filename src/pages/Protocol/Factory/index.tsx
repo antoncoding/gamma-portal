@@ -9,11 +9,9 @@ import Warning from '../../../components/Warning'
 import { getNextFriday, fromTokenAmount } from '../../../utils/math'
 import SectionTitle from '../../../components/SectionHeader'
 import TokenAddress from '../../../components/TokenAddress'
-import { ZERO_ADDR } from '../../../constants/addresses'
+import { ZERO_ADDR, eth } from '../../../constants'
 import WarningText from '../../../components/Warning'
-import { useFactory } from '../../../hooks/useFactory'
-import { useAllProducts } from '../../../hooks/useAllProducts'
-import { useCustomToast } from '../../../hooks'
+import { useCustomToast, useAllProducts, useFactory, getTokenPriceCoingecko } from '../../../hooks'
 
 export default function CreateOption() {
   const factory = useFactory()
@@ -31,7 +29,7 @@ export default function CreateOption() {
   const [expiryWarning, setExpiryWarning] = useState<string>('')
 
   const [isDuplicated, setIsDuplicated] = useState(false)
-  const [isCreating, setIsCreating] = useState(Boolean)
+
   const [targetAddress, setTargetAddress] = useState(ZERO_ADDR)
 
   const { allProducts } = useAllProducts()
@@ -48,6 +46,19 @@ export default function CreateOption() {
 
   const strikePrice = useMemo(() => fromTokenAmount(new BigNumber(strikePriceReadable), 8), [strikePriceReadable])
 
+  const selectedUnderlying = useMemo(
+    () => (selectedProductIndex === -1 ? eth : allProducts[selectedProductIndex].underlying),
+    [allProducts, selectedProductIndex],
+  )
+
+  // reset stikeprice when selected underlying changed
+  useEffect(() => {
+    getTokenPriceCoingecko(selectedUnderlying.id).then(price => {
+      const defaultPrice = price.div(100).integerValue().times(100).integerValue()
+      setStrikePriceReadable(defaultPrice)
+    })
+  }, [selectedUnderlying.id])
+
   const createOToken = useCallback(async () => {
     if (selectedProductIndex === -1) {
       toast.info('Please select a product')
@@ -57,13 +68,10 @@ export default function CreateOption() {
     const strike = allProducts[selectedProductIndex].strike
     const collateral = allProducts[selectedProductIndex].collateral
     const isPut = allProducts[selectedProductIndex].isPut
-    setIsCreating(true)
-    // check if the option has been created.
     try {
       await factory.createOToken(underlying.id, strike.id, collateral.id, strikePrice, expiryTimestamp, isPut)
     } catch (error) {
-    } finally {
-      setIsCreating(false)
+      toast.error(error.message)
     }
   }, [factory, allProducts, selectedProductIndex, expiryTimestamp, strikePrice, toast])
 
@@ -176,16 +184,8 @@ export default function CreateOption() {
             {' '}
             <LabelText label="Create!" /> <WarningText text="This option has been created" show={isDuplicated} />{' '}
           </div>
-          <Button wide disabled={isDuplicated || isCreating || hasExpiryWarning} onClick={createOToken}>
-            {' '}
-            {isCreating ? (
-              <>
-                {' '}
-                <LoadingRing /> <span style={{ paddingLeft: '5px' }}>Createing </span>{' '}
-              </>
-            ) : (
-              'Create'
-            )}{' '}
+          <Button wide disabled={isDuplicated || hasExpiryWarning} onClick={createOToken}>
+            Create
           </Button>
         </CellQuarter>
 

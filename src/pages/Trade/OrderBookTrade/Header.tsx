@@ -44,7 +44,7 @@ export default function TradeHeadBar({
   const uniqueExpiries = useMemo(() => {
     return allOToken
       .filter(o => optionChainMode === OptionChainMode.All || (optionChainMode === OptionChainMode.Put) === o.isPut)
-      .filter(o => o.underlyingAsset.id === series?.underlying.id)
+      .filter(o => o.underlyingAsset.id === series?.underlying.id && o.strikeAsset.id === series?.strike.id)
       .reduce((prev: string[], curr) => {
         if (!prev.includes(curr.expiryTimestamp)) return [...prev, curr.expiryTimestamp]
         return prev
@@ -60,9 +60,10 @@ export default function TradeHeadBar({
   const oTokens = useMemo(
     () =>
       allOToken
+        .filter(o => optionChainMode === OptionChainMode.All || (optionChainMode === OptionChainMode.Put) === o.isPut)
         .filter(o => o.underlyingAsset.id === series?.underlying.id && o.strikeAsset.id === series?.strike.id)
         .filter(o => o.expiryTimestamp === expiry),
-    [allOToken, expiry, series],
+    [allOToken, expiry, series, optionChainMode],
   )
 
   useEffect(() => {

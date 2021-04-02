@@ -1,6 +1,7 @@
 export * from './use0xOrderbook'
 export * from './useAllProducts'
 export * from './useConnection'
+export * from './useFactory'
 export * from './useGasPrice'
 export * from './useOTokenBalances'
 export * from './useOTokens'
