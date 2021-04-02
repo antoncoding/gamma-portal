@@ -30,6 +30,12 @@ export const tokens: TokensTyps = {
       symbol: 'WETH',
       decimals: 18,
     },
+    {
+      name: 'Wrapped Bitcoin',
+      id: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+      symbol: 'WBTC',
+      decimals: 8,
+    },
   ],
   [SupportedNetworks.Kovan]: [
     eth,
