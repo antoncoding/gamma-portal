@@ -43,13 +43,14 @@ export default function TradeHeadBar({
 
   const uniqueExpiries = useMemo(() => {
     return allOToken
+      .filter(o => optionChainMode === OptionChainMode.All || (optionChainMode === OptionChainMode.Put) === o.isPut)
       .filter(o => o.underlyingAsset.id === series?.underlying.id)
       .reduce((prev: string[], curr) => {
         if (!prev.includes(curr.expiryTimestamp)) return [...prev, curr.expiryTimestamp]
         return prev
       }, [])
       .sort((a, b) => (Number(a) > Number(b) ? 1 : -1))
-  }, [allOToken, series])
+  }, [allOToken, series, optionChainMode])
 
   const expiry = useMemo(() => (uniqueExpiries.length === 0 ? null : uniqueExpiries[expiryId]), [
     uniqueExpiries,
