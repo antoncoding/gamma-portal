@@ -1,7 +1,7 @@
 import { SupportedNetworks } from './networks'
 import { Token } from '../types/index'
 
-type TokensTypes = {
+type Tokens = {
   [key in SupportedNetworks]: Token[]
 }
 
@@ -15,7 +15,7 @@ export const eth: Token = {
   decimals: 18,
 }
 
-export const tokens: TokensTyps = {
+export const tokens: Tokens = {
   [SupportedNetworks.Mainnet]: [
     eth,
     {
@@ -37,7 +37,7 @@ export const tokens: TokensTyps = {
       decimals: 8,
     },
   ],
-  
+
   [SupportedNetworks.Ropsten]: [
     eth,
     {
@@ -115,7 +115,6 @@ export const addresses: SystemAddresses = {
     zeroxExchange: '0xdef1c0ded9bec7f1a1670819833240f027b25eff', // v4
   },
   [SupportedNetworks.Kovan]: {
-
     controller: isPublic ? '0xdee7d0f8ccc0f7ac7e45af454e5e7ec1552e8e4e' : '0xa84cff11957a0a08a3e1d568ed1caaf47626c1f3',
     factory: isPublic ? '0xb9d17ab06e27f63d0fd75099d5874a194ee623e2' : '0x32b5a18238BAdF23F8E88669de2bD3671ff7BF83',
     addressBook: isPublic ? '0x8812f219f507e8cfe9d2f1e790164714c5e06a73' : '0x4163Bf53878B2169Ea9E404b9E840FA010DbF949',
