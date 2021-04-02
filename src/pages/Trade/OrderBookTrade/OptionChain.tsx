@@ -229,6 +229,10 @@ export default function OptionChain({ oTokens, selectedOToken, setSelectedOToken
     [selectedOToken, setSelectedOToken],
   )
 
+  // =====================================================
+  // Rows information when mode "Put or Call" is selected
+  // =====================================================
+
   const simpleRows = useMemo(() => {
     // only return items when "Put or Call" is selected.
     if (mode === OptionChainMode.All) return []

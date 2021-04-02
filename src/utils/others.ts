@@ -82,5 +82,6 @@ export function simplifyOTokenSymbol(symbol: string) {
   // oWETHUSDC/WETH-15JAN21-680C
   const [assets, remaining] = symbol.split('/')
   const [, date, strike] = remaining.split('-')
-  return `${assets}-${date}-${strike}`
+  // return oWETH--15JAN21-680C
+  return `${assets.replace('USDC', '')}-${date}-${strike}`
 }
