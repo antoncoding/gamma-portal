@@ -318,7 +318,7 @@ export default function OptionChain({ oTokens, selectedOToken, setSelectedOToken
 
       const strike = bold(toTokenAmount(row.strikePrice, 8).toString())
 
-      return [strike, bidCell, bidSizeCell, bidIvCell, askCell, askSizeCell, askIvCell]
+      return [strike, bidCell, bidIvCell, bidSizeCell, askCell, askIvCell, askSizeCell]
     },
     [setSelectedOToken, selectedOToken],
   )

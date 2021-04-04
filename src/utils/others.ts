@@ -71,7 +71,7 @@ export const getExpiryPayout = (token: SubgraphOToken, amount: string, expiryPri
 
 export function toUTCDateString(expiry: number): string {
   const expiryDate = new Date(expiry * 1000)
-  return expiryDate.toUTCString().split(' ').slice(0, 4).join(' ')
+  return expiryDate.toUTCString().split(' ').slice(1, 4).join(' ')
 }
 
 export function sleep(ms: number) {

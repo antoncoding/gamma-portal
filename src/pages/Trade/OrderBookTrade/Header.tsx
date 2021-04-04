@@ -1,12 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
+import { Col, Row } from 'react-grid-system'
 import { Header, DropDown, LoadingRing } from '@aragon/ui'
 
-import { useOTokenInSeries } from '../../../hooks/useOTokens'
-import { useAllSeries } from '../../../hooks/useAllProducts'
+import { useOTokenInSeries, useAllSeries, useBreakpoint } from '../../../hooks'
+
 import { toUTCDateString } from '../../../utils/others'
 import { Token } from '../../../types'
-import { OptionChainMode, OC_MODE_KEY } from '../../../constants'
+import { OptionChainMode, OC_MODE_KEY, BreakPoints } from '../../../constants'
 import { storePreference } from '../../../utils/storage'
 
 type HeaderProps = {
@@ -32,6 +33,8 @@ export default function TradeHeadBar({
   const [expiryId, setExpiryId] = useState(0)
 
   const { allSeries } = useAllSeries()
+
+  const breakpoint = useBreakpoint()
 
   const series = useMemo(() => (allSeries.length === 0 ? null : allSeries[seriesId]), [allSeries, seriesId])
 
@@ -72,37 +75,46 @@ export default function TradeHeadBar({
 
   return (
     <>
-      <Header
-        primary={`Trade ${underlying.symbol} Options ($${spotPrice.toFixed(2)})`}
-        secondary={
-          <div style={{ display: 'flex' }}>
-            <DropDown
-              placeholder={allSeries.length === 0 ? <LoadingRing /> : 'Select series'}
-              items={allSeries.map(s => `${s.underlying.symbol}-${s.strike.symbol}`)}
-              disabled={allSeries.length === 0}
-              selected={seriesId}
-              onChange={setSeiresId}
-            />
-            <div style={{ padding: '10px' }}></div>
-            <DropDown
-              placeholder={uniqueExpiries.length === 0 ? <LoadingRing /> : 'Select Expiry'}
-              items={uniqueExpiries.map(e => toUTCDateString(Number(e)))}
-              disabled={uniqueExpiries.length === 0}
-              selected={expiryId}
-              onChange={setExpiryId}
-            />
-            <div style={{ padding: '10px' }}></div>
-            <DropDown
-              items={modes}
-              selected={modes.findIndex(i => i === optionChainMode)}
-              onChange={i => {
-                setOptionChainMode(modes[i])
-                storePreference(OC_MODE_KEY, modes[i])
-              }}
-            />
-          </div>
-        }
-      />
+      <Row>
+        <Col xl={9} lg={7} md={6}>
+          <Header primary={`Trade ${underlying.symbol} ($${spotPrice.toFixed(2)})`} />
+        </Col>
+        <Col xl={3} lg={5} md={6}>
+          <Row style={{ paddingTop: 25 }}>
+            <Col lg={4} md={4} sm={12}>
+              <DropDown
+                placeholder={allSeries.length === 0 ? <LoadingRing /> : 'Select series'}
+                items={allSeries.map(s => `${s.underlying.symbol}-${s.strike.symbol}`)}
+                disabled={allSeries.length === 0}
+                selected={seriesId}
+                onChange={setSeiresId}
+                wide={breakpoint <= BreakPoints.sm}
+              />
+            </Col>
+            <Col lg={4} md={4} sm={12}>
+              <DropDown
+                placeholder={uniqueExpiries.length === 0 ? <LoadingRing /> : 'Select Expiry'}
+                items={uniqueExpiries.map(e => toUTCDateString(Number(e)))}
+                disabled={uniqueExpiries.length === 0}
+                selected={expiryId}
+                onChange={setExpiryId}
+                wide={breakpoint <= BreakPoints.sm}
+              />
+            </Col>
+            <Col lg={4} md={4} sm={12}>
+              <DropDown
+                items={modes}
+                selected={modes.findIndex(i => i === optionChainMode)}
+                onChange={i => {
+                  setOptionChainMode(modes[i])
+                  storePreference(OC_MODE_KEY, modes[i])
+                }}
+                wide={true}
+              />
+            </Col>
+          </Row>
+        </Col>
+      </Row>
     </>
   )
 }

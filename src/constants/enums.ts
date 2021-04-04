@@ -38,3 +38,11 @@ export enum Spenders {
   ZeroXERC20Proxy,
   ZeroXStaking,
 }
+
+// use number so we can compare breakpoints. (xs < sm)
+export enum BreakPoints {
+  xs,
+  sm,
+  md,
+  lg,
+}
