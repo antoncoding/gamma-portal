@@ -39,6 +39,10 @@ export default function TradeHeadBar({
   const series = useMemo(() => (allSeries.length === 0 ? null : allSeries[seriesId]), [allSeries, seriesId])
 
   useEffect(() => {
+    document.title = `${underlying.symbol} ($${spotPrice.toFixed(2)})`
+  }, [spotPrice, underlying])
+
+  useEffect(() => {
     if (series !== null) setSelectedUnderlying({ ...series.underlying, id: series.underlying.id })
   }, [series, setSelectedUnderlying])
 

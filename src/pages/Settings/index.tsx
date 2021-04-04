@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
 import ReactGA from 'react-ga'
-import { Header } from '@aragon/ui'
-
+import Header from '../../components/Header'
 import ThemeSwitch from './Theme'
 import ApproveSwitch from './Approval'
 import ZeroXFee from './ZeroXFee'

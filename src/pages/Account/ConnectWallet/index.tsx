@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import ReactGA from 'react-ga'
 import { useHistory } from 'react-router-dom'
-import { TextInput, DataView, Button, LinkBase, EthIdenticon, Header } from '@aragon/ui'
+import { TextInput, DataView, Button, LinkBase, EthIdenticon } from '@aragon/ui'
 import { getPreference, checkAddressAndAddToStorage } from '../../../utils/storage'
 
+import Header from '../../../components/Header'
 import Comment from '../../../components/Comment'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { isAddress } from '../../../utils/math'

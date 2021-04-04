@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import ReactGA from 'react-ga'
-import { Header, DataView, DropDown, Tag, Help } from '@aragon/ui'
+import { DataView, DropDown, Tag, Help } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
 import LabelText from '../../../components/LabelText'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 
 import { expiryToDate, toTokenAmount } from '../../../utils/math'
-
+import Header from '../../../components/Header'
 import SectionTitle from '../../../components/SectionHeader'
 
 import { SubgraphPriceEntry } from '../../../types'
