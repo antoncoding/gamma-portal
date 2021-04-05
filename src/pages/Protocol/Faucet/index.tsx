@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react'
 
-import { Header, Info } from '@aragon/ui'
+import { Info } from '@aragon/ui'
 import MintToken from './mintToken'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { SupportedNetworks } from '../../../constants/networks'
-
+import Header from '../../../components/Header'
 import { tokens } from '../../../constants/addresses'
 
 export default function Faucet() {

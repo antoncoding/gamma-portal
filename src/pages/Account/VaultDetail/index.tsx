@@ -7,7 +7,6 @@ import {
   Button,
   DataView,
   Tag,
-  Header,
   IconCirclePlus,
   IconCircleMinus,
   IconTrash,
@@ -18,6 +17,7 @@ import {
 import History from './history'
 
 import { useConnectedWallet } from '../../../contexts/wallet'
+import Header from '../../../components/Header'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 
 import useAsyncMemo from '../../../hooks/useAsyncMemo'

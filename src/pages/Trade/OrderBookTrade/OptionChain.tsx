@@ -3,12 +3,13 @@ import React, { useMemo, useCallback, useState } from 'react'
 import { DataView, Radio, SyncIndicator } from '@aragon/ui'
 import { SubgraphOToken } from '../../../types'
 import { OTOKENS_BOARD, OTOKENS_BOARD_FILTERED } from '../../../constants/dataviewContents'
-import { SHOW_EMPTY, OptionChainMode } from '../../../constants'
+import { SHOW_EMPTY, OptionChainMode, BreakPoints } from '../../../constants'
 import { toTokenAmount } from '../../../utils/math'
 import { useOrderbook } from '../../../contexts/orderbook'
 import { getOrderBookDetail } from '../../../utils/0x-utils'
 import { getPreference } from '../../../utils/storage'
 import CheckBoxWithLabel from '../../../components/CheckBoxWithLabel'
+import { useBreakpoint } from '../../../hooks'
 import { green, red, onclickWrapper, bold, secondary } from './StyleDiv'
 import BigNumber from 'bignumber.js'
 
@@ -70,6 +71,8 @@ export default function OptionChain({ oTokens, selectedOToken, setSelectedOToken
   const { isLoading: isLoadingOrderbook, orderbooks } = useOrderbook()
 
   const [showEmpty, setShowEmpty] = useState(getPreference(SHOW_EMPTY, 'false') === 'true')
+
+  const breakpoint = useBreakpoint()
 
   const completeRows = useMemo(() => {
     // only return items when "All" is selected.
@@ -318,7 +321,7 @@ export default function OptionChain({ oTokens, selectedOToken, setSelectedOToken
 
       const strike = bold(toTokenAmount(row.strikePrice, 8).toString())
 
-      return [strike, bidCell, bidSizeCell, bidIvCell, askCell, askSizeCell, askIvCell]
+      return [strike, bidCell, bidIvCell, bidSizeCell, askCell, askIvCell, askSizeCell]
     },
     [setSelectedOToken, selectedOToken],
   )
@@ -337,6 +340,7 @@ export default function OptionChain({ oTokens, selectedOToken, setSelectedOToken
         <DataView
           page={page}
           onPageChange={setPage}
+          mode={breakpoint > BreakPoints.md ? 'table' : 'list'}
           entriesPerPage={8}
           tableRowHeight={35}
           status={isLoadingOrderbook ? 'loading' : 'default'}
@@ -364,6 +368,7 @@ export default function OptionChain({ oTokens, selectedOToken, setSelectedOToken
       ) : (
         // simplidied data table: only shows puts or call
         <DataView
+          mode={breakpoint > BreakPoints.md ? 'table' : 'list'}
           page={page}
           onPageChange={setPage}
           entriesPerPage={8}

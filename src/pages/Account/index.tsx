@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import ReactGA from 'react-ga'
-import { Header } from '@aragon/ui'
+import Header from '../../components/Header'
 import { useParams } from 'react-router-dom'
 import L1Balances from './L1Wallet'
 

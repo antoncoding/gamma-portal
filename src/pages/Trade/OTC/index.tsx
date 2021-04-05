@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Col, Row } from 'react-grid-system'
 import ReactGA from 'react-ga'
-import { Header, Tabs, Info } from '@aragon/ui'
-
+import { Tabs, Info } from '@aragon/ui'
+import { Header } from '../../../components/Header'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { useOTokenBalances, useTokenBalance, useLiveOTokens } from '../../../hooks'
 import { getPrimaryPaymentToken, SupportedNetworks } from '../../../constants'

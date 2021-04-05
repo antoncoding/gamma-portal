@@ -1,10 +1,10 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react'
 import ReactGA from 'react-ga'
 import { useHistory, useParams } from 'react-router-dom'
-import { Button, DataView, Header, Tag, Help } from '@aragon/ui'
+import { Button, DataView, Tag, Help } from '@aragon/ui'
 import useAsyncMemo from '../../../hooks/useAsyncMemo'
 import { getAccount } from '../../../utils/graph'
-
+import Header from '../../../components/Header'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { SubgraphVault } from '../../../types'
 import SectionTitle from '../../../components/SectionHeader'

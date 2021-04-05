@@ -21,7 +21,6 @@ export const useTokenPrice = (token: string | undefined, refetchIntervalSec: num
     }
     updatePrice()
     const id = setInterval(updatePrice, refetchIntervalSec * 1000)
-
     // cleanup function: remove interval
     return () => {
       isCancelled = true

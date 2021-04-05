@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { Col, Row } from 'react-grid-system'
 import ReactGA from 'react-ga'
-import { Header, SyncIndicator, Info } from '@aragon/ui'
+import { SyncIndicator, Info } from '@aragon/ui'
 import TradePanel from '../OrderBookTrade/TradePanel'
 
 import { TradeAction, SupportedNetworks } from '../../../constants'
@@ -11,6 +11,7 @@ import { SubgraphOToken } from '../../../types'
 import { useOrderbook } from '../../../contexts/orderbook'
 import OTokenAutoComplete from '../../../components/OTokenAutoComplete'
 import { useConnectedWallet } from '../../../contexts/wallet'
+import { Header } from '../../../components/Header'
 
 export default function Swap() {
   useEffect(() => {

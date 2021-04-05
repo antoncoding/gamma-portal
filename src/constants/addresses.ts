@@ -127,7 +127,7 @@ export const addresses: SystemAddresses = {
 export const blacklistOTokens = {
   [SupportedNetworks.Mainnet]: [ZERO_ADDR],
   [SupportedNetworks.Ropsten]: [ZERO_ADDR],
-  [SupportedNetworks.Kovan]: [ZERO_ADDR],
+  [SupportedNetworks.Kovan]: ['0x81300ac27ac2470713602b4d8a73dfcc85b779b1'],
 }
 
 type KnownOperator = {
