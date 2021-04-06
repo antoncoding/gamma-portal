@@ -12,6 +12,7 @@ import CheckBoxWithLabel from '../../../components/CheckBoxWithLabel'
 import { useBreakpoint } from '../../../hooks'
 import { green, red, onclickWrapper, bold, secondary } from './StyleDiv'
 import BigNumber from 'bignumber.js'
+import './chain.css'
 
 const iv = require('implied-volatility')
 
@@ -421,15 +422,15 @@ function PriceButton({
 }) {
   const mode = isSelected ? (isBid ? 'positive' : 'negative') : 'normal'
 
-  const content = !isSelected ? (isBid ? green(text) : red(text)) : text
+  const content = !isSelected ? isBid ? green(text) : red(text) : <div style={{ fontSize: 14 }}>{text}</div>
 
   const icon = text !== '-' ? isSelected ? <IconCircleCheck size="small" /> : <IconCirclePlus size="small" /> : null
 
   return option === undefined ? (
     <> - </>
   ) : (
-    <Button size="mini" onClick={onClick} mode={mode}>
-      {content} {icon}
+    <Button className="priceButton" size="mini" onClick={onClick} mode={mode}>
+      {<div style={{ padding: 5 }}>{content}</div>} {icon}
     </Button>
   )
 }
