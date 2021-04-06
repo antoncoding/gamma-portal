@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { Col, Row } from 'react-grid-system'
 import { Header, DropDown, LoadingRing } from '@aragon/ui'
 
-import { useOTokenInSeries, useAllSeries, useBreakpoint } from '../../../hooks'
+import { useOTokenInSeries, useAllSeries } from '../../../hooks'
 
 import { toUTCDateString } from '../../../utils/others'
 import { Token } from '../../../types'
@@ -33,10 +33,6 @@ export default function TradeHeadBar({
   const [expiryId, setExpiryId] = useState(0)
 
   const { allSeries } = useAllSeries()
-
-  const breakpoint = useBreakpoint()
-
-  console.log(`breakpoint`, breakpoint)
 
   const series = useMemo(() => (allSeries.length === 0 ? null : allSeries[seriesId]), [allSeries, seriesId])
 

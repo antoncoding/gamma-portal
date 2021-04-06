@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useState } from 'react'
 
-import { DataView, Radio, SyncIndicator } from '@aragon/ui'
+import { DataView, Radio, SyncIndicator, Button, IconCirclePlus, IconCircleCheck } from '@aragon/ui'
 import { SubgraphOToken } from '../../../types'
 import { OTOKENS_BOARD, OTOKENS_BOARD_FILTERED } from '../../../constants/dataviewContents'
 import { SHOW_EMPTY, OptionChainMode, BreakPoints } from '../../../constants'
@@ -176,34 +176,47 @@ export default function OptionChain({ oTokens, selectedOToken, setSelectedOToken
       const putOnClick = () => {
         setSelectedOToken(row.put)
       }
-      const callButton = (
-        <Radio
-          disabled={row.call === undefined}
-          onChange={callOnClick}
-          checked={selectedOToken && selectedOToken?.id === row.call?.id}
+
+      const callSelected = selectedOToken !== null && selectedOToken?.id === row.call?.id
+      const putSelected = selectedOToken !== null && selectedOToken?.id === row.put?.id
+
+      const callButton = <Radio disabled={row.call === undefined} onChange={callOnClick} checked={callSelected} />
+      const putButton = <Radio disabled={row.put === undefined} onChange={putOnClick} checked={putSelected} />
+
+      const callBidCell = (
+        <PriceButton
+          option={row.call}
+          onClick={callOnClick}
+          isBid={true}
+          isSelected={callSelected}
+          text={row.callBid}
         />
       )
-      const putButton = (
-        <Radio
-          disabled={row.put === undefined}
-          onChange={putOnClick}
-          checked={selectedOToken && selectedOToken?.id === row.put?.id}
-        />
-      )
-      const callBidCell = row.call ? onclickWrapper(green(row.callBid), callOnClick) : '-'
-      const callBidSizeCell = row.call ? onclickWrapper(row.callBidSize, callOnClick) : '-'
+      const callBidSizeCell = row.callBidSize ? onclickWrapper(row.callBidSize, callOnClick) : '-'
       const callBidIvCell = secondary(row.call ? onclickWrapper(row.callbidIV, callOnClick) : '-')
 
-      const callAskCell = row.call ? onclickWrapper(red(row.callAsk), callOnClick) : '-'
+      const callAskCell = (
+        <PriceButton
+          option={row.call}
+          onClick={callOnClick}
+          isBid={false}
+          isSelected={callSelected}
+          text={row.callAsk}
+        />
+      )
       const callAskSizeCell = row.call ? onclickWrapper(row.callAskSize, callOnClick) : '-'
       const callAskIvCell = secondary(row.call ? onclickWrapper(row.callAskIV, callOnClick) : '-')
 
       const strike = bold(toTokenAmount(row.strikePrice, 8).toString())
-      const putBidCell = row.put ? onclickWrapper(green(row.putBid), putOnClick) : '-'
+      const putBidCell = (
+        <PriceButton option={row.put} onClick={putOnClick} isBid={true} isSelected={putSelected} text={row.putBid} />
+      )
       const putBidSizeCell = row.put ? onclickWrapper(row.putBidSize, putOnClick) : '-'
       const putBidIvCell = secondary(row.put ? onclickWrapper(row.putbidIV, putOnClick) : '-')
 
-      const putAskCell = row.put ? onclickWrapper(red(row.putAsk), putOnClick) : '-'
+      const putAskCell = (
+        <PriceButton option={row.put} onClick={putOnClick} isBid={false} isSelected={putSelected} text={row.putAsk} />
+      )
       const putAskSizeCell = row.put ? onclickWrapper(row.putAskSize, putOnClick) : '-'
       const putAskIvCell = secondary(row.put ? onclickWrapper(row.putAskIV, putOnClick) : '-')
 
@@ -303,19 +316,26 @@ export default function OptionChain({ oTokens, selectedOToken, setSelectedOToken
 
   const renderSimpleRow = useCallback(
     (row: SimpleRowWithGreeks, idx) => {
+      const selected = selectedOToken?.id === row.option.id
       const onClick = () => {
-        if (selectedOToken?.id === row.option.id) {
+        if (selected) {
           setSelectedOToken(null)
         } else {
           setSelectedOToken(row.option)
         }
       }
 
-      const bidCell = onclickWrapper(green(row.bid), onClick)
+      const bidCell = (
+        <PriceButton option={row.option} onClick={onClick} isBid={true} isSelected={selected} text={row.bid} />
+      )
+      //  onclickWrapper(green(row.bid), onClick)
       const bidSizeCell = onclickWrapper(row.bidSize, onClick)
       const bidIvCell = secondary(onclickWrapper(row.bidIV, onClick))
 
-      const askCell = onclickWrapper(red(row.ask), onClick)
+      const askCell = (
+        <PriceButton option={row.option} onClick={onClick} isBid={false} isSelected={selected} text={row.ask} />
+      )
+
       const askSizeCell = onclickWrapper(row.askSize, onClick)
       const askIvCell = secondary(onclickWrapper(row.askIV, onClick))
 
@@ -345,7 +365,7 @@ export default function OptionChain({ oTokens, selectedOToken, setSelectedOToken
           tableRowHeight={35}
           status={isLoadingOrderbook ? 'loading' : 'default'}
           fields={[
-            'bid ($)',
+            'bid($)',
             'iv',
             'amt',
             'ask ($)',
@@ -383,5 +403,33 @@ export default function OptionChain({ oTokens, selectedOToken, setSelectedOToken
         />
       )}
     </div>
+  )
+}
+
+function PriceButton({
+  option,
+  text,
+  isBid,
+  isSelected,
+  onClick,
+}: {
+  option: any
+  text: string
+  isBid: boolean
+  isSelected: boolean
+  onClick: any
+}) {
+  const mode = isSelected ? (isBid ? 'positive' : 'negative') : 'normal'
+
+  const content = !isSelected ? (isBid ? green(text) : red(text)) : text
+
+  const icon = text !== '-' ? isSelected ? <IconCircleCheck size="small" /> : <IconCirclePlus size="small" /> : null
+
+  return option === undefined ? (
+    <> - </>
+  ) : (
+    <Button size="mini" onClick={onClick} mode={mode}>
+      {content} {icon}
+    </Button>
   )
 }
