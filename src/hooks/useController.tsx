@@ -26,7 +26,7 @@ export function useController() {
 
   const track = useCallback(
     (action: string) => {
-      const label = networkId === SupportedNetworks.Mainnet ? 'mainnet' : 'kovan'
+      const label = networkId === SupportedNetworks.Mainnet ? 'mainnet' : 'testnet'
       ReactGA.event({ category: 'controller', action, label })
     },
     [networkId],
@@ -201,7 +201,7 @@ export function useController() {
 
       // check allowance to add collateral
       const addCollateralAction = actions.find(action => action.actionType === ActionType.DepositCollateral)
-      if (addCollateralAction !== undefined) {
+      if (addCollateralAction !== undefined && !usePayableProxy) {
         await checkAndIncreaseAllowance(addCollateralAction.asset, user, addCollateralAction.amount)
       }
 

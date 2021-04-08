@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Col, Row } from 'react-grid-system'
 import ReactGA from 'react-ga'
-import { Tabs } from '@aragon/ui'
+import { Tabs, Info } from '@aragon/ui'
 import { Header } from '../../../components/Header'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { useOTokenBalances, useTokenBalance, useLiveOTokens } from '../../../hooks'
-import { getUSDC, getWeth } from '../../../constants'
+import { getPrimaryPaymentToken, SupportedNetworks } from '../../../constants'
 
 import MakeOrder from './MakeOrder'
 import TakerOrder from './TakeOrder'
@@ -18,13 +18,15 @@ export default function OTC() {
   const { user, networkId } = useConnectedWallet()
 
   const { balances: oTokenBalances } = useOTokenBalances(user, networkId)
-  const usdcBalance = useTokenBalance(getUSDC(networkId).id, user, 15)
-  const wethBalance = useTokenBalance(getWeth(networkId).id, user, 15)
+  const paymentTokenBalance = useTokenBalance(getPrimaryPaymentToken(networkId).id, user, 15)
+
   const { allOtokens } = useLiveOTokens()
 
   const [selectedTab, setSelectedTab] = useState(0)
 
-  return (
+  return networkId === SupportedNetworks.Kovan ? (
+    <Info mode="error"> 0x V4 doesn't support kovan testnet, please switch network to Ropsten </Info>
+  ) : (
     <>
       <Header primary={'OTC'} />
 
@@ -35,15 +37,10 @@ export default function OTC() {
       </Row>
 
       {selectedTab === 0 && (
-        <MakeOrder allOtokens={allOtokens} usdcBalance={usdcBalance} oTokenBalances={oTokenBalances} />
+        <MakeOrder allOtokens={allOtokens} paymentTokenBalance={paymentTokenBalance} oTokenBalances={oTokenBalances} />
       )}
       {selectedTab === 1 && (
-        <TakerOrder
-          wethBalance={wethBalance}
-          usdcBalance={usdcBalance}
-          oTokenBalances={oTokenBalances}
-          allOtokens={allOtokens}
-        />
+        <TakerOrder paymentTokenBalance={paymentTokenBalance} oTokenBalances={oTokenBalances} allOtokens={allOtokens} />
       )}
     </>
   )

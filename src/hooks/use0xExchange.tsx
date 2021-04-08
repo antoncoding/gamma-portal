@@ -7,25 +7,25 @@ import { useNotify } from './useNotify'
 import { SignedOrder } from '../types'
 import { useGasPrice } from './useGasPrice'
 import { useCustomToast } from './useCustomToast'
-import { zx_exchange, ZEROX_PROTOCOL_FEE_KEY, FeeTypes } from '../constants'
-import { assetDataUtils, signatureUtils, SupportedProvider } from '@0x/order-utils'
-import { MetamaskSubprovider } from '@0x/subproviders'
-import { getPreference } from '../utils/storage'
+// import { ZEROX_PROTOCOL_FEE_KEY, FeeTypes } from '../constants'
 
+// import { getPreference } from '../utils/storage'
+
+const v4orderUtils = require('@0x/protocol-utils')
 const FEE_PERORDER_PER_GWEI = 0.00007
-const FEE_RECIPIENT = '0xD325E15A52B780698C45CA3BdB6c49444fe5B588'
+// const FEE_RECIPIENT = '0xd325e15a52b780698c45ca3bdb6c49444fe5b588'
 
-const abi = require('../constants/abis/0xExchange.json')
+const abi = require('../constants/abis/0xV4Exchange.json')
 
 export function use0xExchange() {
-  const payWithWeth = useMemo(() => getPreference(ZEROX_PROTOCOL_FEE_KEY, FeeTypes.ETH) === FeeTypes.WETH, [])
+  // const payWithWeth = useMemo(() => getPreference(ZEROX_PROTOCOL_FEE_KEY, FeeTypes.ETH) === FeeTypes.WETH, [])
 
   const toast = useCustomToast()
   const { networkId, web3, user } = useConnectedWallet()
 
   const track = useCallback(
     (action: string) => {
-      const label = networkId === SupportedNetworks.Mainnet ? 'mainnet' : 'kovan'
+      const label = networkId === SupportedNetworks.Mainnet ? 'mainnet' : 'testnet'
       ReactGA.event({ category: 'trading', action, label })
     },
     [networkId],
@@ -39,7 +39,7 @@ export function use0xExchange() {
 
   const getGasPriceForOrders = useCallback(
     (orders: SignedOrder[]) => {
-      const closestExpiry = Math.min(...orders.map(o => Number(o.expirationTimeSeconds) - Date.now() / 1000))
+      const closestExpiry = Math.min(...orders.map(o => Number(o.expiry) - Date.now() / 1000))
       return closestExpiry < 120 ? fastest : fast
     },
     [fast, fastest],
@@ -58,41 +58,44 @@ export function use0xExchange() {
 
   const createOrder = useCallback(
     async (
-      makerAsset: string,
-      takerAsset: string,
-      makerFeeAsset: string,
-      makerAssetAmount: BigNumber,
-      takerAssetAmount: BigNumber,
-      makerFee: BigNumber,
+      makerToken: string,
+      takerToken: string,
+      makerAmount: BigNumber,
+      takerAmount: BigNumber,
       expiry: number,
       takerAddress?: string,
     ) => {
-      const exchangeAddress = zx_exchange[networkId]
-      const salt = BigNumber.random(20)
-        .times(new BigNumber(10).pow(new BigNumber(20)))
-        .integerValue()
-      const order = {
-        senderAddress: '0x0000000000000000000000000000000000000000',
-        makerAddress: user,
-        takerAddress: takerAddress ? takerAddress : '0x0000000000000000000000000000000000000000',
-        makerFee: makerFee,
-        takerFee: new BigNumber(0),
-        makerAssetAmount: makerAssetAmount,
-        takerAssetAmount: takerAssetAmount,
-        makerAssetData: assetDataUtils.encodeERC20AssetData(makerAsset),
-        takerAssetData: assetDataUtils.encodeERC20AssetData(takerAsset),
-        salt,
-        exchangeAddress,
-        feeRecipientAddress: FEE_RECIPIENT,
-        expirationTimeSeconds: new BigNumber(expiry).integerValue(),
-        makerFeeAssetData: makerFeeAsset ? assetDataUtils.encodeERC20AssetData(makerFeeAsset) : '0x',
+      const salt = new BigNumber(Date.now()).integerValue().toString()
+      const taker = takerAddress ? takerAddress : '0x0000000000000000000000000000000000000000'
+      const order = new v4orderUtils.LimitOrder({
         chainId: networkId,
-        takerFeeAssetData: '0x',
-      }
+        makerToken,
+        takerToken,
+        makerAmount,
+        takerAmount,
+        // takerTokenFeeAmount,
+        maker: user,
+        taker,
+        sender: '0x0000000000000000000000000000000000000000',
+        // feeRecipient: FEE_RECIPIENT,
+        // pool:
+        expiry: new BigNumber(expiry).integerValue(),
+        salt,
+        // verifyingContract: addresses[networkId].zeroxExchange,
+      })
       track('create-order')
-      const provider = new MetamaskSubprovider(web3.currentProvider as SupportedProvider)
-      return signatureUtils.ecSignOrderAsync(provider, order, user)
-      // return order;
+      const signature = await order.getSignatureWithProviderAsync(
+        web3.currentProvider as any,
+        v4orderUtils.SignatureType.EIP712,
+      )
+      // const provider = new MetamaskSubprovider(web3.currentProvider as SupportedProvider)
+      // return signatureUtils.ecSignOrderAsync(provider, order, user)
+      // return signature;
+
+      return {
+        ...order,
+        signature,
+      }
     },
     [networkId, user, web3, track],
   )
@@ -108,46 +111,51 @@ export function use0xExchange() {
       const feeInEth = getProtocolFee(orders).toString()
       const amountsStr = amounts.map(amount => amount.toString())
 
+      console.log(`only filling first order la, orders[0]`, orders[0])
+
+      // change to batch Fill when it's live
       await exchange.methods
-        .batchFillOrders(orders, amountsStr, signatures)
+        .batchFillLimitOrders(orders, signatures, amountsStr, false)
         .send({
           from: user,
-          value: payWithWeth ? '0' : web3.utils.toWei(feeInEth, 'ether'),
+          value: web3.utils.toWei(feeInEth, 'ether'),
           gasPrice: web3.utils.toWei(gasPrice.toString(), 'gwei'),
         })
         .on('transactionHash', notifyCallback)
 
       track('fill-order')
     },
-    [networkId, getProtocolFee, getGasPriceForOrders, notifyCallback, toast, user, web3, track, payWithWeth],
+    [networkId, getProtocolFee, getGasPriceForOrders, notifyCallback, toast, user, web3, track],
   )
 
   const fillOrder = useCallback(
     async (order: SignedOrder, amount: BigNumber) => {
       const exchange = new web3.eth.Contract(abi, addresses[networkId].zeroxExchange)
 
-      const signature = order.signature
+      // const signature = order.signature
 
       const gasPrice = getGasPriceForOrders([order])
       const feeInEth = getProtocolFee([order]).toString()
       const amountStr = amount.toString()
 
+      console.log(`order`, order)
+
       await exchange.methods
-        .fillOrder(order, amountStr, signature)
+        .fillLimitOrder(order, order.signature, amountStr)
         .send({
           from: user,
-          value: payWithWeth ? '0' : web3.utils.toWei(feeInEth, 'ether'),
+          value: web3.utils.toWei(feeInEth, 'ether'),
           gasPrice: web3.utils.toWei(gasPrice.toString(), 'gwei'),
         })
         .on('transactionHash', notifyCallback)
       track('fill-order')
     },
-    [networkId, getProtocolFee, getGasPriceForOrders, notifyCallback, user, web3, track, payWithWeth],
+    [networkId, getProtocolFee, getGasPriceForOrders, notifyCallback, user, web3, track],
   )
 
   const broadcastOrder = useCallback(
     async (order: SignedOrder) => {
-      const url = `${httpEndpoint}sra/v3/order`
+      const url = `${httpEndpoint}sra/v4/order`
       const res = await fetch(url, {
         method: 'POST',
         headers: {
@@ -169,7 +177,7 @@ export function use0xExchange() {
       const exchange = new web3.eth.Contract(abi, addresses[networkId].zeroxExchange)
 
       await exchange.methods
-        .batchCancelOrders(orders)
+        .batchCancelLimitOrders(orders)
         .send({
           from: user,
         })

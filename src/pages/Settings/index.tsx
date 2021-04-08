@@ -3,7 +3,6 @@ import ReactGA from 'react-ga'
 import Header from '../../components/Header'
 import ThemeSwitch from './Theme'
 import ApproveSwitch from './Approval'
-import ZeroXFee from './ZeroXFee'
 import ClearCache from './ClearCache'
 import Network from './Network'
 import Refresh from './Refresh'
@@ -17,8 +16,8 @@ function Settings({ setTheme }: { setTheme: any }) {
       <br />
       <ApproveSwitch />
       <br />
-      <ZeroXFee />
-      <br />
+      {/* <ZeroXFee />
+      <br /> */}
       <ClearCache />
       <br />
       <br />

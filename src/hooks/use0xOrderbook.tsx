@@ -1,10 +1,10 @@
 import { useEffect, useState, useMemo, useReducer } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
-import { ZeroXEndpoint, OrderType, getUSDC } from '../constants'
+import { ZeroXEndpoint, OrderType } from '../constants'
 import { useConnectedWallet } from '../contexts/wallet'
 import { OrderWithMetaData, SubgraphOToken, OTokenOrderBook } from '../types'
 import { categorizeOrder, getBasePairAskAndBids, sortBids, sortAsks, isValidBid, isValidAsk } from '../utils/0x-utils'
-import { assetDataUtils } from '@0x/order-utils'
+// import { assetDataUtils } from '@0x/order-utils'
 
 enum OrderbookUpdateType {
   Init,
@@ -46,7 +46,7 @@ function orderbookReducer(
             orderBookForThisOToken.bids = orderBookForThisOToken.bids.filter(isValidBid)
           } else {
             // no orderbook for this oToken
-            if (orderInfo.metaData.remainingFillableTakerAssetAmount !== '0') {
+            if (orderInfo.metaData.remainingFillableTakerAmount !== '0') {
               const bids = [orderInfo]
               orderbooksCopy.push({ bids, asks: [], id: token })
             }
@@ -65,7 +65,7 @@ function orderbookReducer(
             orderBookForThisOToken.asks = orderBookForThisOToken.asks.filter(isValidAsk)
           } else {
             // no orderbook for this oToken
-            if (orderInfo.metaData.remainingFillableTakerAssetAmount !== '0') {
+            if (orderInfo.metaData.remainingFillableTakerAmount !== '0') {
               const asks = [orderInfo]
               orderbooksCopy.push({ asks, bids: [], id: token })
             }
@@ -129,12 +129,12 @@ export function use0xOrderBooks(oTokens: SubgraphOToken[], completeCallback?: an
     // subscribe to order changes
     if (readyState === ReadyState.OPEN) return
 
-    const usdcAssetData = assetDataUtils.encodeERC20AssetData(getUSDC(networkId).id)
+    // const usdc = getUSDC(networkId).id
     const config: any = {
       type: 'subscribe',
       channel: 'orders',
       requestId: Date.now().toString(),
-      traderAssetData: usdcAssetData,
+      // traderToken: usdc,
     }
     sendMessage(JSON.stringify(config))
   }, [readyState, sendMessage, networkId])

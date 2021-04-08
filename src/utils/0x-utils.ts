@@ -1,6 +1,4 @@
 import BigNumber from 'bignumber.js'
-import { ERC20AssetData } from '@0x/types'
-import { assetDataUtils } from '@0x/order-utils'
 import {
   SignedOrder,
   OrderWithMetaData,
@@ -8,7 +6,16 @@ import {
   OTokenOrderBook,
   OTokenOrderBookWithDetail,
 } from '../types'
-import { ZeroXEndpoint, getUSDC, zx_exchange, OrderType, Errors, MIN_BID, MAX_ASK, ZERO_ADDR } from '../constants'
+import {
+  ZeroXEndpoint,
+  getPrimaryPaymentToken,
+  OrderType,
+  Errors,
+  MIN_BID,
+  MAX_ASK,
+  ZERO_ADDR,
+  SupportedNetworks,
+} from '../constants'
 import { sleep } from '../utils/others'
 import { toTokenAmount } from './math'
 const Promise = require('bluebird')
@@ -29,7 +36,10 @@ type entries = {
  * @return {Promise<Array<
  * >}
  */
-export async function getBasePairAskAndBids(oTokens: OToken[], networkId: 1 | 42): Promise<OTokenOrderBook[]> {
+export async function getBasePairAskAndBids(
+  oTokens: OToken[],
+  networkId: SupportedNetworks,
+): Promise<OTokenOrderBook[]> {
   const filteredOTokens = oTokens // await filter0xAvailablePairs(networkId, oTokens);
   // 0x has rate limit of 6 request / 10 sec, will need to chuck array into 6 each
   const BATCH_REQUEST = 6
@@ -131,26 +141,6 @@ type PairData = {
   }
 }
 
-export async function filter0xAvailablePairs(networkId: 1 | 42, oTokens: OToken[]): Promise<OToken[]> {
-  // return oTokens;
-  const endpoint = ZeroXEndpoint[networkId].http
-  const usdcAddr = getUSDC(networkId).id
-  const usdcAssetData = assetDataUtils.encodeERC20AssetData(usdcAddr)
-  const url = `${endpoint}sra/v3/asset_pairs?assetDataA=${usdcAssetData}`
-  const res = await fetch(url)
-  if (res.status !== 200) {
-    return oTokens
-  } else {
-    const { records }: { records: PairData[] } = await res.json()
-    const allAddresses = records.map(r => {
-      const token = assetDataUtils.decodeAssetDataOrThrow(r.assetDataB.assetData)
-      if (!token || token.assetProxyId === '0xc339d10a') return ''
-      return (token as ERC20AssetData).tokenAddress.toLowerCase()
-    })
-    return oTokens.filter(o => allAddresses.includes(o.id.toLocaleLowerCase()))
-  }
-}
-
 /**
  *
  * @param {OrderWithMetaData} order
@@ -161,9 +151,9 @@ export const getRemainingAmounts = (
   remainingTakerAssetAmount: BigNumber
   remainingMakerAssetAmount: BigNumber
 } => {
-  const remainingTakerAssetAmount = new BigNumber(order.metaData.remainingFillableTakerAssetAmount)
-  const makerAssetAmountBN = new BigNumber(order.order.makerAssetAmount)
-  const takerAssetAmountBN = new BigNumber(order.order.takerAssetAmount)
+  const remainingTakerAssetAmount = new BigNumber(order.metaData.remainingFillableTakerAmount)
+  const makerAssetAmountBN = new BigNumber(order.order.makerAmount)
+  const takerAssetAmountBN = new BigNumber(order.order.takerAmount)
   const remainingMakerAssetAmount = remainingTakerAssetAmount.multipliedBy(makerAssetAmountBN).div(takerAssetAmountBN)
   return { remainingTakerAssetAmount, remainingMakerAssetAmount }
 }
@@ -172,18 +162,24 @@ export const getRemainingAmounts = (
  * get bids and asks for an oToken
  */
 export async function getOTokenUSDCOrderBook(
-  networkId: 1 | 42,
+  networkId: SupportedNetworks,
   oToken: string,
 ): Promise<{
   success: Boolean
   asks: OrderWithMetaData[]
   bids: OrderWithMetaData[]
 }> {
-  const quote = getUSDC(networkId).id
+  // skip request for kovan.
+  if (networkId === SupportedNetworks.Kovan) {
+    return {
+      success: false,
+      asks: [],
+      bids: [],
+    }
+  }
+  const quote = getPrimaryPaymentToken(networkId).id
   const endpoint = ZeroXEndpoint[networkId].http
-  const baseAsset = assetDataUtils.encodeERC20AssetData(oToken)
-  const quoteAsset = assetDataUtils.encodeERC20AssetData(quote)
-  const url = `${endpoint}sra/v3/orderbook?baseAssetData=${baseAsset}&quoteAssetData=${quoteAsset}&perPage=${100}`
+  const url = `${endpoint}sra/v4/orderbook?baseToken=${oToken}&quoteToken=${quote}&perPage=${100}`
   try {
     const res = await fetch(url)
     // refetch in 0.5 sec
@@ -222,16 +218,14 @@ export const isValidAsk = (entry: OrderWithMetaData) => {
  */
 const isValid = (entry: OrderWithMetaData) => {
   const FILL_BUFFER = 35
-  const open = entry.order.takerAddress === ZERO_ADDR
-  const notExpired = parseInt(entry.order.expirationTimeSeconds, 10) > Date.now() / 1000 + FILL_BUFFER
+  const open = entry.order.taker === ZERO_ADDR
+  const notExpired = parseInt(entry.order.expiry, 10) > Date.now() / 1000 + FILL_BUFFER
   const notDust = getOrderFillRatio(entry).gt(5) // got at least 5% unfill
   return notExpired && notDust && open
 }
 
 export const getOrderFillRatio = (order: OrderWithMetaData) =>
-  new BigNumber(order.metaData.remainingFillableTakerAssetAmount)
-    .div(new BigNumber(order.order.takerAssetAmount))
-    .times(100)
+  new BigNumber(order.metaData.remainingFillableTakerAmount).div(new BigNumber(order.order.takerAmount)).times(100)
 
 /**
  *
@@ -240,65 +234,41 @@ export const getOrderFillRatio = (order: OrderWithMetaData) =>
  * @returns {OrderType}
  */
 export const categorizeOrder = (
-  networkId: 1 | 42,
+  networkId: SupportedNetworks,
   oTokens: string[],
   orderInfo: OrderWithMetaData,
 ): { type: OrderType; token: string } => {
-  const usdc = getUSDC(networkId).id
+  const usd = getPrimaryPaymentToken(networkId).id
 
-  let takerAsset = (assetDataUtils.decodeAssetDataOrThrow(orderInfo.order.takerAssetData) as ERC20AssetData)
-    .tokenAddress
-  if (takerAsset !== undefined) takerAsset = takerAsset.toLowerCase()
-
-  let makerAsset = (assetDataUtils.decodeAssetDataOrThrow(orderInfo.order.makerAssetData) as ERC20AssetData)
-    .tokenAddress
-  if (makerAsset !== undefined) makerAsset = makerAsset.toLowerCase()
-
-  if (takerAsset === usdc && oTokens.includes(makerAsset)) {
-    return { type: OrderType.ASK, token: makerAsset }
+  const takerToken = orderInfo.order.takerToken
+  const makerToken = orderInfo.order.makerToken
+  if (takerToken === usd && oTokens.includes(makerToken)) {
+    return { type: OrderType.ASK, token: makerToken }
   }
-  if (makerAsset === usdc && oTokens.includes(takerAsset)) {
-    return { type: OrderType.BID, token: takerAsset }
+  if (makerToken === usd && oTokens.includes(takerToken)) {
+    return { type: OrderType.BID, token: takerToken }
   }
   return { type: OrderType.NOT_OTOKEN, token: '' }
 }
 
 /**
- * Create Order Object
+ * Send orders to the mesh node
+ * @param {number} networkId
+ * @param {SignedOrder[]} orders
  */
-export const createOrder = (
-  networkId: 1 | 42,
-  maker: string,
-  makerAsset: string,
-  takerAsset: string,
-  makerAssetAmount: BigNumber,
-  takerAssetAmount: BigNumber,
-  expiry: number,
-) => {
-  const exchangeAddress = zx_exchange[networkId]
-  const salt = BigNumber.random(20)
-    .times(new BigNumber(10).pow(new BigNumber(20)))
-    .integerValue()
-    .toString(10)
-  const order = {
-    senderAddress: '0x0000000000000000000000000000000000000000',
-    makerAddress: maker,
-    takerAddress: '0x0000000000000000000000000000000000000000',
-    makerFee: '0',
-    takerFee: '0',
-    makerAssetAmount: makerAssetAmount.toString(),
-    takerAssetAmount: takerAssetAmount.toString(),
-    makerAssetData: assetDataUtils.encodeERC20AssetData(makerAsset),
-    takerAssetData: assetDataUtils.encodeERC20AssetData(takerAsset),
-    salt,
-    exchangeAddress,
-    feeRecipientAddress: '0x1000000000000000000000000000000000000011',
-    expirationTimeSeconds: expiry.toString(),
-    makerFeeAssetData: '0x',
-    chainId: 1,
-    takerFeeAssetData: '0x',
-  }
-  return order
+export const broadcastOrders = async (networkId: SupportedNetworks, orders: SignedOrder[]) => {
+  const endpoint = ZeroXEndpoint[networkId].http
+  const url = `${endpoint}sra/v4/orders`
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(orders),
+  })
+  if (res.status === 200) return
+  const jsonRes = await res.json()
+  throw jsonRes.validationErrors[0].reason
 }
 
 /**
@@ -309,8 +279,8 @@ export const getBidPrice = (
   makerAssetDecimals: number = 6,
   takerAssetDecimals: number = 8,
 ): BigNumber => {
-  const makerAssetAmount = toTokenAmount(new BigNumber(bid.makerAssetAmount), makerAssetDecimals)
-  const takerAssetAmount = toTokenAmount(new BigNumber(bid.takerAssetAmount), takerAssetDecimals)
+  const makerAssetAmount = toTokenAmount(new BigNumber(bid.makerAmount), makerAssetDecimals)
+  const takerAssetAmount = toTokenAmount(new BigNumber(bid.takerAmount), takerAssetDecimals)
   return makerAssetAmount.div(takerAssetAmount)
 }
 
@@ -347,8 +317,8 @@ export const getAskPrice = (
   makerAssetDecimals: number = 8,
   takerAssetDecimals: number = 6,
 ): BigNumber => {
-  const makerAssetAmount = toTokenAmount(new BigNumber(ask.makerAssetAmount), makerAssetDecimals)
-  const takerAssetAmount = toTokenAmount(new BigNumber(ask.takerAssetAmount), takerAssetDecimals)
+  const makerAssetAmount = toTokenAmount(new BigNumber(ask.makerAmount), makerAssetDecimals)
+  const takerAssetAmount = toTokenAmount(new BigNumber(ask.takerAmount), takerAssetDecimals)
   return takerAssetAmount.div(makerAssetAmount)
 }
 
@@ -373,7 +343,7 @@ export const getTotalAskAmount = (asks: OrderWithMetaData[], decimals: number): 
  */
 export const getTotalBidAmount = (bids: OrderWithMetaData[], decimals: number): BigNumber => {
   return bids.reduce(
-    (prev, cur) => prev.plus(toTokenAmount(cur.metaData.remainingFillableTakerAssetAmount, decimals)),
+    (prev, cur) => prev.plus(toTokenAmount(cur.metaData.remainingFillableTakerAmount, decimals)),
     new BigNumber(0),
   )
 }
@@ -411,11 +381,11 @@ export const calculateOrderOutput = (orderInfos: OrderWithMetaData[], amount: Bi
 
   for (const { metaData, order } of orderInfos) {
     // amonunt of oToken fillable. always an integer
-    const fillable = new BigNumber(metaData.remainingFillableTakerAssetAmount)
+    const fillable = new BigNumber(metaData.remainingFillableTakerAmount)
 
     ordersToFill.push(order)
 
-    const price = new BigNumber(order.makerAssetAmount).div(new BigNumber(order.takerAssetAmount))
+    const price = new BigNumber(order.makerAmount).div(new BigNumber(order.takerAmount))
 
     if (fillable.lt(inputLeft)) {
       sumOutput = sumOutput.plus(fillable.times(price).integerValue(BigNumber.ROUND_DOWN))
@@ -472,11 +442,11 @@ export const calculateOrderInput = (orderInfos: OrderWithMetaData[], amount: Big
   const amounts: BigNumber[] = []
 
   for (const { metaData, order } of orderInfos) {
-    const fillableTakerAmount = new BigNumber(metaData.remainingFillableTakerAssetAmount)
+    const fillableTakerAmount = new BigNumber(metaData.remainingFillableTakerAmount)
 
-    const fillableMakerAmount = new BigNumber(order.makerAssetAmount)
+    const fillableMakerAmount = new BigNumber(order.makerAmount)
       .times(fillableTakerAmount)
-      .div(new BigNumber(order.takerAssetAmount))
+      .div(new BigNumber(order.takerAmount))
       .integerValue(BigNumber.ROUND_DOWN)
 
     ordersToFill.push(order)

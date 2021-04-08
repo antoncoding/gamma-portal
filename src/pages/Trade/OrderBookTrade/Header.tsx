@@ -3,11 +3,11 @@ import BigNumber from 'bignumber.js'
 import { Col, Row } from 'react-grid-system'
 import { Header, DropDown, LoadingRing } from '@aragon/ui'
 
-import { useOTokenInSeries, useAllSeries, useBreakpoint } from '../../../hooks'
+import { useOTokenInSeries, useAllSeries } from '../../../hooks'
 
 import { toUTCDateString } from '../../../utils/others'
 import { Token } from '../../../types'
-import { OptionChainMode, OC_MODE_KEY, BreakPoints } from '../../../constants'
+import { OptionChainMode, OC_MODE_KEY } from '../../../constants'
 import { storePreference } from '../../../utils/storage'
 
 type HeaderProps = {
@@ -33,8 +33,6 @@ export default function TradeHeadBar({
   const [expiryId, setExpiryId] = useState(0)
 
   const { allSeries } = useAllSeries()
-
-  const breakpoint = useBreakpoint()
 
   const series = useMemo(() => (allSeries.length === 0 ? null : allSeries[seriesId]), [allSeries, seriesId])
 
@@ -80,10 +78,10 @@ export default function TradeHeadBar({
   return (
     <>
       <Row>
-        <Col xl={9} lg={7} md={6}>
+        <Col xl={8} lg={6} md={6}>
           <Header primary={`Trade ${underlying.symbol} ($${spotPrice.toFixed(2)})`} />
         </Col>
-        <Col xl={3} lg={5} md={6}>
+        <Col xl={4} lg={6} md={6}>
           <Row style={{ paddingTop: 25 }}>
             <Col lg={4} md={4} sm={12}>
               <DropDown
@@ -92,7 +90,7 @@ export default function TradeHeadBar({
                 disabled={allSeries.length === 0}
                 selected={seriesId}
                 onChange={setSeiresId}
-                wide={breakpoint <= BreakPoints.sm}
+                wide={true}
               />
             </Col>
             <Col lg={4} md={4} sm={12}>
@@ -102,7 +100,7 @@ export default function TradeHeadBar({
                 disabled={uniqueExpiries.length === 0}
                 selected={expiryId}
                 onChange={setExpiryId}
-                wide={breakpoint <= BreakPoints.sm}
+                wide={true}
               />
             </Col>
             <Col lg={4} md={4} sm={12}>

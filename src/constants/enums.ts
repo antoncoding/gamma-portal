@@ -35,8 +35,7 @@ export enum Errors {
 
 export enum Spenders {
   MarginPool,
-  ZeroXERC20Proxy,
-  ZeroXStaking,
+  ZeroXExchange,
 }
 
 // use number so we can compare breakpoints. (xs < sm)

@@ -1,6 +1,5 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react'
-import { assetDataUtils } from '@0x/order-utils'
-import { DataView, Timer, Button, LoadingRing, CircleGraph } from '@aragon/ui'
+import { DataView, Timer, Button, LoadingRing } from '@aragon/ui'
 import { SubgraphOToken, OrderWithMetaData } from '../../../types'
 import { useOrderbook } from '../../../contexts/orderbook'
 import { getAskPrice, getBidPrice, getRemainingAmounts } from '../../../utils/0x-utils'
@@ -9,7 +8,7 @@ import { toTokenAmount } from '../../../utils/math'
 import { NO_TOKEN_SELECTED, generateNoUserOrderContent } from '../../../constants/dataviewContents'
 import { simplifyOTokenSymbol } from '../../../utils/others'
 import { useConnectedWallet } from '../../../contexts/wallet'
-import { getUSDC } from '../../../constants'
+import { getPrimaryPaymentToken } from '../../../constants'
 import { use0xExchange } from '../../../hooks/use0xExchange'
 import { useCustomToast } from '../../../hooks'
 import BigNumber from 'bignumber.js'
@@ -28,7 +27,7 @@ export default function UserOrders({ selectedOToken }: OrderbookProps) {
 
   const { user, networkId } = useConnectedWallet()
 
-  const usdc = useMemo(() => getUSDC(networkId), [networkId])
+  const usd = useMemo(() => getPrimaryPaymentToken(networkId), [networkId])
 
   const [entries, setEntries] = useState<OrderWithMetaData[]>([])
 
@@ -36,36 +35,46 @@ export default function UserOrders({ selectedOToken }: OrderbookProps) {
     const thisBook = selectedOToken ? orderbooks.find(book => book.id === selectedOToken.id) : undefined
     if (!thisBook) setEntries([])
     else {
-      const _entries = thisBook.bids
-        .concat(thisBook.asks)
-        .filter((o: OrderWithMetaData) => o.order.makerAddress === user)
+      const _entries = thisBook.bids.concat(thisBook.asks).filter((o: OrderWithMetaData) => o.order.maker === user)
       setEntries(_entries)
     }
   }, [selectedOToken, orderbooks, user])
 
   const renderRow = useCallback(
     (order: OrderWithMetaData) => {
-      const usdcAssetData = assetDataUtils.encodeERC20AssetData(usdc.id)
-      const filled =
-        1 - new BigNumber(order.metaData.remainingFillableTakerAssetAmount).div(order.order.takerAssetAmount).toNumber()
-      if (order.order.makerAssetData === usdcAssetData) {
+      const isBid = order.order.makerToken === usd.id
+
+      const remainingPercentage = new BigNumber(order.metaData.remainingFillableTakerAmount)
+        .div(order.order.takerAmount)
+        .toNumber()
+
+      // 1 - new BigNumber(order.metaData.remainingFillableTakerAmount).div(order.order.takerAmount).toNumber()
+      if (isBid) {
+        const amonutLeft = toTokenAmount(order.metaData.remainingFillableTakerAmount, 8)
+        const amountShown =
+          remainingPercentage === 1
+            ? amonutLeft.toFixed(2)
+            : `${amonutLeft.toFixed(2)} (${remainingPercentage * 100} %)`
         // bid
         return [
-          green(getBidPrice(order.order, 6, 8).toFixed(4)),
-          toTokenAmount(order.metaData.remainingFillableTakerAssetAmount, 8).toFixed(2),
-          <CircleGraph value={filled} size={30} strokeWidth={3} />,
-          <Timer format="ms" showIcon end={new Date(Number(order.order.expirationTimeSeconds) * 1000)} />,
+          green(getBidPrice(order.order, usd.decimals, 8).toFixed(2)),
+          amountShown,
+          <Timer format="ms" showIcon end={new Date(Number(order.order.expiry) * 1000)} />,
         ]
       } else {
+        const amonutLeft = toTokenAmount(getRemainingAmounts(order).remainingMakerAssetAmount, 8)
+        const amountShown =
+          remainingPercentage === 1
+            ? amonutLeft.toFixed(2)
+            : `${amonutLeft.toFixed(2)} (${remainingPercentage * 100} %)`
         return [
-          red(getAskPrice(order.order, 8, 6).toFixed(4)),
-          toTokenAmount(getRemainingAmounts(order).remainingMakerAssetAmount, 8).toFixed(2),
-          <CircleGraph value={filled} size={30} strokeWidth={3} />,
-          <Timer format="ms" showIcon end={new Date(Number(order.order.expirationTimeSeconds) * 1000)} />,
+          red(getAskPrice(order.order, 8, usd.decimals).toFixed(2)),
+          amountShown,
+          <Timer format="ms" showIcon end={new Date(Number(order.order.expiry) * 1000)} />,
         ]
       }
     },
-    [usdc.id],
+    [usd.id, usd.decimals],
   )
 
   const onSelectEntries = useCallback((entries, indexes) => {
@@ -106,7 +115,7 @@ export default function UserOrders({ selectedOToken }: OrderbookProps) {
             onSelectEntries={onSelectEntries}
             selection={selectedIdxs}
             renderSelectionCount={x => `${x} Orders Selected`}
-            fields={['My Orders', 'amount', 'filled', 'expiration']}
+            fields={['My Orders', 'amount', 'expiration']}
             renderEntry={renderRow}
           />
           {selectedIdxs.length > 0 && (

@@ -9,7 +9,7 @@ import { toTokenAmount, fromTokenAmount } from '../../../utils/math'
 
 import { TradeAction, Errors, DeadlineUnit, Spenders } from '../../../constants'
 import { useConnectedWallet } from '../../../contexts/wallet'
-import { getUSDC } from '../../../constants/addresses'
+import { getPrimaryPaymentToken } from '../../../constants/addresses'
 
 import USDCImgUrl from '../../../imgs/USDC.png'
 import OTokenIcon from '../../../components/OTokenIcon'
@@ -25,7 +25,7 @@ type MarketTicketProps = {
   action: TradeAction
   selectedOToken: SubgraphOToken
   oTokenBalances: OTokenBalance[] | null
-  usdcBalance: BigNumber
+  usdBalance: BigNumber
   inputTokenAmount: BigNumber
   setInputTokenAmount: React.Dispatch<React.SetStateAction<BigNumber>>
   outputTokenAmount: BigNumber
@@ -36,7 +36,7 @@ export default function LimitTicket({
   action,
   selectedOToken,
   oTokenBalances,
-  usdcBalance,
+  usdBalance,
   inputTokenAmount,
   setInputTokenAmount,
   outputTokenAmount,
@@ -44,7 +44,7 @@ export default function LimitTicket({
 }: MarketTicketProps) {
   const { networkId } = useConnectedWallet()
 
-  const paymentToken = useMemo(() => getUSDC(networkId), [networkId])
+  const paymentToken = useMemo(() => getPrimaryPaymentToken(networkId), [networkId])
 
   const { createOrder, broadcastOrder } = use0xExchange()
 
@@ -74,10 +74,10 @@ export default function LimitTicket({
   const [needApprove, setNeedApprove] = useState(true)
   const [isApproving, setIsApproving] = useState(false)
 
-  const { allowance: usdcAllowance, approve: approveUSDC } = useUserAllowance(paymentToken.id, Spenders.ZeroXERC20Proxy)
+  const { allowance: usdcAllowance, approve: approveUSDC } = useUserAllowance(paymentToken.id, Spenders.ZeroXExchange)
   const { allowance: oTokenAllowance, approve: approveOToken } = useUserAllowance(
     selectedOToken.id,
-    Spenders.ZeroXERC20Proxy,
+    Spenders.ZeroXExchange,
   )
 
   const approve = useCallback(async () => {
@@ -144,11 +144,11 @@ export default function LimitTicket({
   // check balance error
   useEffect(() => {
     // if (error !== Errors.NO_ERROR || error !== Errors.INSUFFICIENT_BALANCE) return
-    const inputBalance = action === TradeAction.Buy ? usdcBalance : oTokenBalance
+    const inputBalance = action === TradeAction.Buy ? usdBalance : oTokenBalance
     const rawInputAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals).integerValue()
     if (rawInputAmount.gt(inputBalance)) setError(Errors.INSUFFICIENT_BALANCE)
     else if (error === Errors.INSUFFICIENT_BALANCE) setError(Errors.NO_ERROR)
-  }, [usdcBalance, oTokenBalance, inputToken, inputTokenAmount, action, error])
+  }, [usdBalance, oTokenBalance, inputToken, inputTokenAmount, action, error])
 
   const makerFee = useMemo(
     () =>
@@ -177,10 +177,10 @@ export default function LimitTicket({
     const order = await createOrder(
       inputToken.id,
       outputToken.id,
-      inputToken.id,
+      // inputToken.id,
       makerAssetAmount,
       takerAssetAmount,
-      makerFee,
+      // makerFee,
       expiry,
     )
 
@@ -189,7 +189,7 @@ export default function LimitTicket({
     finalDeadlineUnit,
     createOrder,
     deadline,
-    makerFee,
+    // makerFee,
     inputToken.decimals,
     inputToken.id,
     inputTokenAmount,
@@ -228,7 +228,7 @@ export default function LimitTicket({
         </Col>
       </Row>
       <br />
-      <TokenBalanceEntry label="Price" amount={price.toFixed(4)} symbol="USDC / oToken" />
+      <TokenBalanceEntry label="Price" amount={price.toFixed(4)} symbol={`${paymentToken.symbol} / oToken`} />
       <TokenBalanceEntry
         label="Maker Fee"
         amount={toTokenAmount(makerFee, inputToken.decimals).toString()}
@@ -249,8 +249,8 @@ export default function LimitTicket({
         symbol={simplifyOTokenSymbol(selectedOToken.symbol)}
       />
       <TokenBalanceEntry
-        label="USDC Balance"
-        amount={toTokenAmount(usdcBalance, paymentToken.decimals).toString()}
+        label="USD Balance"
+        amount={toTokenAmount(usdBalance, paymentToken.decimals).toString()}
         symbol={paymentToken.symbol}
       />
 
