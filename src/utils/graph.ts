@@ -572,7 +572,7 @@ export const getOracleAssetsAndPricers = async (
        lockingPeriod
        disputePeriod
      }
-     prices {
+     prices (first: 1000) {
       expiry
       reportedTimestamp
       isDisputed
