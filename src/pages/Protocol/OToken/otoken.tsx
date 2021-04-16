@@ -19,7 +19,7 @@ import { networkIdToAddressUrl } from '../../../constants'
 import BigNumber from 'bignumber.js'
 import { OTokenTrade } from '../../../types'
 
-export default function VaultDetail() {
+export default function Otoken() {
   useEffect(() => {
     ReactGA.pageview('account/otoken/')
   }, [])
