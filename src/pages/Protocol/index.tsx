@@ -3,7 +3,7 @@ import ReactGA from 'react-ga'
 import { Container, Row, Col } from 'react-grid-system'
 import { useHistory } from 'react-router-dom'
 import { BoxButton } from '../../components/BoxButton'
-import { IconCoin, useTheme } from '@aragon/ui'
+import { IconCoin, IconMenu, useTheme } from '@aragon/ui'
 import Header from '../../components/Header'
 import Comment from '../../components/Comment'
 import factoryBlack from '../../imgs/icons/factory-black.png'
@@ -29,6 +29,17 @@ function ProtocolPage() {
             icon={<IconCoin size="large" />}
             onClick={() => {
               history.push('/protocol/oracle/')
+            }}
+          />
+        </Col>
+
+        <Col sm={12} md={6} lg={4}>
+          <BoxButton
+            title="OTokens"
+            description="List of oTokens"
+            icon={<IconMenu size="large" />}
+            onClick={() => {
+              history.push('/protocol/otokens/')
             }}
           />
         </Col>

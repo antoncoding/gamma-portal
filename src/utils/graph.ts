@@ -255,28 +255,14 @@ export async function getVault(
 /**
  * Get all oTokens
  */
-export async function getOTokens(
-  networkId: SupportedNetworks,
-  errorCallback: Function,
-): Promise<
-  | {
-      id: string
-      symbol: string
-      name: string
-      strikeAsset: { id: string; symbol: string }
-      strikePrice: string
-      underlyingAsset: { id: string; symbol: string }
-      collateralAsset: { id: string; symbol: string }
-      isPut: boolean
-      expiryTimestamp: string
-      createdAt: string
-      createdTx: string
-    }[]
-  | null
-> {
+export async function getOTokens(networkId: SupportedNetworks, errorCallback: Function): Promise<SubgraphOToken[]> {
   const query = `
   {
-    otokens {
+    otokens (
+      first: 1000, 
+      orderBy: createdAt, 
+      orderDirection: desc
+    ) {
       id
       symbol
       name
@@ -300,6 +286,7 @@ export async function getOTokens(
       expiryTimestamp
       createdAt
       createdTx
+      creator
     }
   }`
   try {
@@ -310,7 +297,7 @@ export async function getOTokens(
     return oTokens
   } catch (error) {
     errorCallback(error.toString())
-    return null
+    return []
   }
 }
 
@@ -321,21 +308,7 @@ export async function getOToken(
   id: string,
   networkId: SupportedNetworks,
   errorCallback: Function,
-): Promise<{
-  id: string
-  symbol: string
-  name: string
-  decimals: number
-  strikeAsset: SubgraphToken
-  strikePrice: string
-  underlyingAsset: SubgraphToken
-  collateralAsset: SubgraphToken
-  isPut: boolean
-  expiryTimestamp: string
-  createdAt: string
-  createdTx: string
-  totalSupply: string
-} | null> {
+): Promise<SubgraphOToken | null> {
   const query = `
   {
     otoken (id: "${id}") {
@@ -363,6 +336,7 @@ export async function getOToken(
       expiryTimestamp
       createdAt
       createdTx
+      creator
       totalSupply
       decimals
     }

@@ -78,6 +78,9 @@ export type SubgraphOToken = SubgraphToken & {
   strikePrice: string
   expiryTimestamp: string
   isPut: boolean
+  creator: string
+  createdAt: string
+  totalSupply: string
 }
 
 export type SubgraphPriceEntry = {
