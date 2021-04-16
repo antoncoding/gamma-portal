@@ -18,6 +18,7 @@ import AccountVault from './pages/Account/AccountVaults'
 import ConnectWallet from './pages/Account/ConnectWallet'
 import Vault from './pages/Account/VaultDetail'
 import Oracle from './pages/Protocol/Oracle'
+import OToken from './pages/Protocol/OToken'
 import Operators from './pages/Account/Operators'
 import HomePage from './pages/HomePage'
 import Settings from './pages/Settings'
@@ -133,6 +134,11 @@ function App() {
                   <Route path="/protocol/factory/">
                     <Layout>
                       <Factory />
+                    </Layout>
+                  </Route>
+                  <Route path="/protocol/otoken/:otoken">
+                    <Layout>
+                      <OToken />
                     </Layout>
                   </Route>
                   <Route path="/protocol/">

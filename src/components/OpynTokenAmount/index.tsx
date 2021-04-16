@@ -5,13 +5,8 @@ import { EmptyToken } from '../TokenDisplay'
 
 import { TokenAmount, LinkBase, Modal, AddressField } from '@aragon/ui'
 
-import ETH from '../../imgs/ETH.png'
-import WBTC from '../../imgs/WBTC.png'
-import oETH from '../../imgs/oETH.svg'
-import oBTC from '../../imgs/oBTC.png'
-import USDC from '../../imgs/USDC.png'
-import USDT from '../../imgs/USDT.png'
 import { simplifyOTokenSymbol } from '../../utils/others'
+import { getTokenImg } from '../../imgs/utils'
 
 type TokenAmountProps = {
   token: SubgraphOToken | SubgraphToken | null
@@ -23,23 +18,7 @@ export default function OpynTokenAmount({ token, amount, chainId }: TokenAmountP
   const [open, setOpen] = useState(false)
 
   const imgUrl = useMemo(() => {
-    return token === null
-      ? null
-      : token.symbol === 'USDC'
-      ? USDC
-      : token.symbol === 'USDT'
-      ? USDT
-      : token.symbol === 'WETH'
-      ? ETH
-      : token.symbol === 'WBTC'
-      ? WBTC
-      : (token as SubgraphOToken).underlyingAsset
-      ? (token as SubgraphOToken).underlyingAsset.symbol === 'WETH'
-        ? oETH
-        : (token as SubgraphOToken).underlyingAsset.symbol === 'WBTC'
-        ? oBTC
-        : null
-      : null
+    return getTokenImg(token)
   }, [token])
 
   const symbol =

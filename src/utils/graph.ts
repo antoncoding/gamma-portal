@@ -5,7 +5,7 @@ import { SupportedNetworks } from '../constants/networks'
 import { SubgraphVault, SubgraphToken, SubgraphOracleAsset, SubgraphOToken, OTokenBalance, OTokenTrade } from '../types'
 
 /**
- * Get all oTokens
+ * Get account info
  */
 export async function getAccount(
   networkId: SupportedNetworks,
@@ -73,11 +73,15 @@ export async function getOTokenTrades(
   networkId: SupportedNetworks,
   otoken: string,
   errorCallback: Function,
-): Promise<null | OTokenTrade[]> {
+): Promise<OTokenTrade[]> {
   const query = `{
-    otokenTrades(where: {
-      oToken_contains: "${otoken}"
-    }) {
+    otokenTrades(
+      where: {
+        oToken_contains: "${otoken}"
+      }, 
+      orderBy: timestamp, 
+      orderDirection: desc
+    ) {
       oTokenAmount
       paymentTokenAmount
       paymentToken {
@@ -85,6 +89,8 @@ export async function getOTokenTrades(
         decimals
         id
       }
+      buyer
+      seller
       timestamp
       transactionHash
     }
@@ -95,7 +101,7 @@ export async function getOTokenTrades(
     return response.data.otokenTrades
   } catch (error) {
     errorCallback(error.toString())
-    return null
+    return []
   }
 }
 
@@ -305,6 +311,116 @@ export async function getOTokens(
   } catch (error) {
     errorCallback(error.toString())
     return null
+  }
+}
+
+/**
+ * Get oTokens
+ */
+export async function getOToken(
+  id: string,
+  networkId: SupportedNetworks,
+  errorCallback: Function,
+): Promise<{
+  id: string
+  symbol: string
+  name: string
+  decimals: number
+  strikeAsset: SubgraphToken
+  strikePrice: string
+  underlyingAsset: SubgraphToken
+  collateralAsset: SubgraphToken
+  isPut: boolean
+  expiryTimestamp: string
+  createdAt: string
+  createdTx: string
+  totalSupply: string
+} | null> {
+  const query = `
+  {
+    otoken (id: "${id}") {
+      id
+      symbol
+      name
+      decimals
+      strikeAsset {
+        id
+        symbol
+        decimals
+      }
+      underlyingAsset {
+        id
+        symbol
+        decimals
+      }
+      collateralAsset {
+        id
+        symbol
+        decimals
+      }
+      strikePrice
+      isPut
+      expiryTimestamp
+      createdAt
+      createdTx
+      totalSupply
+      decimals
+    }
+  }`
+  try {
+    const response = await postQuery(endpoints[networkId], query)
+    return response.data.otoken
+  } catch (error) {
+    errorCallback(error.toString())
+    return null
+  }
+}
+
+export async function getHolders(
+  otoken: string,
+  networkId: SupportedNetworks,
+  errorCallback: Function,
+): Promise<{ account: string; balance: string }[]> {
+  const query = `
+  {
+    accountBalances (where: {token: "${otoken.toLowerCase()}"}) {
+      account
+      balance
+    }
+  }`
+  try {
+    const response = await postQuery(endpoints[networkId], query)
+    const balances = response.data.accountBalances.filter(
+      (balanceEntry: { account: string; balance: string }) => balanceEntry.balance !== '0',
+    )
+    return balances
+  } catch (error) {
+    errorCallback(error.toString())
+    return []
+  }
+}
+
+export async function getMintersForOToken(
+  otoken: string,
+  networkId: SupportedNetworks,
+  errorCallback: Function,
+): Promise<string[]> {
+  const query = `
+  {
+    mintShortActions (first: 1000, where:{
+      oToken: "${otoken.toLowerCase()}"
+    }) {
+      to
+    }
+  }`
+  try {
+    const response = await postQuery(endpoints[networkId], query)
+    const actions = response.data.mintShortActions
+    const uniqueMinters = Array.from(new Set(actions.map((a: { to: string }) => a.to)))
+    return uniqueMinters as string[]
+  } catch (error) {
+    errorCallback(error.toString())
+    return []
   }
 }
 

@@ -1,0 +1,28 @@
+import { SubgraphOToken } from '../types'
+
+import ETH from './ETH.png'
+import WBTC from './WBTC.png'
+import oETH from './oETH.svg'
+import oBTC from './oBTC.png'
+import USDC from './USDC.png'
+import USDT from './USDT.png'
+
+export function getTokenImg(token: { id: string; symbol: string } | null) {
+  return token === null
+    ? null
+    : token.symbol === 'USDC'
+    ? USDC
+    : token.symbol === 'USDT'
+    ? USDT
+    : token.symbol === 'WETH'
+    ? ETH
+    : token.symbol === 'WBTC'
+    ? WBTC
+    : (token as SubgraphOToken).underlyingAsset
+    ? (token as SubgraphOToken).underlyingAsset.symbol === 'WETH'
+      ? oETH
+      : (token as SubgraphOToken).underlyingAsset.symbol === 'WBTC'
+      ? oBTC
+      : null
+    : null
+}
