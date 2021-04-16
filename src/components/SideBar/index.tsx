@@ -85,11 +85,11 @@ export default function SideBar() {
         />
 
         <SubButton
-          title="Factory"
+          title="OTokens"
           onClick={() => {
-            history.push(`/protocol/factory/`)
+            history.push(`/protocol/otokens/`)
           }}
-          isSelected={selectedTab === 3 && subSelected === 'factory'}
+          isSelected={selectedTab === 3 && subSelected === 'otokens'}
           shown={selectedTab === 3}
         />
         <SubButton
@@ -98,6 +98,14 @@ export default function SideBar() {
             history.push(`/protocol/oracle/`)
           }}
           isSelected={selectedTab === 3 && subSelected === 'oracle'}
+          shown={selectedTab === 3}
+        />
+        <SubButton
+          title="Factory"
+          onClick={() => {
+            history.push(`/protocol/factory/`)
+          }}
+          isSelected={selectedTab === 3 && subSelected === 'factory'}
           shown={selectedTab === 3}
         />
         <SubButton
@@ -186,6 +194,8 @@ function locationToSubButtomId(location) {
     ? 'faucet'
     : location.pathname.includes('/oracle/')
     ? 'oracle'
+    : location.pathname.includes('/otokens/')
+    ? 'otokens'
     : location.pathname.includes('/swap/')
     ? 'swap'
     : location.pathname.includes('/orderbook/')

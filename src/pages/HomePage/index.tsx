@@ -73,7 +73,7 @@ function HomePage() {
         <Col sm={12} md={6} lg={4}>
           <BoxButton
             title="Ribbon Finance"
-            description="buy ETH strangles"
+            description="Invest in Delta Vault"
             icon={<img height={50} src={ribbon} alt={'ribbon finance'} />}
             onClick={() => {
               window.location.href = 'https://ribbon.finance/'
