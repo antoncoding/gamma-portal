@@ -16,6 +16,8 @@
 
 ## Intro
 
+Currently hosted on [Netlify](https://gammaportal.xyz/) and [Fleek](https://gammaportal.on.fleek.co/#/)
+
 This is an open-sourced alternative front end to interact with [Gamma protocol](https://github.com/opynfinance/GammaProtocol), or, Opyn V2.
 
 We encourage everyone to open discussions / feature requests or pull requests to help this project boom 😉.
