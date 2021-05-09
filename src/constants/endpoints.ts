@@ -19,7 +19,7 @@ export const subgraph: graphEndPointType = {
 export const rfqServer: graphEndPointType = {
   [SupportedNetworks.Mainnet]: 'https://quoter-testnet-jt76tpqb5q-uc.a.run.app/', // update this
   [SupportedNetworks.Kovan]: 'https://quoter-testnet-jt76tpqb5q-uc.a.run.app/', // update this
-  [SupportedNetworks.Ropsten]: 'http://localhost:3000/',
+  [SupportedNetworks.Ropsten]: 'https://quoter-testnet-jt76tpqb5q-uc.a.run.app/',
 }
 
 export const ZeroXEndpoint: { [key in SupportedNetworks]: { http: string; ws: string } } = {

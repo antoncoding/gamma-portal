@@ -111,8 +111,6 @@ export function use0xExchange() {
       const feeInEth = getProtocolFee(orders).toString()
       const amountsStr = amounts.map(amount => amount.toString())
 
-      console.log(`only filling first order la, orders[0]`, orders[0])
-
       // change to batch Fill when it's live
       await exchange.methods
         .batchFillLimitOrders(orders, signatures, amountsStr, false)
@@ -162,7 +160,6 @@ export function use0xExchange() {
       const exchange = new web3.eth.Contract(abi, addresses[networkId].zeroxExchange)
 
       const gasPrice = fast
-      // const feeInEth = getProtocolFee([order]).toString()
       const amountStr = amount.toString()
 
       await exchange.methods

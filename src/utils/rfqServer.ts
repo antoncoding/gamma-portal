@@ -14,7 +14,6 @@ export async function getSellIndicativeQuoteByOtokenAmount(
   const rawOtokenAmount = fromTokenAmount(otokenAmount, 8).toString()
   const url = `${host}/price?sellTokenAddress=${otoken}&buyTokenAddress=${quote}&takerAddress=${user}&protocolVersion=4&txOrigin=${user}&sellAmountBaseUnits=${rawOtokenAmount}`
   const result = await (await fetch(url)).json()
-  console.log(result)
   return result
 }
 
@@ -27,9 +26,7 @@ export async function getSellIndicativeQuoteByUSDCAmount(
 ) {
   const host = rfqServer[network]
   const rawUSDCAmount = fromTokenAmount(usdcAmount, 6).toString()
-  console.log('rawUSDCAmount', rawUSDCAmount.toString())
   const url = `${host}/price?sellTokenAddress=${otoken}&buyTokenAddress=${quote}&takerAddress=${user}&protocolVersion=4&txOrigin=${user}&buyAmountBaseUnits=${rawUSDCAmount}`
   const result = await (await fetch(url)).json()
-  console.log(result)
   return result
 }
