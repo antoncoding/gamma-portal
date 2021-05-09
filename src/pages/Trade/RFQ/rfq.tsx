@@ -1,6 +1,5 @@
-import React, { useMemo, useState } from 'react'
+import React from 'react'
 import { Row, Col, Hidden } from 'react-grid-system'
-import BigNumber from 'bignumber.js'
 import { Box, Button, useTheme } from '@aragon/ui'
 
 import MainTicket from './main'
@@ -8,7 +7,7 @@ import MainTicket from './main'
 import { SubgraphOToken } from '../../../types'
 import { simplifyOTokenSymbol } from '../../../utils/others'
 
-import { TradeAction, getWeth, getPrimaryPaymentToken } from '../../../constants'
+import { TradeAction, getPrimaryPaymentToken } from '../../../constants'
 import { useOTokenBalances, useTokenBalance } from '../../../hooks'
 import { useConnectedWallet } from '../../../contexts/wallet'
 
@@ -22,39 +21,21 @@ export default function RFQ({ selectedOToken, action, setAction }: RFQProps) {
   const theme = useTheme()
 
   const { user, networkId } = useConnectedWallet()
-
-  const [inputTokenAmount, setInputTokenAmount] = useState(new BigNumber(1))
-  const [outputTokenAmount, setOutputTokenAmount] = useState(new BigNumber(0))
-
   const { balances: oTokenBalances } = useOTokenBalances(user, networkId)
   const usdBalance = useTokenBalance(getPrimaryPaymentToken(networkId).id, user, 15)
-  const wethBalance = useTokenBalance(getWeth(networkId).id, user, 15)
-
-  const titleText = useMemo(
-    () =>
-      `${action === TradeAction.Buy ? 'Buy' : 'Sell'} ${
-        selectedOToken ? simplifyOTokenSymbol(selectedOToken?.symbol) : 'oToken'
-      }`,
-    [selectedOToken, action],
-  )
 
   return (
-    <Box heading={titleText}>
+    <Box heading={`Trade ${selectedOToken ? simplifyOTokenSymbol(selectedOToken?.symbol) : 'oToken'}`}>
       <Row>
         <Col sm={12} lg={8} xl={9}>
           {selectedOToken === null ? (
             <div style={{ color: theme.contentSecondary }}> Select an oToken to proceed </div>
           ) : (
             <MainTicket
-              inputTokenAmount={inputTokenAmount}
-              setInputTokenAmount={setInputTokenAmount}
-              outputTokenAmount={outputTokenAmount}
-              setOutputTokenAmount={setOutputTokenAmount}
               action={action}
               selectedOToken={selectedOToken}
               oTokenBalances={oTokenBalances}
               usdBalance={usdBalance}
-              wethBalance={wethBalance}
             />
           )}
         </Col>

@@ -33,24 +33,12 @@ type MarketTicketProps = {
   selectedOToken: SubgraphOToken
   oTokenBalances: OTokenBalance[] | null
   usdBalance: BigNumber
-  wethBalance: BigNumber
-  inputTokenAmount: BigNumber
-  setInputTokenAmount: React.Dispatch<React.SetStateAction<BigNumber>>
-  outputTokenAmount: BigNumber
-  setOutputTokenAmount: React.Dispatch<React.SetStateAction<BigNumber>>
 }
 
-export default function RFQMain({
-  action,
-  selectedOToken,
-  oTokenBalances,
-  usdBalance,
-  // wethBalance,
-  inputTokenAmount,
-  setInputTokenAmount,
-  outputTokenAmount,
-  setOutputTokenAmount,
-}: MarketTicketProps) {
+export default function RFQMain({ action, selectedOToken, oTokenBalances, usdBalance }: MarketTicketProps) {
+  const [inputTokenAmount, setInputTokenAmount] = useState(new BigNumber(1))
+  const [outputTokenAmount, setOutputTokenAmount] = useState(new BigNumber(0))
+
   const { networkId } = useConnectedWallet()
 
   const paymentToken = useMemo(() => getPrimaryPaymentToken(networkId), [networkId])
