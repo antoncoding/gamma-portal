@@ -92,6 +92,11 @@ function App() {
                       <RFQ />
                     </Layout>
                   </Route>
+                  <Route path="/trade/rfq/">
+                    <Layout>
+                      <RFQ />
+                    </Layout>
+                  </Route>
                   <Route path="/trade/otc/">
                     <Layout>
                       <OTC />
