@@ -36,8 +36,8 @@ type MarketTicketProps = {
 }
 
 export default function RFQMain({ action, selectedOToken, oTokenBalances, usdBalance }: MarketTicketProps) {
-  const [inputTokenAmount, setInputTokenAmount] = useState(new BigNumber(1))
-  const [outputTokenAmount, setOutputTokenAmount] = useState(new BigNumber(0))
+  const [takerTokenAmount, setInputTokenAmount] = useState(new BigNumber(1))
+  const [makerTokenAmount, setOutputTokenAmount] = useState(new BigNumber(0))
 
   const { networkId } = useConnectedWallet()
 
@@ -60,13 +60,13 @@ export default function RFQMain({ action, selectedOToken, oTokenBalances, usdBal
     [oTokenBalances, selectedOToken],
   )
 
-  const inputToken = useMemo(() => (action === TradeAction.Buy ? paymentToken : selectedOToken), [
+  const takerToken = useMemo(() => (action === TradeAction.Buy ? paymentToken : selectedOToken), [
     paymentToken,
     selectedOToken,
     action,
   ])
 
-  const outputToken = useMemo(() => (action === TradeAction.Buy ? selectedOToken : paymentToken), [
+  const makerToken = useMemo(() => (action === TradeAction.Buy ? selectedOToken : paymentToken), [
     paymentToken,
     selectedOToken,
     action,
@@ -83,11 +83,11 @@ export default function RFQMain({ action, selectedOToken, oTokenBalances, usdBal
 
   const approve = useCallback(async () => {
     setIsApproving(true)
-    const rawInputAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals)
-    if (action === TradeAction.Buy) await approveUSDC(rawInputAmount)
-    else await approveOToken(rawInputAmount)
+    const rawTakerAmount = fromTokenAmount(takerTokenAmount, takerToken.decimals)
+    if (action === TradeAction.Buy) await approveUSDC(rawTakerAmount)
+    else await approveOToken(rawTakerAmount)
     setIsApproving(false)
-  }, [inputTokenAmount, inputToken, action, approveUSDC, approveOToken])
+  }, [takerTokenAmount, takerToken, action, approveUSDC, approveOToken])
 
   const inputIcon = useMemo(
     () =>
@@ -146,15 +146,15 @@ export default function RFQMain({ action, selectedOToken, oTokenBalances, usdBal
 
   const price = useMemo(() => {
     if (action === TradeAction.Sell) {
-      return inputTokenAmount.isZero() || inputTokenAmount.isNaN()
+      return takerTokenAmount.isZero() || takerTokenAmount.isNaN()
         ? new BigNumber(0)
-        : outputTokenAmount.div(inputTokenAmount)
+        : makerTokenAmount.div(takerTokenAmount)
     } else {
-      return outputTokenAmount.isZero() || outputTokenAmount.isNaN()
+      return makerTokenAmount.isZero() || makerTokenAmount.isNaN()
         ? new BigNumber(0)
-        : inputTokenAmount.div(outputTokenAmount)
+        : takerTokenAmount.div(makerTokenAmount)
     }
-  }, [inputTokenAmount, action, outputTokenAmount])
+  }, [takerTokenAmount, action, makerTokenAmount])
 
   const impliedV = useMemo(() => {
     const t = new BigNumber(Number(selectedOToken.expiryTimestamp) - Date.now() / 1000).div(86400).div(365).toNumber()
@@ -171,24 +171,24 @@ export default function RFQMain({ action, selectedOToken, oTokenBalances, usdBal
   useEffect(() => {
     if (lastUpdate !== Updates.Input) return
     // fix input, recalculate output
-    const rawInputAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals).integerValue().toString()
-    requestIndicativeQuote(undefined, rawInputAmount)
-  }, [inputTokenAmount, inputToken, requestIndicativeQuote, lastUpdate])
+    const rawTakerAmount = fromTokenAmount(takerTokenAmount, takerToken.decimals).integerValue().toString()
+    requestIndicativeQuote(undefined, rawTakerAmount)
+  }, [takerTokenAmount, takerToken, requestIndicativeQuote, lastUpdate])
 
   useEffect(() => {
     if (lastUpdate !== Updates.Output) return
     // fix output, update input
-    const rawOutputAmount = fromTokenAmount(outputTokenAmount, outputToken.decimals).integerValue().toString()
-    requestIndicativeQuote(rawOutputAmount, undefined)
-  }, [outputToken, requestIndicativeQuote, lastUpdate, outputTokenAmount])
+    const rawMakerAmount = fromTokenAmount(makerTokenAmount, makerToken.decimals).integerValue().toString()
+    requestIndicativeQuote(rawMakerAmount, undefined)
+  }, [makerToken, requestIndicativeQuote, lastUpdate, makerTokenAmount])
 
   useEffect(() => {
     if (error !== Errors.NO_ERROR && error !== Errors.INSUFFICIENT_BALANCE) return
     const inputBalance = action === TradeAction.Buy ? usdBalance : oTokenBalance
-    const rawInputAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals).integerValue()
-    if (rawInputAmount.gt(inputBalance)) setError(Errors.INSUFFICIENT_BALANCE)
+    const rawTakerAmount = fromTokenAmount(takerTokenAmount, takerToken.decimals).integerValue()
+    if (rawTakerAmount.gt(inputBalance)) setError(Errors.INSUFFICIENT_BALANCE)
     else if (error === Errors.INSUFFICIENT_BALANCE) setError(Errors.NO_ERROR)
-  }, [usdBalance, oTokenBalance, inputToken, inputTokenAmount, action, error])
+  }, [usdBalance, oTokenBalance, takerToken, takerTokenAmount, action, error])
 
   // update input / output box when indicativeQuote updated
   useEffect(() => {
@@ -197,9 +197,9 @@ export default function RFQMain({ action, selectedOToken, oTokenBalances, usdBal
     if (isFinalized && !rfqOrder) return
     const quote = (isFinalized ? rfqOrder : indicativeQuote) as IndicativeQuote
     // update input
-    const rawOutputAmount = fromTokenAmount(outputTokenAmount, outputToken.decimals).integerValue().toString()
-    if (rawOutputAmount === quote.makerAmount) {
-      const takerAmount = toTokenAmount(quote.takerAmount, inputToken.decimals)
+    const rawMakerAmount = fromTokenAmount(makerTokenAmount, makerToken.decimals).integerValue().toString()
+    if (rawMakerAmount === quote.makerAmount) {
+      const takerAmount = toTokenAmount(quote.takerAmount, takerToken.decimals)
       setInputTokenAmount(takerAmount)
     }
   }, [
@@ -207,9 +207,9 @@ export default function RFQMain({ action, selectedOToken, oTokenBalances, usdBal
     rfqOrder,
     indicativeQuote,
     lastUpdate,
-    inputToken.decimals,
-    outputToken.decimals,
-    outputTokenAmount,
+    takerToken.decimals,
+    makerToken.decimals,
+    makerTokenAmount,
     setInputTokenAmount,
   ])
 
@@ -220,9 +220,9 @@ export default function RFQMain({ action, selectedOToken, oTokenBalances, usdBal
     const quote = (isFinalized ? rfqOrder : indicativeQuote) as IndicativeQuote
 
     // fix input, recalculate output
-    const rawInputAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals).integerValue().toString()
-    if (rawInputAmount === quote.takerAmount) {
-      const makerAmount = toTokenAmount(quote.makerAmount, outputToken.decimals)
+    const rawTakerAmount = fromTokenAmount(takerTokenAmount, takerToken.decimals).integerValue().toString()
+    if (rawTakerAmount === quote.takerAmount) {
+      const makerAmount = toTokenAmount(quote.makerAmount, makerToken.decimals)
       setOutputTokenAmount(makerAmount)
     }
   }, [
@@ -230,44 +230,44 @@ export default function RFQMain({ action, selectedOToken, oTokenBalances, usdBal
     rfqOrder,
     indicativeQuote,
     lastUpdate,
-    inputToken.decimals,
-    inputTokenAmount,
-    outputToken.decimals,
+    takerToken.decimals,
+    takerTokenAmount,
+    makerToken.decimals,
     setOutputTokenAmount,
   ])
 
   const finalizedQuote = useCallback(async () => {
     if (lastUpdate === Updates.Input) {
       // fix input, recalculate output
-      const rawInputAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals).integerValue().toString()
-      await requestFirmQuote(undefined, rawInputAmount)
+      const rawTakerAmount = fromTokenAmount(takerTokenAmount, takerToken.decimals).integerValue().toString()
+      await requestFirmQuote(undefined, rawTakerAmount)
     } else {
       // fix output, update input
-      const rawOutputAmount = fromTokenAmount(outputTokenAmount, outputToken.decimals).integerValue().toString()
-      await requestFirmQuote(rawOutputAmount, undefined)
+      const rawMakerAmount = fromTokenAmount(makerTokenAmount, makerToken.decimals).integerValue().toString()
+      await requestFirmQuote(rawMakerAmount, undefined)
     }
     setIsFinalized(true)
-  }, [requestFirmQuote, lastUpdate, inputTokenAmount, outputTokenAmount, outputToken, inputToken])
+  }, [requestFirmQuote, lastUpdate, takerTokenAmount, makerTokenAmount, makerToken, takerToken])
 
   // fill rfq order
   const fill = useCallback(async () => {
     setIsFilling(true)
     try {
-      await fillRFQOrder(rfqOrder, fromTokenAmount(inputTokenAmount, inputToken.decimals).integerValue())
+      await fillRFQOrder(rfqOrder, fromTokenAmount(takerTokenAmount, takerToken.decimals).integerValue())
     } finally {
       setIsFilling(false)
     }
-  }, [fillRFQOrder, rfqOrder, inputTokenAmount, inputToken])
+  }, [fillRFQOrder, rfqOrder, takerTokenAmount, takerToken])
 
   // check has enough input
   useEffect(() => {
-    const inputRawAmount = fromTokenAmount(inputTokenAmount, inputToken.decimals)
+    const inputRawAmount = fromTokenAmount(takerTokenAmount, takerToken.decimals)
     if (action === TradeAction.Buy) {
       setNeedApprove(usdcAllowance.lt(inputRawAmount))
     } else {
       setNeedApprove(oTokenAllowance.lt(inputRawAmount))
     }
-  }, [action, oTokenAllowance, usdcAllowance, inputTokenAmount, inputToken])
+  }, [action, oTokenAllowance, usdcAllowance, takerTokenAmount, takerToken])
 
   const closestExpry = useMemo(() => {
     return rfqOrder ? rfqOrder.expiry : '0'
@@ -282,7 +282,7 @@ export default function RFQMain({ action, selectedOToken, oTokenBalances, usdBal
             type="number"
             adornment={inputIcon}
             adornmentPosition="end"
-            value={inputTokenAmount.toNumber()}
+            value={takerTokenAmount.toNumber()}
             onChange={handleInputChange}
             wide
           />
@@ -297,7 +297,7 @@ export default function RFQMain({ action, selectedOToken, oTokenBalances, usdBal
             type="number"
             adornment={outputIcon}
             adornmentPosition="end"
-            value={outputTokenAmount.toFixed()}
+            value={makerTokenAmount.toFixed()}
             onChange={handleOuputChange}
             wide
           />
@@ -340,7 +340,7 @@ export default function RFQMain({ action, selectedOToken, oTokenBalances, usdBal
           <>
             <Button
               disabled={
-                needApprove || error !== Errors.NO_ERROR || inputTokenAmount.isZero() || inputTokenAmount.isNaN()
+                needApprove || error !== Errors.NO_ERROR || takerTokenAmount.isZero() || takerTokenAmount.isNaN()
               }
               mode={action === TradeAction.Buy ? 'positive' : 'negative'}
               onClick={fill}
@@ -351,7 +351,7 @@ export default function RFQMain({ action, selectedOToken, oTokenBalances, usdBal
             <Button label={'Cancel'} onClick={() => setIsFinalized(false)} />{' '}
           </>
         ) : (
-          <Button disabled={inputTokenAmount.isZero() || inputTokenAmount.isNaN()} onClick={finalizedQuote}>
+          <Button disabled={takerTokenAmount.isZero() || takerTokenAmount.isNaN()} onClick={finalizedQuote}>
             {' '}
             {isRequestingFirm ? <LoadingRing /> : 'Finalize Offer'}{' '}
           </Button>
