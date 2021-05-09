@@ -38,23 +38,27 @@ export default function RFQPanel() {
 
   const [action, setAction] = useState(TradeAction.Buy)
 
-  return networkId !== SupportedNetworks.Ropsten ? (
-    <Info mode="error"> RFQ is only supported on Ropsten now </Info>
-  ) : (
+  return (
     <>
       <Header primary={'RFQ'} />
-      <Row>
-        <Col lg={4} md={6} sm={12}>
-          <OTokenAutoComplete
-            oTokens={allOtokens}
-            selectedOToken={selectedOToken}
-            setSelectedOToken={setSelectedOToken}
-          />
-        </Col>
-      </Row>
-      <br />
-      <RFQ selectedOToken={selectedOToken} action={action} setAction={setAction} />
-      <SyncIndicator visible={isLoading} children={'Fetching token data 🍕'} />
+      {networkId !== SupportedNetworks.Ropsten ? (
+        <Info mode="error"> RFQ is only supported on Ropsten testnet. </Info>
+      ) : (
+        <>
+          <Row>
+            <Col lg={4} md={6} sm={12}>
+              <OTokenAutoComplete
+                oTokens={allOtokens}
+                selectedOToken={selectedOToken}
+                setSelectedOToken={setSelectedOToken}
+              />
+            </Col>
+          </Row>
+          <br />
+          <RFQ selectedOToken={selectedOToken} action={action} setAction={setAction} />
+          <SyncIndicator visible={isLoading} children={'Fetching token data 🍕'} />
+        </>
+      )}
     </>
   )
 }
