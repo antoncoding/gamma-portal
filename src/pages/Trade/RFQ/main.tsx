@@ -17,6 +17,11 @@ import { simplifyOTokenSymbol } from '../../../utils/others'
 import WarningText from '../../../components/Warning'
 import LabelText from '../../../components/LabelText'
 import TokenBalanceEntry from '../../../components/TokenBalanceEntry'
+import SectionTitle from '../../../components/SectionHeader'
+import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
+import { useTokenPrice } from '../../../hooks'
+
+const iv = require('implied-volatility')
 
 enum Updates {
   Input,
@@ -59,6 +64,8 @@ export default function RFQMain({
   const [lastUpdate, setLastUpdate] = useState<Updates>(Updates.Input)
 
   const [error, setError] = useState(Errors.NO_ERROR)
+
+  const spotPrice = useTokenPrice(selectedOToken.underlyingAsset.id, 10)
 
   const oTokenBalance = useMemo(
     () => oTokenBalances?.find(b => b.token.id === selectedOToken.id)?.balance ?? new BigNumber(0),
@@ -114,10 +121,6 @@ export default function RFQMain({
     [action, selectedOToken],
   )
 
-  const protocolFee = useMemo(() => {
-    return new BigNumber(0)
-  }, [])
-
   const {
     rfqOrder,
     indicativeQuote,
@@ -164,6 +167,17 @@ export default function RFQMain({
         : inputTokenAmount.div(outputTokenAmount)
     }
   }, [inputTokenAmount, action, outputTokenAmount])
+
+  const impliedV = useMemo(() => {
+    const t = new BigNumber(Number(selectedOToken.expiryTimestamp) - Date.now() / 1000).div(86400).div(365).toNumber()
+    const s = spotPrice.toNumber()
+    const initEstimation = 1
+    const interestRate = 0.05
+
+    const k = parseInt(selectedOToken.strikePrice) / 1e8
+    const type = selectedOToken.isPut ? 'put' : 'call'
+    return iv.getImpliedVolatility(price.toNumber(), s, k, t, interestRate, type, initEstimation)
+  }, [price, spotPrice, selectedOToken])
 
   // refetch indicative quote upon input change
   useEffect(() => {
@@ -301,16 +315,26 @@ export default function RFQMain({
           />
         </Col>
       </Row>
-      <br />
+      <SectionTitle title="Quote" />
       <TokenBalanceEntry
         label="Avg. Price"
         isLoading={isRequestingIndicative}
         amount={price.toFixed(4)}
         symbol={paymentToken.symbol}
       />
-      <TokenBalanceEntry label="Protocol Fee" amount={protocolFee.toString()} symbol={'ETH'} />
+      <TokenBalanceEntry label="Impl. Vol" amount={(impliedV * 100).toFixed(4)} symbol={'%'} />
+      <TokenBalanceEntry
+        label="Maker"
+        isLoading={isRequestingFirm}
+        amount={isFinalized && rfqOrder ? <CustomIdentityBadge entity={rfqOrder.maker} /> : '-'}
+        symbol={''}
+      />
+      <div style={{ display: 'flex', paddingTop: '5px' }}>
+        <LabelText label={'Expires in'} minWidth={'150px'} />
+        {isFinalized ? <Timer end={new Date(parseInt(closestExpry) * 1000)} /> : <> - </>}
+      </div>
 
-      <br />
+      <SectionTitle title="My Wallet" />
       <TokenBalanceEntry
         label="oToken Balance"
         amount={toTokenAmount(oTokenBalance, 8).toString()}
@@ -322,11 +346,6 @@ export default function RFQMain({
         symbol={paymentToken.symbol}
       />
       <br />
-
-      <div style={{ display: 'flex', paddingTop: '5px' }}>
-        <LabelText label={'Expires in'} minWidth={'150px'} />
-        {isFinalized ? <Timer end={new Date(parseInt(closestExpry) * 1000)} /> : <> - </>}
-      </div>
 
       <div style={{ display: 'flex', paddingTop: '20px' }}>
         {isFinalized ? (

@@ -4,7 +4,7 @@ import { LoadingRing } from '@aragon/ui'
 
 type Props = {
   label: string
-  amount: string
+  amount: string | any
   symbol: string
   isLoading?: boolean
 }
