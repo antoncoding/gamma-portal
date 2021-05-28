@@ -17,7 +17,7 @@ function HomePage() {
   useEffect(() => ReactGA.pageview('/'), [])
   return (
     <Container>
-      <Header primary="Welcome to Gamma Portal" />
+      <Header primary="Gamma Portal" />
 
       <Comment padding={0} text="Create, manage and trade decentralized options" />
 
@@ -63,7 +63,7 @@ function HomePage() {
           <BoxButton
             title="Opyn.co"
             description="Trade the most capital efficient defi options"
-            icon={<img height={50} src={opynLogo} alt={'opyn official'} />}
+            icon={<img height={24} style={{ margin: 13 }} src={opynLogo} alt={'opyn official'} />}
             onClick={() => {
               window.location.href = 'https://opyn.co'
             }}
