@@ -9,6 +9,7 @@ import Comment from '../../components/Comment'
 import SectionTitle from '../../components/SectionHeader'
 import TotalAsset from './TotalAsset'
 
+const opeth = require('../../imgs/icons/opeth.png')
 const ribbon = require('../../imgs/icons/ribbon.svg')
 const opynLogo = require('../../imgs/icons/opyn.png')
 
@@ -65,7 +66,7 @@ function HomePage() {
             description="Trade the most capital efficient defi options"
             icon={<img height={24} style={{ margin: 13 }} src={opynLogo} alt={'opyn official'} />}
             onClick={() => {
-              window.location.href = 'https://opyn.co'
+              window.open('https://opyn.co', '_blank')
             }}
           />
         </Col>
@@ -76,7 +77,18 @@ function HomePage() {
             description="Invest in Delta Vault"
             icon={<img height={50} src={ribbon} alt={'ribbon finance'} />}
             onClick={() => {
-              window.location.href = 'https://ribbon.finance/'
+              window.open('https://ribbon.finance/', '_blank')
+            }}
+          />
+        </Col>
+
+        <Col sm={12} md={6} lg={4}>
+          <BoxButton
+            title="Opeth Finance"
+            description="Smart collateral for DeFi powered by Options"
+            icon={<img height={50} src={opeth} alt={'Opeth Finance'} />}
+            onClick={() => {
+              window.open('https://opeth.finance/', '_blank')
             }}
           />
         </Col>
