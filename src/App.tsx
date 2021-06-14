@@ -150,9 +150,7 @@ function App() {
                     </Layout>
                   </Route>
                   <Route path="/">
-                    <Layout>
-                      <HomePage />
-                    </Layout>
+                    <HomePage />
                   </Route>
                 </Switch>
               </Col>
