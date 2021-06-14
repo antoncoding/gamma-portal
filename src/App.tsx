@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import ReactGA from 'react-ga'
-import { Col, Row } from 'react-grid-system'
+import { Col, Row, setConfiguration } from 'react-grid-system'
 import 'moment-timezone'
 
 import { Main, Layout } from '@aragon/ui'
@@ -45,6 +45,8 @@ function App() {
   const [theme, setTheme] = useState(defaultTheme)
 
   const [isSideBarOpen, setSideBarOpen] = useState(getPreference(SHOW_SIDE_BAR, 'true') === 'true')
+
+  setConfiguration({ containerWidths: [540, 540, 760, 980, 1140] })
 
   return (
     <Router>
