@@ -52,23 +52,23 @@ function App() {
         <walletContext.Provider value={wallet}>
           <OrderbookProvider>
             <NavBar isSideBarOpen={isSideBarOpen} setSideBarOpen={setSideBarOpen} />
-            <Row style={{ height: '100%' }}>
+            <Row style={{ height: '100%' }} nogutter>
               {isSideBarOpen && (
-                <Col sm={12} md={3} lg={3} xl={2}>
+                <Col sm={12} md={3} lg={2} xl={2}>
                   <SideBar />
                 </Col>
               )}
               <Col
                 sm={12}
                 md={isSideBarOpen ? 9 : 12}
-                lg={isSideBarOpen ? 9 : 12}
+                lg={isSideBarOpen ? 10 : 12}
                 xl={isSideBarOpen ? 10 : 12}
                 // offset={maincontentOffset}
               >
                 <Switch>
                   {/* without layout */}
                   <Route path="/trade/orderbook">
-                    <Row>
+                    <Row nogutter>
                       <Col sm={12} xl={10} offset={{ xl: 1 }}>
                         <Orderbook />
                       </Col>
@@ -77,24 +77,16 @@ function App() {
 
                   {/* pages with layout */}
                   <Route path="/trade/swap/:otoken">
-                    <Layout>
-                      <Swap />
-                    </Layout>
+                    <Swap />
                   </Route>
                   <Route path="/trade/swap/">
-                    <Layout>
-                      <Swap />
-                    </Layout>
+                    <Swap />
                   </Route>
                   <Route path="/trade/otc/">
-                    <Layout>
-                      <OTC />
-                    </Layout>
+                    <OTC />
                   </Route>
                   <Route path="/trade/">
-                    <Layout>
-                      <Trade />
-                    </Layout>
+                    <Trade />
                   </Route>
 
                   <Route path="/account/:account/operators">
