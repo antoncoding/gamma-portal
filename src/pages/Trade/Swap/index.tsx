@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
-import { Col, Row } from 'react-grid-system'
+import { Container, Col, Row } from 'react-grid-system'
 import ReactGA from 'react-ga'
 import { SyncIndicator, Info } from '@aragon/ui'
 import TradePanel from '../OrderBookTrade/TradePanel'
@@ -44,7 +44,7 @@ export default function Swap() {
   return networkId === SupportedNetworks.Kovan ? (
     <Info mode="error"> 0x V4 doesn't support kovan testnet, please switch network to Ropsten </Info>
   ) : (
-    <>
+    <Container>
       <Header primary={'Swap'} />
       <Row>
         <Col lg={4} md={6} sm={12}>
@@ -58,6 +58,6 @@ export default function Swap() {
       <br />
       <TradePanel selectedOToken={selectedOToken} action={action} setAction={setAction} />
       <SyncIndicator visible={isLoading || loadingOrderbook} children={'Syncing order book... 🍕'} />
-    </>
+    </Container>
   )
 }

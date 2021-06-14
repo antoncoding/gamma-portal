@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Col, Row } from 'react-grid-system'
+import { Container, Col, Row } from 'react-grid-system'
 import ReactGA from 'react-ga'
 import { Tabs, Info } from '@aragon/ui'
 import { Header } from '../../../components/Header'
@@ -27,11 +27,11 @@ export default function OTC() {
   return networkId === SupportedNetworks.Kovan ? (
     <Info mode="error"> 0x V4 doesn't support kovan testnet, please switch network to Ropsten </Info>
   ) : (
-    <>
+    <Container>
       <Header primary={'OTC'} />
 
       <Row>
-        <Col xl={3} lg={4} md={6} sm={12}>
+        <Col xl={4} lg={5} md={6} sm={12}>
           <Tabs selected={selectedTab} onChange={setSelectedTab} items={['Make Order', 'Take Order']} />
         </Col>
       </Row>
@@ -42,6 +42,6 @@ export default function OTC() {
       {selectedTab === 1 && (
         <TakerOrder paymentTokenBalance={paymentTokenBalance} oTokenBalances={oTokenBalances} allOtokens={allOtokens} />
       )}
-    </>
+    </Container>
   )
 }
