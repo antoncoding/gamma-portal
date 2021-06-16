@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import ReactGA from 'react-ga'
-import { Col, Row, setConfiguration } from 'react-grid-system'
+import { Col, Container, Row, setConfiguration } from 'react-grid-system'
 import 'moment-timezone'
 
 import { Main, Layout } from '@aragon/ui'
@@ -46,7 +46,7 @@ function App() {
 
   const [isSideBarOpen, setSideBarOpen] = useState(getPreference(SHOW_SIDE_BAR, 'true') === 'true')
 
-  setConfiguration({ containerWidths: [540, 540, 760, 980, 1140] })
+  setConfiguration({ containerWidths: [540, 620, 760, 980, 1140] })
 
   return (
     <Router>
@@ -56,28 +56,27 @@ function App() {
             <NavBar isSideBarOpen={isSideBarOpen} setSideBarOpen={setSideBarOpen} />
             <Row style={{ height: '100%' }} nogutter>
               {isSideBarOpen && (
-                <Col sm={12} md={3} lg={2} xl={2}>
+                <Col sm={12} md={2} lg={2} xl={2}>
                   <SideBar />
                 </Col>
               )}
               <Col
                 sm={12}
-                md={isSideBarOpen ? 9 : 12}
+                md={isSideBarOpen ? 10 : 12}
                 lg={isSideBarOpen ? 10 : 12}
                 xl={isSideBarOpen ? 10 : 12}
                 // offset={maincontentOffset}
               >
                 <Switch>
-                  {/* without layout */}
                   <Route path="/trade/orderbook">
-                    <Row nogutter>
-                      <Col sm={12} xl={10} offset={{ xl: 1 }}>
-                        <Orderbook />
-                      </Col>
-                    </Row>
+                    <Container>
+                      <Row nogutter>
+                        <Col sm={12} xl={10} offset={{ xl: 1 }}>
+                          <Orderbook />
+                        </Col>
+                      </Row>
+                    </Container>
                   </Route>
-
-                  {/* pages with layout */}
                   <Route path="/trade/swap/:otoken">
                     <Swap />
                   </Route>
@@ -92,64 +91,43 @@ function App() {
                   </Route>
 
                   <Route path="/account/:account/operators">
-                    <Layout>
-                      <Operators />
-                    </Layout>
+                    <Operators />
                   </Route>
                   <Route path="/account/:account/vaults/">
-                    <Layout>
-                      <AccountVault />
-                    </Layout>
+                    <AccountVault />
                   </Route>
                   <Route path="/account/:account">
-                    <Layout>
-                      <Account />
-                    </Layout>
+                    <Account />
                   </Route>
                   <Route path="/account/">
-                    <Layout>
-                      <ConnectWallet />
-                    </Layout>
+                    <ConnectWallet />
                   </Route>
+
                   <Route path="/vault/:owner/:vaultId">
-                    <Layout>
-                      <Vault />
-                    </Layout>
+                    <Vault />
                   </Route>
                   <Route path="/protocol/faucet">
-                    <Layout>
-                      <Faucet />
-                    </Layout>
+                    <Faucet />
                   </Route>
                   <Route path="/protocol/oracle">
-                    <Layout>
-                      <Oracle />
-                    </Layout>
+                    <Oracle />
                   </Route>
+
                   <Route path="/protocol/factory/">
-                    <Layout>
-                      <Factory />
-                    </Layout>
+                    <Factory />
                   </Route>
                   <Route path="/protocol/otokens/">
-                    <Layout>
-                      <OTokenList />
-                    </Layout>
+                    <OTokenList />
                   </Route>
                   <Route path="/protocol/">
-                    <Layout>
-                      <ProtocolHome />
-                    </Layout>
+                    <ProtocolHome />
                   </Route>
+
                   <Route path="/otoken/:otoken">
-                    <Layout>
-                      <OToken />
-                    </Layout>
+                    <OToken />
                   </Route>
                   <Route path="/settings/">
-                    <Layout>
-                      <Settings setTheme={setTheme} />
-                    </Layout>
+                    <Settings setTheme={setTheme} />
                   </Route>
                   <Route path="/">
                     <HomePage />

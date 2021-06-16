@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react'
 import ReactGA from 'react-ga'
+import { Container } from 'react-grid-system'
 import { useHistory, useParams } from 'react-router-dom'
 import { Button, DataView, Tag, Help } from '@aragon/ui'
 import useAsyncMemo from '../../../hooks/useAsyncMemo'
@@ -86,7 +87,7 @@ export default function AccountVaults() {
   )
 
   return (
-    <>
+    <Container>
       <Header
         primary="Vaults"
         secondary={
@@ -130,6 +131,6 @@ export default function AccountVaults() {
       <br />
       <SectionTitle title="Open New" />
       <Button label={'Open Empty Vault'} onClick={goToEmptyVault} />
-    </>
+    </Container>
   )
 }

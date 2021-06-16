@@ -46,7 +46,7 @@ export default function OperatorSection() {
   }
 
   return (
-    <>
+    <Container>
       <Header primary="Operators" />
       Operators are addresses which can manipulate your vaults on your behalf.
       {operators.length > 0 && (
@@ -117,7 +117,7 @@ export default function OperatorSection() {
           </Col>
         </Row>
       </Container>
-    </>
+    </Container>
   )
 }
 

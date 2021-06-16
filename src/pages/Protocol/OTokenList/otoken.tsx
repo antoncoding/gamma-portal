@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, useState, useCallback } from 'react'
 import ReactGA from 'react-ga'
-import { Col, Row } from 'react-grid-system'
+import { Col, Container, Row } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 import { Box, AddressField, Button, DataView, IconExternal, Tag, TransactionBadge } from '@aragon/ui'
 
@@ -118,7 +118,7 @@ export default function Otoken() {
   )
 
   return (
-    <>
+    <Container>
       {tokenDetails === null ? (
         <SectionTitle title="Token Not Found on this network. " />
       ) : (
@@ -232,6 +232,6 @@ export default function Otoken() {
           </Row>
         </>
       )}
-    </>
+    </Container>
   )
 }

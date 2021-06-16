@@ -35,6 +35,7 @@ import { ZERO_ADDR, tokens, getPayableProxyAddr, getWeth } from '../../../consta
 import { SubgraphOToken } from '../../../types'
 import { useController } from '../../../hooks/useController'
 import { useCustomToast } from '../../../hooks'
+import { Container } from 'react-grid-system'
 
 export default function VaultDetail() {
   useEffect(() => {
@@ -106,15 +107,15 @@ export default function VaultDetail() {
     networkId,
   )
 
-  const shortOtoken = useMemo(() => (vaultDetail && vaultDetail.shortOToken) || selectedShort || null, [
-    vaultDetail,
-    selectedShort,
-  ])
+  const shortOtoken = useMemo(
+    () => (vaultDetail && vaultDetail.shortOToken) || selectedShort || null,
+    [vaultDetail, selectedShort],
+  )
 
-  const longOtoken = useMemo(() => (vaultDetail && vaultDetail.longOToken) || selectedLong || null, [
-    vaultDetail,
-    selectedLong,
-  ])
+  const longOtoken = useMemo(
+    () => (vaultDetail && vaultDetail.longOToken) || selectedLong || null,
+    [vaultDetail, selectedLong],
+  )
 
   const collateralBalance = useTokenBalance(collateralToken.id, user, 20)
 
@@ -388,7 +389,7 @@ export default function VaultDetail() {
   }, [refetch, controller])
 
   return (
-    <>
+    <Container>
       <Header
         primary={
           <div style={{ fontSize: 26 }}>
@@ -505,7 +506,7 @@ export default function VaultDetail() {
       <br />
       <br />
       <History />
-    </>
+    </Container>
   )
 }
 
