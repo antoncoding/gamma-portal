@@ -6,6 +6,7 @@ import { getPreference, checkAddressAndAddToStorage } from '../../../utils/stora
 
 import Header from '../../../components/Header'
 import Comment from '../../../components/Comment'
+import StyledContainer from '../../../components/StyledContainer'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { isAddress } from '../../../utils/math'
 import { resolveENS } from '../../../utils/others'
@@ -42,7 +43,7 @@ function Login() {
   }, [])
 
   return (
-    <>
+    <StyledContainer>
       <Header primary="Account" />
       <p style={{ fontSize: 20 }}> Connect Wallet </p>
       <Comment text="Please connect wallet to proceed or enter an address to use Watch Mode." />
@@ -108,7 +109,7 @@ function Login() {
           />
         </div>
       </div>
-    </>
+    </StyledContainer>
   )
 }
 

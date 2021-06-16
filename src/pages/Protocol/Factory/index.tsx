@@ -10,6 +10,7 @@ import { getNextFriday, fromTokenAmount } from '../../../utils/math'
 import Header from '../../../components/Header'
 import SectionTitle from '../../../components/SectionHeader'
 import TokenAddress from '../../../components/TokenAddress'
+import StyledContainer from '../../../components/StyledContainer'
 import { ZERO_ADDR, eth } from '../../../constants'
 import WarningText from '../../../components/Warning'
 import { useCustomToast, useAllProducts, useFactory, getTokenPriceCoingecko } from '../../../hooks'
@@ -107,7 +108,7 @@ export default function CreateOption() {
   }, [computeAddress, selectedProductIndex, strikePrice, expiryTimestamp])
 
   return (
-    <>
+    <StyledContainer>
       <SyncIndicator visible={allProducts.length === 0} children={'Syncing data... 🎄'} />
       <Header primary="oToken Factory" />
       <SectionTitle title="Create new oToken" />
@@ -201,7 +202,7 @@ export default function CreateOption() {
           <AddressField address={targetAddress} />
         </CellQuarter>
       </Row>
-    </>
+    </StyledContainer>
   )
 }
 

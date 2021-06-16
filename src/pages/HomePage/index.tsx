@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react'
 import ReactGA from 'react-ga'
 import { useHistory } from 'react-router-dom'
-import { Container, Row, Col } from 'react-grid-system'
+import { Row, Col } from 'react-grid-system'
 import BoxButton from '../../components/BoxButton'
 import { Header, IconUser, IconConfiguration, IconSwap } from '@aragon/ui'
 
 import Comment from '../../components/Comment'
 import SectionTitle from '../../components/SectionHeader'
+import StyledContainer from '../../components/StyledContainer'
 import TotalAsset from './TotalAsset'
 
 const opeth = require('../../imgs/icons/opeth.png')
@@ -17,7 +18,7 @@ function HomePage() {
   const history = useHistory()
   useEffect(() => ReactGA.pageview('/'), [])
   return (
-    <Container>
+    <StyledContainer>
       <Header primary="Gamma Portal" />
 
       <Comment padding={0} text="Create, manage and trade decentralized options" />
@@ -105,7 +106,7 @@ function HomePage() {
 
         <Col sm={12} md={6} lg={4}></Col>
       </Row>
-    </Container>
+    </StyledContainer>
   )
 }
 

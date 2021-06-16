@@ -25,7 +25,7 @@ export default function MakeOrder({ oTokenBalances, paymentTokenBalance, allOtok
     <>
       <SectionHeader title="Select oToken" />
       <Row>
-        <Col xl={3} lg={4} md={6} sm={12}>
+        <Col xl={4} lg={5} md={6} sm={12}>
           <OTokenAutoComplete
             oTokens={allOtokens}
             selectedOToken={selectedOToken}

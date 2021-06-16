@@ -10,6 +10,8 @@ import SectionTitle from '../../../components/SectionHeader'
 import Header from '../../../components/Header'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 import Comment from '../../../components/Comment'
+import StyledContainer from '../../../components/StyledContainer'
+
 import { knownOperators } from '../../../constants/addresses'
 import { OPERATORS } from '../../../constants/dataviewContents'
 
@@ -46,7 +48,7 @@ export default function OperatorSection() {
   }
 
   return (
-    <>
+    <StyledContainer>
       <Header primary="Operators" />
       Operators are addresses which can manipulate your vaults on your behalf.
       {operators.length > 0 && (
@@ -117,7 +119,7 @@ export default function OperatorSection() {
           </Col>
         </Row>
       </Container>
-    </>
+    </StyledContainer>
   )
 }
 

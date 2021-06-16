@@ -10,6 +10,7 @@ import { useLiveOTokens } from '../../../hooks'
 import { SubgraphOToken } from '../../../types'
 import { useOrderbook } from '../../../contexts/orderbook'
 import OTokenAutoComplete from '../../../components/OTokenAutoComplete'
+import StyledContainer from '../../../components/StyledContainer'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { Header } from '../../../components/Header'
 
@@ -44,7 +45,7 @@ export default function Swap() {
   return networkId === SupportedNetworks.Kovan ? (
     <Info mode="error"> 0x V4 doesn't support kovan testnet, please switch network to Ropsten </Info>
   ) : (
-    <>
+    <StyledContainer>
       <Header primary={'Swap'} />
       <Row>
         <Col lg={4} md={6} sm={12}>
@@ -58,6 +59,6 @@ export default function Swap() {
       <br />
       <TradePanel selectedOToken={selectedOToken} action={action} setAction={setAction} />
       <SyncIndicator visible={isLoading || loadingOrderbook} children={'Syncing order book... 🍕'} />
-    </>
+    </StyledContainer>
   )
 }

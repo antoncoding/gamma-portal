@@ -19,6 +19,7 @@ import History from './history'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import Header from '../../../components/Header'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
+import StyledContainer from '../../../components/StyledContainer'
 
 import useAsyncMemo from '../../../hooks/useAsyncMemo'
 import { useTokenByAddress } from '../../../hooks/useToken'
@@ -106,15 +107,15 @@ export default function VaultDetail() {
     networkId,
   )
 
-  const shortOtoken = useMemo(() => (vaultDetail && vaultDetail.shortOToken) || selectedShort || null, [
-    vaultDetail,
-    selectedShort,
-  ])
+  const shortOtoken = useMemo(
+    () => (vaultDetail && vaultDetail.shortOToken) || selectedShort || null,
+    [vaultDetail, selectedShort],
+  )
 
-  const longOtoken = useMemo(() => (vaultDetail && vaultDetail.longOToken) || selectedLong || null, [
-    vaultDetail,
-    selectedLong,
-  ])
+  const longOtoken = useMemo(
+    () => (vaultDetail && vaultDetail.longOToken) || selectedLong || null,
+    [vaultDetail, selectedLong],
+  )
 
   const collateralBalance = useTokenBalance(collateralToken.id, user, 20)
 
@@ -388,7 +389,7 @@ export default function VaultDetail() {
   }, [refetch, controller])
 
   return (
-    <>
+    <StyledContainer>
       <Header
         primary={
           <div style={{ fontSize: 26 }}>
@@ -505,7 +506,7 @@ export default function VaultDetail() {
       <br />
       <br />
       <History />
-    </>
+    </StyledContainer>
   )
 }
 

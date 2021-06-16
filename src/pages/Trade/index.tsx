@@ -2,9 +2,10 @@ import React, { useEffect } from 'react'
 import ReactGA from 'react-ga'
 import { Info } from '@aragon/ui'
 import { useHistory } from 'react-router-dom'
-import { Container, Row, Col } from 'react-grid-system'
+import { Row, Col } from 'react-grid-system'
 import BoxButton from '../../components/BoxButton'
 import Header from '../../components/Header'
+import StyledContainer from '../../components/StyledContainer'
 import { IconCopy, IconSwap, IconGroup } from '@aragon/ui'
 
 import Comment from '../../components/Comment'
@@ -18,7 +19,7 @@ function TradePage() {
     ReactGA.pageview('/trade/')
   }, [])
   return (
-    <Container>
+    <StyledContainer>
       <Header primary="Trade" />
       <Comment padding={0} text="Trade oTokens with 0x protocol!" />
       <br />
@@ -64,7 +65,7 @@ function TradePage() {
           </Row>
         </>
       )}
-    </Container>
+    </StyledContainer>
   )
 }
 

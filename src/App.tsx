@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import ReactGA from 'react-ga'
-import { Col, Row } from 'react-grid-system'
+import { Col, Row, setConfiguration } from 'react-grid-system'
 import 'moment-timezone'
 
-import { Main, Layout } from '@aragon/ui'
+import { Main } from '@aragon/ui'
 import { walletContext } from './contexts/wallet'
 import { OrderbookProvider } from './contexts/orderbook'
 
@@ -46,121 +46,89 @@ function App() {
 
   const [isSideBarOpen, setSideBarOpen] = useState(getPreference(SHOW_SIDE_BAR, 'true') === 'true')
 
+  setConfiguration({ containerWidths: [540, 620, 760, 980, 1140] })
+
   return (
     <Router>
       <Main layout={false} theme={theme}>
         <walletContext.Provider value={wallet}>
           <OrderbookProvider>
             <NavBar isSideBarOpen={isSideBarOpen} setSideBarOpen={setSideBarOpen} />
-            <Row style={{ height: '100%' }}>
+            <Row style={{ height: '100%' }} nogutter>
               {isSideBarOpen && (
-                <Col sm={12} md={3} lg={3} xl={2}>
+                <Col sm={12} md={2} lg={2} xl={2}>
                   <SideBar />
                 </Col>
               )}
               <Col
                 sm={12}
-                md={isSideBarOpen ? 9 : 12}
-                lg={isSideBarOpen ? 9 : 12}
+                md={isSideBarOpen ? 10 : 12}
+                lg={isSideBarOpen ? 10 : 12}
                 xl={isSideBarOpen ? 10 : 12}
                 // offset={maincontentOffset}
               >
                 <Switch>
-                  {/* without layout */}
                   <Route path="/trade/orderbook">
-                    <Row>
-                      <Col sm={12} xl={10} offset={{ xl: 1 }}>
+                    <Row nogutter>
+                      <Col sm={12} md={10} offset={{ md: 1 }}>
                         <Orderbook />
                       </Col>
                     </Row>
                   </Route>
-
-                  {/* pages with layout */}
                   <Route path="/trade/swap/:otoken">
-                    <Layout>
-                      <Swap />
-                    </Layout>
+                    <Swap />
                   </Route>
                   <Route path="/trade/swap/">
-                    <Layout>
-                      <Swap />
-                    </Layout>
+                    <Swap />
                   </Route>
                   <Route path="/trade/otc/">
-                    <Layout>
-                      <OTC />
-                    </Layout>
+                    <OTC />
                   </Route>
                   <Route path="/trade/">
-                    <Layout>
-                      <Trade />
-                    </Layout>
+                    <Trade />
                   </Route>
 
                   <Route path="/account/:account/operators">
-                    <Layout>
-                      <Operators />
-                    </Layout>
+                    <Operators />
                   </Route>
                   <Route path="/account/:account/vaults/">
-                    <Layout>
-                      <AccountVault />
-                    </Layout>
+                    <AccountVault />
                   </Route>
                   <Route path="/account/:account">
-                    <Layout>
-                      <Account />
-                    </Layout>
+                    <Account />
                   </Route>
                   <Route path="/account/">
-                    <Layout>
-                      <ConnectWallet />
-                    </Layout>
+                    <ConnectWallet />
                   </Route>
+
                   <Route path="/vault/:owner/:vaultId">
-                    <Layout>
-                      <Vault />
-                    </Layout>
+                    <Vault />
                   </Route>
                   <Route path="/protocol/faucet">
-                    <Layout>
-                      <Faucet />
-                    </Layout>
+                    <Faucet />
                   </Route>
                   <Route path="/protocol/oracle">
-                    <Layout>
-                      <Oracle />
-                    </Layout>
+                    <Oracle />
                   </Route>
+
                   <Route path="/protocol/factory/">
-                    <Layout>
-                      <Factory />
-                    </Layout>
+                    <Factory />
                   </Route>
                   <Route path="/protocol/otokens/">
-                    <Layout>
-                      <OTokenList />
-                    </Layout>
+                    <OTokenList />
                   </Route>
                   <Route path="/protocol/">
-                    <Layout>
-                      <ProtocolHome />
-                    </Layout>
+                    <ProtocolHome />
                   </Route>
+
                   <Route path="/otoken/:otoken">
-                    <Layout>
-                      <OToken />
-                    </Layout>
+                    <OToken />
                   </Route>
                   <Route path="/settings/">
-                    <Layout>
-                      <Settings setTheme={setTheme} />
-                    </Layout>
+                    <Settings setTheme={setTheme} />
                   </Route>
                   <Route path="/">
-                    <Layout>
-                      <HomePage />
-                    </Layout>
+                    <HomePage />
                   </Route>
                 </Switch>
               </Col>

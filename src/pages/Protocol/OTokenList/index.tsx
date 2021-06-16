@@ -7,6 +7,7 @@ import { Button, TextInput, DataView, IconSearch, Timer, Tag, IconGraph } from '
 import { useConnectedWallet } from '../../../contexts/wallet'
 import Header from '../../../components/Header'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
+import StyledContainer from '../../../components/StyledContainer'
 
 import { SubgraphOToken } from '../../../types'
 
@@ -84,7 +85,7 @@ export default function OtokenList() {
   )
 
   return (
-    <>
+    <StyledContainer>
       <Header primary={'OTokens'} />
       <Row style={{ paddingBottom: 30 }}>
         <Col>
@@ -108,6 +109,6 @@ export default function OtokenList() {
         page={page}
         onPageChange={setPage}
       />
-    </>
+    </StyledContainer>
   )
 }

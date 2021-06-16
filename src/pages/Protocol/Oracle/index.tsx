@@ -8,6 +8,7 @@ import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 import { expiryToDate, toTokenAmount } from '../../../utils/math'
 import Header from '../../../components/Header'
 import SectionTitle from '../../../components/SectionHeader'
+import StyledContainer from '../../../components/StyledContainer'
 
 import { SubgraphPriceEntry } from '../../../types'
 import { pricerMap } from './config'
@@ -25,10 +26,10 @@ export default function Oracle() {
 
   const { allOracleAssets, isLoading } = useExpiryPriceData()
 
-  const haveValidSelection = useMemo(() => allOracleAssets.length > 0 && selectedAssetIndex !== -1, [
-    allOracleAssets,
-    selectedAssetIndex,
-  ])
+  const haveValidSelection = useMemo(
+    () => allOracleAssets.length > 0 && selectedAssetIndex !== -1,
+    [allOracleAssets, selectedAssetIndex],
+  )
 
   // update ths history array
   useEffect(() => {
@@ -37,7 +38,7 @@ export default function Oracle() {
   }, [selectedAssetIndex, allOracleAssets, haveValidSelection])
 
   return (
-    <>
+    <StyledContainer>
       <Header primary="Oracle" />
       In Opyn v2, we need on-chain prices for underlying assets to settle oTokens.
       <SectionTitle title="Choose an Asset" />
@@ -99,6 +100,6 @@ export default function Oracle() {
           ]
         }}
       />
-    </>
+    </StyledContainer>
   )
 }

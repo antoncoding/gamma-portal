@@ -10,6 +10,7 @@ import { SubgraphVault } from '../../../types'
 import SectionTitle from '../../../components/SectionHeader'
 import OpynTokenAmount from '../../../components/OpynTokenAmount'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
+import StyledContainer from '../../../components/StyledContainer'
 import { VAULTS } from '../../../constants/dataviewContents'
 import { useController } from '../../../hooks/useController'
 import { useExpiryPriceData } from '../../../hooks/useExpiryPriceData'
@@ -86,7 +87,7 @@ export default function AccountVaults() {
   )
 
   return (
-    <>
+    <StyledContainer>
       <Header
         primary="Vaults"
         secondary={
@@ -130,6 +131,6 @@ export default function AccountVaults() {
       <br />
       <SectionTitle title="Open New" />
       <Button label={'Open Empty Vault'} onClick={goToEmptyVault} />
-    </>
+    </StyledContainer>
   )
 }
