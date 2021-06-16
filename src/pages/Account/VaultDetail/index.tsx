@@ -19,6 +19,7 @@ import History from './history'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import Header from '../../../components/Header'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
+import StyledContainer from '../../../components/StyledContainer'
 
 import useAsyncMemo from '../../../hooks/useAsyncMemo'
 import { useTokenByAddress } from '../../../hooks/useToken'
@@ -35,7 +36,6 @@ import { ZERO_ADDR, tokens, getPayableProxyAddr, getWeth } from '../../../consta
 import { SubgraphOToken } from '../../../types'
 import { useController } from '../../../hooks/useController'
 import { useCustomToast } from '../../../hooks'
-import { Container } from 'react-grid-system'
 
 export default function VaultDetail() {
   useEffect(() => {
@@ -389,7 +389,7 @@ export default function VaultDetail() {
   }, [refetch, controller])
 
   return (
-    <Container>
+    <StyledContainer>
       <Header
         primary={
           <div style={{ fontSize: 26 }}>
@@ -506,7 +506,7 @@ export default function VaultDetail() {
       <br />
       <br />
       <History />
-    </Container>
+    </StyledContainer>
   )
 }
 

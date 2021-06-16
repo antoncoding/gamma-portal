@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import ReactGA from 'react-ga'
-import { Col, Container, Row, setConfiguration } from 'react-grid-system'
+import { Col, Row, setConfiguration } from 'react-grid-system'
 import 'moment-timezone'
 
-import { Main, Layout } from '@aragon/ui'
+import { Main } from '@aragon/ui'
 import { walletContext } from './contexts/wallet'
 import { OrderbookProvider } from './contexts/orderbook'
 
@@ -69,13 +69,11 @@ function App() {
               >
                 <Switch>
                   <Route path="/trade/orderbook">
-                    <Container>
-                      <Row nogutter>
-                        <Col sm={12} xl={10} offset={{ xl: 1 }}>
-                          <Orderbook />
-                        </Col>
-                      </Row>
-                    </Container>
+                    <Row nogutter>
+                      <Col sm={12} md={10} offset={{ md: 1 }}>
+                        <Orderbook />
+                      </Col>
+                    </Row>
                   </Route>
                   <Route path="/trade/swap/:otoken">
                     <Swap />

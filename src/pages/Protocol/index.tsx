@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react'
 import ReactGA from 'react-ga'
-import { Container, Row, Col } from 'react-grid-system'
+import { Row, Col } from 'react-grid-system'
 import { useHistory } from 'react-router-dom'
 import { BoxButton } from '../../components/BoxButton'
 import { IconCoin, IconMenu, useTheme } from '@aragon/ui'
 import Header from '../../components/Header'
 import Comment from '../../components/Comment'
+import StyledContainer from '../../components/StyledContainer'
 import factoryBlack from '../../imgs/icons/factory-black.png'
 import factoryWhite from '../../imgs/icons/factory-white.png'
 import dripBlack from '../../imgs/icons/drip-black.png'
@@ -16,7 +17,7 @@ function ProtocolPage() {
   const history = useHistory()
   useEffect(() => ReactGA.pageview('/protocol/'), [])
   return (
-    <Container>
+    <StyledContainer>
       <Header primary="Protocol" />
       <Comment padding={0} text="Advanced Settings of Opyn v2" />
       <br />
@@ -68,7 +69,7 @@ function ProtocolPage() {
           />
         </Col>
       </Row>
-    </Container>
+    </StyledContainer>
   )
 }
 

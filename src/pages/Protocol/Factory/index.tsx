@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import ReactGA from 'react-ga'
-import { Row, Col, Container } from 'react-grid-system'
+import { Row, Col } from 'react-grid-system'
 import BigNumber from 'bignumber.js'
 import moment from 'moment'
 import { TextInput, Button, DropDown, LoadingRing, AddressField, Help, SyncIndicator } from '@aragon/ui'
@@ -10,6 +10,7 @@ import { getNextFriday, fromTokenAmount } from '../../../utils/math'
 import Header from '../../../components/Header'
 import SectionTitle from '../../../components/SectionHeader'
 import TokenAddress from '../../../components/TokenAddress'
+import StyledContainer from '../../../components/StyledContainer'
 import { ZERO_ADDR, eth } from '../../../constants'
 import WarningText from '../../../components/Warning'
 import { useCustomToast, useAllProducts, useFactory, getTokenPriceCoingecko } from '../../../hooks'
@@ -107,7 +108,7 @@ export default function CreateOption() {
   }, [computeAddress, selectedProductIndex, strikePrice, expiryTimestamp])
 
   return (
-    <Container>
+    <StyledContainer>
       <SyncIndicator visible={allProducts.length === 0} children={'Syncing data... 🎄'} />
       <Header primary="oToken Factory" />
       <SectionTitle title="Create new oToken" />
@@ -201,7 +202,7 @@ export default function CreateOption() {
           <AddressField address={targetAddress} />
         </CellQuarter>
       </Row>
-    </Container>
+    </StyledContainer>
   )
 }
 

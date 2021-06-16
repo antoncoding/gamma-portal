@@ -1,12 +1,13 @@
 import React, { useMemo, useEffect, useState, useCallback } from 'react'
 import ReactGA from 'react-ga'
 import { useHistory } from 'react-router-dom'
-import { Col, Container, Row } from 'react-grid-system'
+import { Col, Row } from 'react-grid-system'
 import { Button, TextInput, DataView, IconSearch, Timer, Tag, IconGraph } from '@aragon/ui'
 
 import { useConnectedWallet } from '../../../contexts/wallet'
 import Header from '../../../components/Header'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
+import StyledContainer from '../../../components/StyledContainer'
 
 import { SubgraphOToken } from '../../../types'
 
@@ -84,7 +85,7 @@ export default function OtokenList() {
   )
 
   return (
-    <Container>
+    <StyledContainer>
       <Header primary={'OTokens'} />
       <Row style={{ paddingBottom: 30 }}>
         <Col>
@@ -108,6 +109,6 @@ export default function OtokenList() {
         page={page}
         onPageChange={setPage}
       />
-    </Container>
+    </StyledContainer>
   )
 }

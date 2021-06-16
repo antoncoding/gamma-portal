@@ -6,11 +6,11 @@ import { getPreference, checkAddressAndAddToStorage } from '../../../utils/stora
 
 import Header from '../../../components/Header'
 import Comment from '../../../components/Comment'
+import StyledContainer from '../../../components/StyledContainer'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { isAddress } from '../../../utils/math'
 import { resolveENS } from '../../../utils/others'
 import { useCustomToast } from '../../../hooks'
-import { Container } from 'react-grid-system'
 
 function Login() {
   const { user, setUser, networkId } = useConnectedWallet()
@@ -43,7 +43,7 @@ function Login() {
   }, [])
 
   return (
-    <Container>
+    <StyledContainer>
       <Header primary="Account" />
       <p style={{ fontSize: 20 }}> Connect Wallet </p>
       <Comment text="Please connect wallet to proceed or enter an address to use Watch Mode." />
@@ -109,7 +109,7 @@ function Login() {
           />
         </div>
       </div>
-    </Container>
+    </StyledContainer>
   )
 }
 

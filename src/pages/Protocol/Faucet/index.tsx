@@ -5,8 +5,8 @@ import MintToken from './mintToken'
 import { useConnectedWallet } from '../../../contexts/wallet'
 import { SupportedNetworks } from '../../../constants/networks'
 import Header from '../../../components/Header'
+import StyledContainer from '../../../components/StyledContainer'
 import { tokens } from '../../../constants/addresses'
-import { Container } from 'react-grid-system'
 
 export default function Faucet() {
   const { networkId } = useConnectedWallet()
@@ -14,7 +14,7 @@ export default function Faucet() {
   const mintableTokens = useMemo(() => tokens[networkId].filter(token => token.canMint), [networkId])
 
   return (
-    <Container>
+    <StyledContainer>
       <Header primary={'Token Faucet'} />
 
       {networkId === SupportedNetworks.Mainnet ? (
@@ -29,6 +29,6 @@ export default function Faucet() {
       {mintableTokens.map((token, i) => {
         return <MintToken token={token} key={i} />
       })}
-    </Container>
+    </StyledContainer>
   )
 }

@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, useState, useCallback } from 'react'
 import ReactGA from 'react-ga'
-import { Col, Container, Row } from 'react-grid-system'
+import { Col, Row } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 import { Box, AddressField, Button, DataView, IconExternal, Tag, TransactionBadge } from '@aragon/ui'
 
@@ -8,6 +8,7 @@ import { useConnectedWallet } from '../../../contexts/wallet'
 import Header from '../../../components/Header'
 import SectionTitle from '../../../components/SectionHeader'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
+import StyledContainer from '../../../components/StyledContainer'
 
 import { useCustomToast, useTokenPrice, useExpiryPriceData } from '../../../hooks'
 import useAsyncMemo from '../../../hooks/useAsyncMemo'
@@ -118,7 +119,7 @@ export default function Otoken() {
   )
 
   return (
-    <Container>
+    <StyledContainer>
       {tokenDetails === null ? (
         <SectionTitle title="Token Not Found on this network. " />
       ) : (
@@ -232,6 +233,6 @@ export default function Otoken() {
           </Row>
         </>
       )}
-    </Container>
+    </StyledContainer>
   )
 }
