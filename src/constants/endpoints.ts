@@ -13,7 +13,9 @@ export const subgraph: graphEndPointType = {
   [SupportedNetworks.Kovan]: isPublic
     ? 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-kovan'
     : 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-internal-kovan',
-  [SupportedNetworks.Ropsten]: 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-ropsten',
+  [SupportedNetworks.Ropsten]: isPublic
+    ? 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-ropsten'
+    : 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-internal-ropsten',
 }
 
 export const ZeroXEndpoint: { [key in SupportedNetworks]: { http: string; ws: string } } = {

@@ -107,19 +107,19 @@ export const addresses: SystemAddresses = {
     zeroxExchange: '0xdef1c0ded9bec7f1a1670819833240f027b25eff',
   },
   [SupportedNetworks.Ropsten]: {
-    controller: '0x7e9beaccdccee88558aaa2dc121e52ec6226864e',
-    factory: '0x8d6994b701f480c27757c5fe2bd93d5352160081',
-    addressBook: '0xe71417eefc794c9b83fc494861981721e26db0e9',
-    pool: '0x3C325EeBB64495665F5376930d30151C1075bFD8',
-    whitelist: '0x5faCA6DF39c897802d752DfCb8c02Ea6959245Fc',
+    controller: isPublic ? '0x7e9beaccdccee88558aaa2dc121e52ec6226864e' : '0xdA9BDf0B5BAA8e6ab727408e6072c4Ab35e3229D',
+    factory: isPublic ? '0x8d6994b701f480c27757c5fe2bd93d5352160081' : '0xE3DFeFee5b295e57bAb033Fd66B8EdF016Fe85Ec',
+    addressBook: isPublic ? '0xe71417eefc794c9b83fc494861981721e26db0e9' : '0x8f92cfB1BF6eD1ce79F2E8Eb0DC96e0F3b61276D',
+    pool: isPublic ? '0x3C325EeBB64495665F5376930d30151C1075bFD8' : '0xFf8efB964Fa3219D1563Dd83e7253FC8d2B9c405',
+    whitelist: isPublic ? '0x5faCA6DF39c897802d752DfCb8c02Ea6959245Fc' : '0x32724C61e948892A906f5EB8892B1E7e6583ba1f',
     zeroxExchange: '0xdef1c0ded9bec7f1a1670819833240f027b25eff', // v4
   },
   [SupportedNetworks.Kovan]: {
     controller: isPublic ? '0xdee7d0f8ccc0f7ac7e45af454e5e7ec1552e8e4e' : '0xa84cff11957a0a08a3e1d568ed1caaf47626c1f3',
     factory: isPublic ? '0xb9d17ab06e27f63d0fd75099d5874a194ee623e2' : '0x32b5a18238BAdF23F8E88669de2bD3671ff7BF83',
     addressBook: isPublic ? '0x8812f219f507e8cfe9d2f1e790164714c5e06a73' : '0x4163Bf53878B2169Ea9E404b9E840FA010DbF949',
-    pool: isPublic ? '0x8c7c60d766951c5c570bbb7065c993070061b795' : '0xFf7a2BD21f6dAb62948Bb7545266E9a6b2a0bEb2',
-    whitelist: isPublic ? '0x9164eB40a1b59512F1803aB4C2d1dE4B89627A93' : '0xc990BB199c0ed8CEE305bD1A4c50A87029AdfAE3',
+    pool: isPublic ? '0x8c7c60d766951c5c570bbb7065c993070061b795' : '0xFf8efB964Fa3219D1563Dd83e7253FC8d2B9c405',
+    whitelist: isPublic ? '0x9164eB40a1b59512F1803aB4C2d1dE4B89627A93' : '0x32724C61e948892A906f5EB8892B1E7e6583ba1f',
     zeroxExchange: '0x4eacd0af335451709e1e7b570b8ea68edec8bc97',
   },
 }
@@ -152,7 +152,7 @@ export const knownOperators: {
   ],
   [SupportedNetworks.Ropsten]: [
     {
-      address: '0x0da6280d0837292b7a1f27fc602c7e0bd3ce0b66',
+      address: isPublic ? '0x0da6280d0837292b7a1f27fc602c7e0bd3ce0b66' : '0x02d048A5f5153Eb48ce0fd4E7f03966C91139636',
       name: 'PayableProxy',
       description: 'Proxy contract to help mint calls with ETH instead of WETH',
       audited: true,
