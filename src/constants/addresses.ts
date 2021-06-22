@@ -42,7 +42,7 @@ export const tokens: Tokens = {
     eth,
     {
       name: 'Opyn USDC',
-      id: '0x27415c30d8c87437BeCbd4f98474f26E712047f4',
+      id: '0x27415c30d8c87437becbd4f98474f26e712047f4',
       symbol: 'USDC',
       decimals: 6,
       canMint: true,
@@ -55,7 +55,7 @@ export const tokens: Tokens = {
     },
     {
       name: 'Opyn Wrapped Bitcoin',
-      id: '0xe477d1FFC1e5eA6a577846a4699617997315B4ee',
+      id: '0xe477d1ffc1e5ea6a577846a4699617997315b4ee',
       symbol: 'WBTC',
       decimals: 8,
       canMint: true,
@@ -65,7 +65,7 @@ export const tokens: Tokens = {
     eth,
     {
       name: 'USDC',
-      id: '0x7e6edA50d1c833bE936492BF42C1BF376239E9e2',
+      id: '0x7e6eda50d1c833be936492bf42c1bf376239e9e2',
       symbol: 'USDC',
       decimals: 6,
       canMint: true,
@@ -78,7 +78,7 @@ export const tokens: Tokens = {
     },
     {
       name: 'Wrapped Bitcoin',
-      id: '0x50570256f0da172a1908207aAf0c80d4b279f303',
+      id: '0x50570256f0da172a1908207aaf0c80d4b279f303',
       symbol: 'WBTC',
       decimals: 8,
       canMint: true,

@@ -31,7 +31,7 @@ export default function OperatorSection() {
   const { operators, isLoading } = useAuthorizedOperators(user)
 
   const recommendedOperators = useMemo(
-    () => knownOperators[networkId].filter(o => !operators.find(added => added.address === o.address)),
+    () => knownOperators[networkId].filter(o => !operators.find(added => added.address === o.address.toLowerCase())),
     [networkId, operators],
   )
 
@@ -130,7 +130,7 @@ function getOperatorDetail(address: string, networkId: SupportedNetworks, isEOA:
   let label = 'Unknown'
   let description = ''
   let author = 'Unknown'
-  const operatorInfo = knownOperators[networkId].find(info => info.address === address)
+  const operatorInfo = knownOperators[networkId].find(info => info.address.toLowerCase() === address.toLowerCase())
   if (operatorInfo) {
     label = operatorInfo.name
     author = operatorInfo.author

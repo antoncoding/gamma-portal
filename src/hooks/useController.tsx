@@ -84,7 +84,7 @@ export function useController() {
   const pushAddCollateralArg = useCallback(
     (account: string, vaultId: BigNumber, from: string, asset: string, amount: BigNumber) => {
       let finalAsset = asset
-      if (from === getPayableProxyAddr(networkId).address) {
+      if (from === getPayableProxyAddr(networkId).address.toLowerCase()) {
         finalAsset = getWeth(networkId).id
         setUsePayableProxy(true)
         setOperateValue(amount)
@@ -99,7 +99,7 @@ export function useController() {
   const pushRemoveCollateralArg = useCallback(
     (account: string, vaultId: BigNumber, to: string, asset: string, amount: BigNumber) => {
       let finalAsset = asset
-      if (to === getPayableProxyAddr(networkId).address) {
+      if (to === getPayableProxyAddr(networkId).address.toLowerCase()) {
         finalAsset = getWeth(networkId).id
         setUsePayableProxy(true)
       }

@@ -107,15 +107,15 @@ export default function VaultDetail() {
     networkId,
   )
 
-  const shortOtoken = useMemo(
-    () => (vaultDetail && vaultDetail.shortOToken) || selectedShort || null,
-    [vaultDetail, selectedShort],
-  )
+  const shortOtoken = useMemo(() => (vaultDetail && vaultDetail.shortOToken) || selectedShort || null, [
+    vaultDetail,
+    selectedShort,
+  ])
 
-  const longOtoken = useMemo(
-    () => (vaultDetail && vaultDetail.longOToken) || selectedLong || null,
-    [vaultDetail, selectedLong],
-  )
+  const longOtoken = useMemo(() => (vaultDetail && vaultDetail.longOToken) || selectedLong || null, [
+    vaultDetail,
+    selectedLong,
+  ])
 
   const collateralBalance = useTokenBalance(collateralToken.id, user, 20)
 
@@ -177,7 +177,7 @@ export default function VaultDetail() {
     // if using eth, from address is payable proxy
     let from = user
     if (collateralToken.id === ZERO_ADDR) {
-      from = getPayableProxyAddr(networkId).address
+      from = getPayableProxyAddr(networkId).address.toLowerCase()
     }
     controller.pushAddCollateralArg(
       user,
@@ -194,7 +194,7 @@ export default function VaultDetail() {
   const pushRemoveCollateral = useCallback(() => {
     let to = user
     if (collateralToken.id === ZERO_ADDR) {
-      to = getPayableProxyAddr(networkId).address
+      to = getPayableProxyAddr(networkId).address.toLowerCase()
     }
     controller.pushRemoveCollateralArg(
       user,

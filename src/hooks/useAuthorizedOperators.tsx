@@ -37,7 +37,7 @@ export function useAuthorizedOperators(account: string) {
 
   const hasAuthorizedPayalbeProxy = useMemo(() => {
     const payableProxy = getPayableProxyAddr(networkId)
-    return operators.find(o => o.address === payableProxy.address) !== undefined
+    return operators.find(o => o.address === payableProxy.address.toLowerCase()) !== undefined
   }, [networkId, operators])
 
   return { operators, isLoading, hasAuthorizedPayalbeProxy }
