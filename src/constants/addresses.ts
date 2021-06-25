@@ -118,8 +118,8 @@ export const addresses: SystemAddresses = {
     controller: isPublic ? '0xdee7d0f8ccc0f7ac7e45af454e5e7ec1552e8e4e' : '0xa84cff11957a0a08a3e1d568ed1caaf47626c1f3',
     factory: isPublic ? '0xb9d17ab06e27f63d0fd75099d5874a194ee623e2' : '0x32b5a18238BAdF23F8E88669de2bD3671ff7BF83',
     addressBook: isPublic ? '0x8812f219f507e8cfe9d2f1e790164714c5e06a73' : '0x4163Bf53878B2169Ea9E404b9E840FA010DbF949',
-    pool: isPublic ? '0x8c7c60d766951c5c570bbb7065c993070061b795' : '0xFf8efB964Fa3219D1563Dd83e7253FC8d2B9c405',
-    whitelist: isPublic ? '0x9164eB40a1b59512F1803aB4C2d1dE4B89627A93' : '0x32724C61e948892A906f5EB8892B1E7e6583ba1f',
+    pool: isPublic ? '0x8c7c60d766951c5c570bbb7065c993070061b795' : '0xFf7a2BD21f6dAb62948Bb7545266E9a6b2a0bEb2',
+    whitelist: isPublic ? '0x9164eB40a1b59512F1803aB4C2d1dE4B89627A93' : '0xc990BB199c0ed8CEE305bD1A4c50A87029AdfAE3',
     zeroxExchange: '0x4eacd0af335451709e1e7b570b8ea68edec8bc97',
   },
 }
