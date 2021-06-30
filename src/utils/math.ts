@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js'
-import { SubgraphVault } from '../types'
 
 const Web3 = require('web3')
 const web3 = new Web3()

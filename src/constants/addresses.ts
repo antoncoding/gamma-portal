@@ -89,6 +89,7 @@ export const tokens: Tokens = {
 type SystemAddresses = {
   [key in SupportedNetworks]: {
     controller: string
+    calculator: string
     factory: string
     addressBook: string
     whitelist: string
@@ -100,6 +101,7 @@ type SystemAddresses = {
 export const addresses: SystemAddresses = {
   [SupportedNetworks.Mainnet]: {
     controller: isPublic ? '0x4ccc2339F87F6c59c6893E1A678c2266cA58dC72' : '0xde158Fa7022f11707d4a3570eec4621B35d83829',
+    calculator: isPublic ? '0xfaa67e3736572645B38AF7410B3E1006708e13F4' : '0x9a33230f59Cc7Cc9A084E0098A2b2934FC7BF7c0',
     factory: isPublic ? '0x7C06792Af1632E77cb27a558Dc0885338F4Bdf8E' : '0xE21127f47B365d3b1467746804f32BF8dCf47e26',
     addressBook: isPublic ? '0x1E31F2DCBad4dc572004Eae6355fB18F9615cBe4' : '0x57ADe7D5E9D2F45A07f8039Da7228ACC305fbeaF',
     pool: isPublic ? '0x5934807cC0654d46755eBd2848840b616256C6Ef' : '0x0Cb5BDBf1726f7CC720B21EA910ACeda9FdDf680',
@@ -108,6 +110,7 @@ export const addresses: SystemAddresses = {
   },
   [SupportedNetworks.Ropsten]: {
     controller: isPublic ? '0x7e9beaccdccee88558aaa2dc121e52ec6226864e' : '0xdA9BDf0B5BAA8e6ab727408e6072c4Ab35e3229D',
+    calculator: isPublic ? '0x48DAd1a9e38Ff941429F1542e1Cf552e647306bB' : '0x7A63Eb4e5e024FAbD16c2FD508c92878f6F6445E',
     factory: isPublic ? '0x8d6994b701f480c27757c5fe2bd93d5352160081' : '0xE3DFeFee5b295e57bAb033Fd66B8EdF016Fe85Ec',
     addressBook: isPublic ? '0xe71417eefc794c9b83fc494861981721e26db0e9' : '0x8f92cfB1BF6eD1ce79F2E8Eb0DC96e0F3b61276D',
     pool: isPublic ? '0x3C325EeBB64495665F5376930d30151C1075bFD8' : '0xFf8efB964Fa3219D1563Dd83e7253FC8d2B9c405',
@@ -116,6 +119,7 @@ export const addresses: SystemAddresses = {
   },
   [SupportedNetworks.Kovan]: {
     controller: isPublic ? '0xdee7d0f8ccc0f7ac7e45af454e5e7ec1552e8e4e' : '0xa84cff11957a0a08a3e1d568ed1caaf47626c1f3',
+    calculator: isPublic ? '0xFf8efB964Fa3219D1563Dd83e7253FC8d2B9c405' : '0xE9f33Cc4e29c3215fff5C8890E4e0d930246CC28',
     factory: isPublic ? '0xb9d17ab06e27f63d0fd75099d5874a194ee623e2' : '0x32b5a18238BAdF23F8E88669de2bD3671ff7BF83',
     addressBook: isPublic ? '0x8812f219f507e8cfe9d2f1e790164714c5e06a73' : '0x4163Bf53878B2169Ea9E404b9E840FA010DbF949',
     pool: isPublic ? '0x8c7c60d766951c5c570bbb7065c993070061b795' : '0xFf7a2BD21f6dAb62948Bb7545266E9a6b2a0bEb2',

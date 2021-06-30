@@ -4,12 +4,12 @@ import { SupportedNetworks, getETHAggregators, addresses } from '../constants'
 const aggregatorAbi = require('../constants/abis/chainlinkAggregator.json')
 const controllerAbi = require('../constants/abis/controller.json')
 
-export async function getLastRoundId(web3: Web3, networkId: SupportedNetworks): Promise<string> {
+export async function getLastRoundId(web3: Web3, networkId: SupportedNetworks) {
   const aggregatorAddress = getETHAggregators(networkId)
   const aggregator = new web3.eth.Contract(aggregatorAbi, aggregatorAddress)
-  const roundId = await aggregator.methods.latestRound().call()
-  console.log(`roundId`, roundId)
-  return roundId
+  const latestRoundId = (await aggregator.methods.latestRound().call()) as string
+  const latestAnswer = (await aggregator.methods.latestAnswer().call()) as string
+  return { latestAnswer, latestRoundId }
 }
 
 export async function dumbCheckIsLiquidatable(

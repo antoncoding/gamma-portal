@@ -324,6 +324,7 @@ export async function getNonEmptyPartialCollatVaults(
         symbol
         decimals
         expiryTimestamp
+        strikePrice
         collateralAsset {
           id
           symbol
@@ -334,6 +335,12 @@ export async function getNonEmptyPartialCollatVaults(
           symbol
           decimals
         }
+        strikeAsset{
+          id
+          symbol
+          decimals
+        }
+        isPut
       }
       shortAmount
       collateralAsset {
