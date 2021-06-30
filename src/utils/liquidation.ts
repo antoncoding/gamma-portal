@@ -6,6 +6,7 @@ const controllerAbi = require('../constants/abis/controller.json')
 
 export async function getLastRoundId(web3: Web3, networkId: SupportedNetworks) {
   const aggregatorAddress = getETHAggregators(networkId)
+  if (aggregatorAddress === '') return { latestAnswer: '0', latestRoundId: '0' }
   const aggregator = new web3.eth.Contract(aggregatorAbi, aggregatorAddress)
   const latestRoundId = (await aggregator.methods.latestRound().call()) as string
   const latestAnswer = (await aggregator.methods.latestAnswer().call()) as string

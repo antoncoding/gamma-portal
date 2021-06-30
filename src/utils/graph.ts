@@ -305,6 +305,10 @@ export async function getNonEmptyPartialCollatVaults(
   networkId: SupportedNetworks,
   errorCallback: Function,
 ): Promise<SubgraphVault[]> {
+  if (networkId === SupportedNetworks.Ropsten) {
+    console.log(`not on ropsten yet`)
+    return []
+  }
   const query = `
   { 
     vaults (

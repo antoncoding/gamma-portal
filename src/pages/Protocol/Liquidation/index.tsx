@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import ReactGA from 'react-ga'
-import { Button, DataView, SyncIndicator } from '@aragon/ui'
+import { Button, DataView, SyncIndicator, Info } from '@aragon/ui'
 
 import { useConnectedWallet } from '../../../contexts/wallet'
 import Header from '../../../components/Header'
@@ -10,7 +10,7 @@ import { red, green, regular } from '../../../pages/Trade/OrderBookTrade/StyleDi
 
 import { useLiquidationStatus } from '../../../hooks'
 import OpynTokenAmount from '../../../components/OpynTokenAmount'
-import { getWeth } from '../../../constants'
+import { getWeth, SupportedNetworks } from '../../../constants'
 import BigNumber from 'bignumber.js'
 
 export default function Liquidation() {
@@ -42,16 +42,21 @@ export default function Liquidation() {
   return (
     <StyledContainer>
       <Header primary={'Liquidation'} />
-
-      <DataView
-        fields={['owner', 'collateral', 'ratio', 'short', '']}
-        entries={vaults}
-        renderEntry={renderVaultRow}
-        entriesPerPage={8}
-        page={page}
-        onPageChange={setPage}
-      />
-      <SyncIndicator visible={isSyncing} children={'Syncing Oracle Data 🍣'} />
+      {networkId === SupportedNetworks.Ropsten ? (
+        <Info> Partial Liquidation is not available on Ropsten yet </Info>
+      ) : (
+        <div>
+          <DataView
+            fields={['owner', 'collateral', 'ratio', 'short', '']}
+            entries={vaults}
+            renderEntry={renderVaultRow}
+            entriesPerPage={8}
+            page={page}
+            onPageChange={setPage}
+          />
+          <SyncIndicator visible={isSyncing} children={'Syncing Oracle Data 🍣'} />
+        </div>
+      )}
     </StyledContainer>
   )
 }
