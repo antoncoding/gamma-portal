@@ -50,6 +50,7 @@ export type SubgraphVault = {
   longOToken: SubgraphOToken | null
   shortAmount: string | null
   shortOToken: SubgraphOToken | null
+  owner: { id: string }
 }
 
 export type SubgraphVaultAction = {

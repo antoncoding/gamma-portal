@@ -301,6 +301,58 @@ export async function getOTokens(networkId: SupportedNetworks, errorCallback: Fu
   }
 }
 
+export async function getNonEmptyPartialCollatVaults(
+  networkId: SupportedNetworks,
+  errorCallback: Function,
+): Promise<SubgraphVault[]> {
+  const query = `
+  { 
+    vaults (
+      where: {
+        type:"1",
+        shortAmount_gt: "0"
+      },
+      first: 1000
+    ) {
+      type
+      owner {
+        id
+      }
+      vaultId
+      shortOToken {
+        id
+        symbol
+        decimals
+        expiryTimestamp
+        collateralAsset {
+          id
+          symbol
+          decimals
+        }
+        underlyingAsset{
+          id
+          symbol
+          decimals
+        }
+      }
+      shortAmount
+      collateralAsset {
+        id
+        symbol
+        decimals
+      }
+      collateralAmount
+    }
+  }`
+  try {
+    const response = await postQuery(endpoints[networkId], query)
+    return response.data.vaults
+  } catch (error) {
+    errorCallback(error.toString())
+    return []
+  }
+}
+
 /**
  * Get oTokens
  */

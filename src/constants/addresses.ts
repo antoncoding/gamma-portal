@@ -170,6 +170,12 @@ export const knownOperators: {
   ],
 }
 
+export const getETHAggregators = (networkId: SupportedNetworks) => {
+  if (networkId === SupportedNetworks.Mainnet) return '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419'
+  if (networkId === SupportedNetworks.Kovan) return '0x9326BFA02ADD2366b30bacB125260Af641031331'
+  return ''
+}
+
 export const getPrimaryPaymentToken = (networkId: SupportedNetworks) => {
   return tokens[networkId].find(t => t.symbol === 'USDC') as Token
 }
