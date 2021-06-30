@@ -14,6 +14,7 @@ import useMarginCalculator from './useMarginCalculator'
  */
 export const useLiquidationStatus = (underlying, refetchIntervalSec: number) => {
   const toast = useCustomToast()
+  const [isInitializing, setIsInitializing] = useState(true)
   const [isSyncing, setIsSyncing] = useState(true)
 
   const [latestRoundId, setLatestRound] = useState('0')
@@ -54,6 +55,7 @@ export const useLiquidationStatus = (underlying, refetchIntervalSec: number) => 
       if (!isCancelled) {
         setRawVaults(vaults)
       }
+      setIsInitializing(true)
       setIsSyncing(false)
     }
     refetchVaults()
@@ -98,5 +100,5 @@ export const useLiquidationStatus = (underlying, refetchIntervalSec: number) => 
     [networkId, toast.error, latestRoundId, rawVaults],
   )
 
-  return { vaults, latestRoundId, isSyncing }
+  return { vaults, latestRoundId, isSyncing, isInitializing }
 }

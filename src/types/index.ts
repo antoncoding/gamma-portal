@@ -28,6 +28,7 @@ export enum ActionType {
   SettleVault,
   Redeem,
   Call,
+  Liquidate,
   InvalidAction,
 }
 

@@ -3,7 +3,7 @@ import ReactGA from 'react-ga'
 import { Row, Col } from 'react-grid-system'
 import { useHistory } from 'react-router-dom'
 import { BoxButton } from '../../components/BoxButton'
-import { IconCoin, IconMenu, useTheme } from '@aragon/ui'
+import { IconCoin, IconMenu, useTheme, IconConnect } from '@aragon/ui'
 import Header from '../../components/Header'
 import Comment from '../../components/Comment'
 import StyledContainer from '../../components/StyledContainer'
@@ -41,6 +41,17 @@ function ProtocolPage() {
             icon={<IconMenu size="large" />}
             onClick={() => {
               history.push('/protocol/otokens/')
+            }}
+          />
+        </Col>
+
+        <Col sm={12} md={6} lg={4}>
+          <BoxButton
+            title="Liquidation"
+            description="Liquidation Status"
+            icon={<IconConnect size="large" />}
+            onClick={() => {
+              history.push('/protocol/liquidation/')
             }}
           />
         </Col>

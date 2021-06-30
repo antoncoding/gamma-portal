@@ -7,11 +7,13 @@ import Header from '../../../components/Header'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 import StyledContainer from '../../../components/StyledContainer'
 import { red, green, regular } from '../../../pages/Trade/OrderBookTrade/StyleDiv'
+import { LIQ_VAULT_STATE } from '../../../constants/dataviewContents'
 
 import { useLiquidationStatus } from '../../../hooks'
 import OpynTokenAmount from '../../../components/OpynTokenAmount'
 import { getWeth, SupportedNetworks } from '../../../constants'
 import BigNumber from 'bignumber.js'
+import { useController } from '../../../hooks/useController'
 
 export default function Liquidation() {
   useEffect(() => {
@@ -22,21 +24,36 @@ export default function Liquidation() {
 
   const [page, setPage] = useState(0)
 
-  const { vaults, isSyncing } = useLiquidationStatus(getWeth(networkId), 15)
+  const { vaults, isSyncing, isInitializing, latestRoundId } = useLiquidationStatus(getWeth(networkId), 15)
+
+  const { liquidate } = useController()
+
+  const handleLiquidate = useCallback(
+    async (vaultOwner: string, vaultId: string, amount: string, roundId: string) => {
+      await liquidate(vaultOwner, vaultId, amount, roundId)
+    },
+    [liquidate],
+  )
 
   const renderVaultRow = useCallback(
     vault => {
       const collateralAmount = vault.collateralAmount ? vault.collateralAmount : '0'
-      const shortAmount = vault.shortAmount ? vault.shortAmount : '0'
+      const shortAmount = vault.shortAmount as string
       return [
         <CustomIdentityBadge entity={vault.owner.id} />,
         <OpynTokenAmount token={vault.collateralAsset} amount={collateralAmount} chainId={networkId} />,
         ratioComponent(vault.collatRatio),
         <OpynTokenAmount token={vault.shortOToken} amount={shortAmount} chainId={networkId} />,
-        <Button disabled={!vault.isLiquidatable} label={'Liquidate'} onClick={() => {}} />,
+        <Button
+          disabled={!vault.isLiquidatable}
+          label={'Liquidate'}
+          onClick={async () => {
+            await handleLiquidate(vault.owner.id, vault.vaultId, shortAmount, latestRoundId)
+          }}
+        />,
       ]
     },
-    [networkId],
+    [networkId, handleLiquidate, latestRoundId],
   )
 
   return (
@@ -47,6 +64,8 @@ export default function Liquidation() {
       ) : (
         <div>
           <DataView
+            status={isInitializing ? 'loading' : 'default'}
+            emptyState={LIQ_VAULT_STATE}
             fields={['owner', 'collateral', 'ratio', 'short', '']}
             entries={vaults}
             renderEntry={renderVaultRow}

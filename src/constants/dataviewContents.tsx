@@ -119,3 +119,15 @@ export const PRICE_SUBMISSION = {
     subtitle: 'Fetching historical price',
   },
 }
+
+export const LIQ_VAULT_STATE = {
+  default: {
+    title: 'No Vaults',
+    subtitle: 'No partial collateralizated vaults opened',
+    illustration: EmptyState,
+  },
+  loading: {
+    title: 'Analyzing',
+    subtitle: 'Loading all partial collateralized vaults🏖',
+  },
+}

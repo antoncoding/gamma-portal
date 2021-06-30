@@ -6,7 +6,6 @@ import { toTokenAmount } from '../utils/math'
 import { useConnectedWallet } from '../contexts/wallet'
 import { addresses } from '../constants'
 const calculatorAbi = require('../constants/abis/marginCalculator.json')
-const controllerAbi = require('../constants/abis/controller.json')
 
 type vaultDetail = {
   underlying: string
@@ -24,7 +23,6 @@ const useMarginCalculator = () => {
   const { web3, networkId } = useConnectedWallet()
 
   const calculator = useMemo(() => new web3.eth.Contract(calculatorAbi, addresses[networkId].calculator), [networkId])
-  const controller = useMemo(() => new web3.eth.Contract(controllerAbi, addresses[networkId].controller), [networkId])
 
   const getNakedMarginRequired = useCallback(
     async (
@@ -164,24 +162,6 @@ const useMarginCalculator = () => {
     [getLiquidationPrice],
   )
 
-  const getNakedCap = useCallback(
-    async (collateral: string, decimals: number) => {
-      if (!controller) return new BigNumber(0)
-      const capAmount = await controller.methods.getNakedCap(collateral).call()
-      return toTokenAmount(new BigNumber(capAmount.toString()), decimals)
-    },
-    [controller],
-  )
-
-  const getNakedBalance = useCallback(
-    async (collateral: string, decimals: number) => {
-      if (!controller) return new BigNumber(0)
-      const balance = await controller.methods.getNakedPoolBalance(collateral).call()
-      return toTokenAmount(new BigNumber(balance.toString()), decimals)
-    },
-    [controller],
-  )
-
   const getNakedMarginVariables = useCallback(
     async (props: vaultDetail) => {
       const {
@@ -236,8 +216,6 @@ const useMarginCalculator = () => {
 
   return {
     getNakedMarginRequired,
-    getNakedCap,
-    getNakedBalance,
     getMarginRequired,
     getMaxPrice,
     getSpotPercent,
