@@ -6,10 +6,12 @@ import { useConnectedWallet } from '../../../contexts/wallet'
 import Header from '../../../components/Header'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 import StyledContainer from '../../../components/StyledContainer'
+import { red, green, regular } from '../../../pages/Trade/OrderBookTrade/StyleDiv'
 
 import { useLiquidationStatus } from '../../../hooks'
 import OpynTokenAmount from '../../../components/OpynTokenAmount'
 import { getWeth } from '../../../constants'
+import BigNumber from 'bignumber.js'
 
 export default function Liquidation() {
   useEffect(() => {
@@ -26,11 +28,10 @@ export default function Liquidation() {
     vault => {
       const collateralAmount = vault.collateralAmount ? vault.collateralAmount : '0'
       const shortAmount = vault.shortAmount ? vault.shortAmount : '0'
-      const ratio = vault.collatRatio.isNegative() ? 'N/A' : `${vault.collatRatio.times(100).toFixed(1)} %`
       return [
         <CustomIdentityBadge entity={vault.owner.id} />,
         <OpynTokenAmount token={vault.collateralAsset} amount={collateralAmount} chainId={networkId} />,
-        ratio,
+        ratioComponent(vault.collatRatio),
         <OpynTokenAmount token={vault.shortOToken} amount={shortAmount} chainId={networkId} />,
         <Button disabled={!vault.isLiquidatable} label={'Liquidate'} onClick={() => {}} />,
       ]
@@ -53,4 +54,12 @@ export default function Liquidation() {
       <SyncIndicator visible={isSyncing} children={'Syncing Oracle Data 🍣'} />
     </StyledContainer>
   )
+}
+
+const ratioComponent = (ratio: BigNumber) => {
+  if (ratio.isNegative()) return <div>N/A</div>
+  const percentage = ratio.times(100)
+  if (percentage.lt(120)) return red(`${percentage.toFixed(1)}%`)
+  if (percentage.gt(200)) return green(`${percentage.toFixed(1)}%`)
+  else return regular(`${percentage.toFixed(1)}%`)
 }
