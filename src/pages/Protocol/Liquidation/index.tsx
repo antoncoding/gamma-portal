@@ -49,7 +49,6 @@ export default function Liquidation() {
       return [
         <CustomIdentityBadge entity={vault.owner.id} />,
         <OpynTokenAmount token={vault.collateralAsset} amount={collateralAmount} chainId={networkId} />,
-        ratioComponent(vault.collatRatio),
         liquidationPrice(vault.liquidationPrice),
         <OpynTokenAmount token={vault.shortOToken} amount={shortAmount} chainId={networkId} />,
         <Button
@@ -75,7 +74,7 @@ export default function Liquidation() {
             heading={'Call vaults'}
             status={isInitializing ? 'loading' : 'default'}
             emptyState={LIQ_CALL_VAULT_STATE}
-            fields={['owner', 'collateral', 'ratio', 'Liq price', 'short', '']}
+            fields={['owner', 'collateral', 'Liq price', 'short', '']}
             entries={callVaults}
             renderEntry={renderVaultRow}
             entriesPerPage={5}
@@ -101,11 +100,6 @@ export default function Liquidation() {
       )}
     </StyledContainer>
   )
-}
-
-const ratioComponent = (ratio: BigNumber) => {
-  const percentage = ratio.times(100)
-  return regular(`${percentage.toFixed(1)}%`)
 }
 
 const liquidationPrice = (price: BigNumber) => {
