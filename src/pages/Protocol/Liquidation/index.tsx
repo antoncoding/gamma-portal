@@ -22,7 +22,8 @@ export default function Liquidation() {
 
   const { networkId } = useConnectedWallet()
 
-  const [page, setPage] = useState(0)
+  const [putPage, setPutPage] = useState(0)
+  const [callPage, setCallPage] = useState(0)
 
   const { vaults, isSyncing, isInitializing } = useLiquidationStatus(getWeth(networkId), 30)
 
@@ -75,9 +76,10 @@ export default function Liquidation() {
             fields={['owner', 'collateral', 'ratio', 'Liq price', 'short', '']}
             entries={callVaults}
             renderEntry={renderVaultRow}
-            entriesPerPage={4}
-            page={page}
-            onPageChange={setPage}
+            entriesPerPage={5}
+            page={callPage}
+            onPageChange={setCallPage}
+            tableRowHeight={45}
           />
 
           <DataView
@@ -87,9 +89,10 @@ export default function Liquidation() {
             fields={['owner', 'collateral', 'ratio', 'Liq price', 'short', '']}
             entries={putVaults}
             renderEntry={renderVaultRow}
-            entriesPerPage={4}
-            page={page}
-            onPageChange={setPage}
+            entriesPerPage={5}
+            page={putPage}
+            onPageChange={setPutPage}
+            tableRowHeight={45}
           />
           <SyncIndicator visible={isSyncing} children={'Syncing Oracle Data 🍣'} />
         </div>

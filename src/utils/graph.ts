@@ -365,7 +365,8 @@ export async function getNonEmptyPartialCollatVaults(
   }`
   try {
     const response = await postQuery(endpoints[networkId], query)
-    return response.data.vaults
+    const now = Math.floor(Date.now() / 1000)
+    return response.data.vaults.filter(vault => parseInt(vault.shortOToken.expiryTimestamp) > now)
   } catch (error) {
     errorCallback(error.toString())
     return []
