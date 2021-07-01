@@ -72,37 +72,35 @@ export const useLiquidationStatus = (underlying, refetchIntervalSec: number) => 
   const vaults = useAsyncMemo(
     async () => {
       setIsSyncing(true)
-      const result = rawVaults
-        .map(vault => {
-          const short = vault.shortOToken as SubgraphOToken
-          const shortAmount = vault.shortAmount as string
-          const collateralAmount = vault.collateralAmount as string
-          const fullCollateralAmount = short.isPut
-            ? fromTokenAmount(
-                toTokenAmount(short.strikePrice, 8).times(toTokenAmount(shortAmount, 8)),
-                short.collateralAsset.decimals,
-              )
-            : fromTokenAmount(toTokenAmount(shortAmount, 8), short.collateralAsset.decimals)
+      const result = rawVaults.map(vault => {
+        const short = vault.shortOToken as SubgraphOToken
+        const shortAmount = vault.shortAmount as string
+        const collateralAmount = vault.collateralAmount as string
+        const fullCollateralAmount = short.isPut
+          ? fromTokenAmount(
+              toTokenAmount(short.strikePrice, 8).times(toTokenAmount(shortAmount, 8)),
+              short.collateralAsset.decimals,
+            )
+          : fromTokenAmount(toTokenAmount(shortAmount, 8), short.collateralAsset.decimals)
 
-          const collatRatio = new BigNumber(collateralAmount).div(fullCollateralAmount)
-          const liquidationPrice = getLiquidationPrice(
-            collatRatio,
-            short.isPut,
-            short.strikePrice,
-            parseInt(short.expiryTimestamp),
-          )
+        const collatRatio = new BigNumber(collateralAmount).div(fullCollateralAmount)
+        const liquidationPrice = getLiquidationPrice(
+          collatRatio,
+          short.isPut,
+          short.strikePrice,
+          parseInt(short.expiryTimestamp),
+        )
 
-          const { isLiquidatable, round } = getMostProfitableRoundId(
-            short,
-            collateralAmount,
-            shortAmount,
-            liquidationPrice,
-            rounds,
-          )
+        const { isLiquidatable, round } = getMostProfitableRoundId(
+          short,
+          collateralAmount,
+          shortAmount,
+          liquidationPrice,
+          rounds,
+        )
 
-          return { ...vault, isLiquidatable, collatRatio, liquidationPrice, round }
-        })
-        .sort((a, b) => (a.collatRatio.gt(b.collatRatio) ? 1 : -1))
+        return { ...vault, isLiquidatable, collatRatio, liquidationPrice, round }
+      })
       setIsSyncing(false)
       return result
     },
