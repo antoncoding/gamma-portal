@@ -2,7 +2,15 @@ import BigNumber from 'bignumber.js'
 import { subgraph as endpoints } from '../constants/endpoints'
 import { blacklistOTokens } from '../constants/addresses'
 import { SupportedNetworks } from '../constants/networks'
-import { SubgraphVault, SubgraphToken, SubgraphOracleAsset, SubgraphOToken, OTokenBalance, OTokenTrade } from '../types'
+import {
+  ChainlinkRound,
+  SubgraphVault,
+  SubgraphToken,
+  SubgraphOracleAsset,
+  SubgraphOToken,
+  OTokenBalance,
+  OTokenTrade,
+} from '../types'
 
 /**
  * Get account info
@@ -756,4 +764,46 @@ const postQuery = async (endpoint: string, query: string) => {
   } else {
     return data
   }
+}
+
+export const getMainnetChainlinkRounds = async (
+  earliestTimestamp: number,
+  errorCallback: Function,
+): Promise<ChainlinkRound[]> => {
+  // const earliestTimestamp = Math.floor(Date.now() / 1000 - 21600)
+  const query = `{
+    feeds(where:{contractAddress:"0x37bc7498f4ff12c19678ee8fe19d713b87f6a9e6"}) {
+      rounds (
+        where: {
+          unixTimestamp_gt: ${earliestTimestamp}
+        }
+        orderBy: unixTimestamp,
+      ) {
+        number
+        unixTimestamp
+        value
+      }
+    }
+  }`
+  try {
+    const endpoint = 'https://api.thegraph.com/subgraphs/name/skofman/chainlink'
+    const response = await postQuery(endpoint, query)
+    const rawRounds = response.data.feeds[0].rounds
+    // sorted by oldest to latest
+    return rawRounds.map(rawRound => {
+      return { ...rawRound, roundIdHex: toAggregatorRoundId(rawRound.number) }
+    })
+  } catch (error) {
+    errorCallback(error.toString())
+    return []
+  }
+}
+
+const toAggregatorRoundId = (feedRoundId: string) => {
+  const rawRoundIdHex = parseInt(feedRoundId).toString(16)
+  const base = '0x50000000000000000'
+  const aggregatorRoundIdHex = base
+    .substring(0, base.length - rawRoundIdHex.length) // cut last {rawRoundHex.length} chars
+    .concat(rawRoundIdHex)
+  return aggregatorRoundIdHex
 }

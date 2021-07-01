@@ -3,10 +3,11 @@ import { useState, useEffect } from 'react'
 import { useConnectedWallet } from '../contexts/wallet'
 import { useCustomToast } from './useCustomToast'
 import useAsyncMemo from './useAsyncMemo'
-import { getNonEmptyPartialCollatVaults } from '../utils/graph'
-import { getLastRoundId, dumbCheckIsLiquidatable } from '../utils/liquidation'
-import { SubgraphVault, SubgraphOToken } from '../types'
+import { getNonEmptyPartialCollatVaults, getMainnetChainlinkRounds } from '../utils/graph'
+import { getMostProfitableRoundId } from '../utils/liquidation'
+import { SubgraphVault, SubgraphOToken, ChainlinkRound } from '../types'
 import useMarginCalculator from './useMarginCalculator'
+import { toTokenAmount, fromTokenAmount } from '../utils/math'
 
 /**
  * get latest roundId
@@ -17,34 +18,31 @@ export const useLiquidationStatus = (underlying, refetchIntervalSec: number) => 
   const [isInitializing, setIsInitializing] = useState(true)
   const [isSyncing, setIsSyncing] = useState(true)
 
-  const [latestRoundId, setLatestRound] = useState('0')
-  const [underlyingPrice, setUnderlyingPrice] = useState('0')
+  const [rounds, setRounds] = useState<ChainlinkRound[]>([])
 
   const [rawVaults, setRawVaults] = useState<SubgraphVault[]>([])
-  const { networkId, web3 } = useConnectedWallet()
+  const { networkId } = useConnectedWallet()
 
-  const { getNakedMarginRequired } = useMarginCalculator()
+  const { getLiquidationPrice } = useMarginCalculator()
 
   useEffect(() => {
     let isCancelled = false
-
-    async function updateRoundId() {
-      const { latestAnswer, latestRoundId } = await getLastRoundId(web3, networkId)
+    async function updateRoundsData() {
+      const sixHoursBefore = Math.floor(Date.now() / 1000) - 3600 * 6
+      const rounds = await getMainnetChainlinkRounds(sixHoursBefore, toast.error)
       if (!isCancelled) {
-        setLatestRound(latestRoundId)
-        setUnderlyingPrice(latestAnswer)
+        setRounds(rounds)
       }
     }
     setIsSyncing(true)
-    updateRoundId()
-    const id = setInterval(updateRoundId, refetchIntervalSec * 1000)
-
+    updateRoundsData()
+    const id = setInterval(updateRoundsData, refetchIntervalSec * 1000)
     // cleanup function: remove interval
     return () => {
       isCancelled = true
       clearInterval(id)
     }
-  }, [refetchIntervalSec, networkId, web3])
+  }, [refetchIntervalSec, toast.error])
 
   // fetch vaults
   useEffect(() => {
@@ -71,34 +69,37 @@ export const useLiquidationStatus = (underlying, refetchIntervalSec: number) => 
   const vaults = useAsyncMemo(
     async () => {
       setIsSyncing(true)
-      const result = ((await Promise.all(
-        rawVaults.map(async vault => {
+      const result = rawVaults
+        .map(vault => {
           const short = vault.shortOToken as SubgraphOToken
+          const shortAmount = vault.shortAmount as string
           const collateralAmount = vault.collateralAmount as string
-          const minCollateral = await getNakedMarginRequired(
-            short.underlyingAsset.id,
-            short.strikeAsset.id,
-            short.collateralAsset.id,
-            new BigNumber(vault.shortAmount as string),
-            new BigNumber(short.strikePrice),
-            underlyingPrice,
-            parseInt(short.expiryTimestamp),
-            short.collateralAsset.decimals,
-            short.isPut,
-          )
-          const collatRatio =
-            minCollateral === null ? new BigNumber(-1) : new BigNumber(collateralAmount).div(minCollateral)
+          const fullCollateralAmount = short.isPut
+            ? fromTokenAmount(
+                toTokenAmount(short.strikePrice, 8).times(toTokenAmount(shortAmount, 8)),
+                short.collateralAsset.decimals,
+              )
+            : fromTokenAmount(toTokenAmount(shortAmount, 8), short.collateralAsset.decimals)
 
-          const { isLiquidatable } = await dumbCheckIsLiquidatable(web3, networkId, vault, latestRoundId)
-          return { ...vault, isLiquidatable, minCollateral, collatRatio }
-        }),
-      )) as any[]).sort((a, b) => (a.collatRatio.gt(b.collatRatio) ? 1 : -1))
+          const collatRatio = new BigNumber(collateralAmount).div(fullCollateralAmount)
+          const liquidationPrice = getLiquidationPrice(
+            collatRatio,
+            short.isPut,
+            short.strikePrice,
+            parseInt(short.expiryTimestamp),
+          )
+
+          const { isLiquidatable, round } = getMostProfitableRoundId(short, liquidationPrice, rounds)
+
+          return { ...vault, isLiquidatable, collatRatio, liquidationPrice, round }
+        })
+        .sort((a, b) => (a.collatRatio.gt(b.collatRatio) ? 1 : -1))
       setIsSyncing(false)
       return result
     },
     [],
-    [networkId, toast.error, latestRoundId, rawVaults],
+    [networkId, toast.error, rawVaults, rounds],
   )
 
-  return { vaults, latestRoundId, isSyncing, isInitializing }
+  return { vaults, isSyncing, isInitializing }
 }

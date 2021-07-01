@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import ReactGA from 'react-ga'
 import { Button, DataView, SyncIndicator, Info } from '@aragon/ui'
 
@@ -6,8 +6,8 @@ import { useConnectedWallet } from '../../../contexts/wallet'
 import Header from '../../../components/Header'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 import StyledContainer from '../../../components/StyledContainer'
-import { red, green, regular } from '../../../pages/Trade/OrderBookTrade/StyleDiv'
-import { LIQ_VAULT_STATE } from '../../../constants/dataviewContents'
+import { regular } from '../../../pages/Trade/OrderBookTrade/StyleDiv'
+import { LIQ_CALL_VAULT_STATE, LIQ_PUT_VAULT_STATE } from '../../../constants/dataviewContents'
 
 import { useLiquidationStatus } from '../../../hooks'
 import OpynTokenAmount from '../../../components/OpynTokenAmount'
@@ -24,7 +24,11 @@ export default function Liquidation() {
 
   const [page, setPage] = useState(0)
 
-  const { vaults, isSyncing, isInitializing, latestRoundId } = useLiquidationStatus(getWeth(networkId), 15)
+  const { vaults, isSyncing, isInitializing } = useLiquidationStatus(getWeth(networkId), 30)
+
+  const putVaults = useMemo(() => vaults.filter(vault => vault.shortOToken?.isPut), [vaults])
+
+  const callVaults = useMemo(() => vaults.filter(vault => !vault.shortOToken?.isPut), [vaults])
 
   const { liquidate } = useController()
 
@@ -43,33 +47,47 @@ export default function Liquidation() {
         <CustomIdentityBadge entity={vault.owner.id} />,
         <OpynTokenAmount token={vault.collateralAsset} amount={collateralAmount} chainId={networkId} />,
         ratioComponent(vault.collatRatio),
+        liquidationPrice(vault.liquidationPrice),
         <OpynTokenAmount token={vault.shortOToken} amount={shortAmount} chainId={networkId} />,
         <Button
           disabled={!vault.isLiquidatable}
           label={'Liquidate'}
           onClick={async () => {
-            await handleLiquidate(vault.owner.id, vault.vaultId, shortAmount, latestRoundId)
+            await handleLiquidate(vault.owner.id, vault.vaultId, shortAmount, vault.round.roundIdHex)
           }}
         />,
       ]
     },
-    [networkId, handleLiquidate, latestRoundId],
+    [networkId, handleLiquidate],
   )
 
   return (
     <StyledContainer>
       <Header primary={'Liquidation'} />
-      {networkId === SupportedNetworks.Ropsten ? (
-        <Info> Partial Liquidation is not available on Ropsten yet </Info>
+      {networkId !== SupportedNetworks.Mainnet ? (
+        <Info> This monitor is only available on Mainnet </Info>
       ) : (
         <div>
           <DataView
+            heading={'Call vaults'}
             status={isInitializing ? 'loading' : 'default'}
-            emptyState={LIQ_VAULT_STATE}
-            fields={['owner', 'collateral', 'ratio', 'short', '']}
-            entries={vaults}
+            emptyState={LIQ_CALL_VAULT_STATE}
+            fields={['owner', 'collateral', 'ratio', 'Liq price', 'short', '']}
+            entries={callVaults}
             renderEntry={renderVaultRow}
-            entriesPerPage={8}
+            entriesPerPage={4}
+            page={page}
+            onPageChange={setPage}
+          />
+
+          <DataView
+            heading={'Put vaults'}
+            status={isInitializing ? 'loading' : 'default'}
+            emptyState={LIQ_PUT_VAULT_STATE}
+            fields={['owner', 'collateral', 'ratio', 'Liq price', 'short', '']}
+            entries={putVaults}
+            renderEntry={renderVaultRow}
+            entriesPerPage={4}
             page={page}
             onPageChange={setPage}
           />
@@ -81,9 +99,10 @@ export default function Liquidation() {
 }
 
 const ratioComponent = (ratio: BigNumber) => {
-  if (ratio.isNegative()) return <div>N/A</div>
   const percentage = ratio.times(100)
-  if (percentage.lt(120)) return red(`${percentage.toFixed(1)}%`)
-  if (percentage.gt(200)) return green(`${percentage.toFixed(1)}%`)
-  else return regular(`${percentage.toFixed(1)}%`)
+  return regular(`${percentage.toFixed(1)}%`)
+}
+
+const liquidationPrice = (price: BigNumber) => {
+  return regular(`$${price.toFixed(0)}`)
 }

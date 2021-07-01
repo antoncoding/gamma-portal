@@ -120,3 +120,10 @@ export type OTokenTrade = {
   timestamp: string
   transactionHash: string
 }
+
+export type ChainlinkRound = {
+  number: string
+  unixTimestamp: number
+  value: string
+  roundIdHex: string
+}

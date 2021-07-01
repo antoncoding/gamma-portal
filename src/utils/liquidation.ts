@@ -1,8 +1,20 @@
-import { SubgraphVault } from '../types'
+import BigNumber from 'bignumber.js'
+
 import Web3 from 'web3'
+import { SubgraphVault, SubgraphOToken, ChainlinkRound } from '../types'
 import { SupportedNetworks, getETHAggregators, addresses } from '../constants'
+import { toTokenAmount } from './math'
+
 const aggregatorAbi = require('../constants/abis/chainlinkAggregator.json')
 const controllerAbi = require('../constants/abis/controller.json')
+
+export function getMostProfitableRoundId(otoken: SubgraphOToken, liqPrice: BigNumber, roundData: ChainlinkRound[]) {
+  const round = roundData.find(round => {
+    const historicalPrice = toTokenAmount(round.value, 8)
+    return otoken.isPut ? historicalPrice.lt(liqPrice) : historicalPrice.gt(liqPrice)
+  })
+  return { isLiquidatable: round !== undefined, round }
+}
 
 export async function getLastRoundId(web3: Web3, networkId: SupportedNetworks) {
   const aggregatorAddress = getETHAggregators(networkId)
