@@ -119,3 +119,27 @@ export const PRICE_SUBMISSION = {
     subtitle: 'Fetching historical price',
   },
 }
+
+export const LIQ_CALL_VAULT_STATE = {
+  default: {
+    title: 'No Call Vaults',
+    subtitle: 'No partial collateralizated call vaults opened',
+    illustration: EmptyState,
+  },
+  loading: {
+    title: 'Analyzing',
+    subtitle: 'Loading all partial collateralized vaults🏖',
+  },
+}
+
+export const LIQ_PUT_VAULT_STATE = {
+  default: {
+    title: 'No Put Vaults',
+    subtitle: 'No partial collateralizated vaults opened',
+    illustration: EmptyState,
+  },
+  loading: {
+    title: 'Analyzing',
+    subtitle: 'Loading all partial collateralized put vaults🏖',
+  },
+}

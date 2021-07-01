@@ -1,6 +1,8 @@
 import BigNumber from 'bignumber.js'
 import { ZERO_ADDR } from '../constants/addresses'
 import { actionArg, ActionType } from '../types'
+import Web3 from 'web3'
+const web3 = new Web3()
 
 export function createOpenVaultArg(account: string, vaultId: BigNumber): actionArg {
   return {
@@ -152,5 +154,24 @@ export function createRedeemArg(token: string, amount: string, to: string): acti
     amount: amount,
     index: '0',
     data: ZERO_ADDR,
+  }
+}
+
+export function createLiquidateArg(
+  vaultOwner: string,
+  vaultId: string,
+  recipient: string,
+  amount: string,
+  roundId: string,
+): actionArg {
+  return {
+    actionType: ActionType.Liquidate,
+    owner: vaultOwner,
+    secondAddress: recipient,
+    asset: ZERO_ADDR,
+    vaultId: vaultId,
+    amount: amount,
+    index: '0',
+    data: web3.eth.abi.encodeParameter('uint256', roundId),
   }
 }

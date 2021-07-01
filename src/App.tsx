@@ -20,6 +20,7 @@ import Vault from './pages/Account/VaultDetail'
 import Oracle from './pages/Protocol/Oracle'
 import OTokenList from './pages/Protocol/OTokenList/index'
 import OToken from './pages/Protocol/OTokenList/otoken'
+import Liquidation from './pages/Protocol/Liquidation/index'
 import Operators from './pages/Account/Operators'
 import HomePage from './pages/HomePage'
 import Settings from './pages/Settings'
@@ -116,6 +117,9 @@ function App() {
                   </Route>
                   <Route path="/protocol/otokens/">
                     <OTokenList />
+                  </Route>
+                  <Route path="/protocol/liquidation/">
+                    <Liquidation />
                   </Route>
                   <Route path="/protocol/">
                     <ProtocolHome />

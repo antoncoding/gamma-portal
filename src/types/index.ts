@@ -28,6 +28,7 @@ export enum ActionType {
   SettleVault,
   Redeem,
   Call,
+  Liquidate,
   InvalidAction,
 }
 
@@ -50,6 +51,7 @@ export type SubgraphVault = {
   longOToken: SubgraphOToken | null
   shortAmount: string | null
   shortOToken: SubgraphOToken | null
+  owner: { id: string }
 }
 
 export type SubgraphVaultAction = {
@@ -117,4 +119,11 @@ export type OTokenTrade = {
   paymentTokenAmount: string
   timestamp: string
   transactionHash: string
+}
+
+export type ChainlinkRound = {
+  number: string
+  unixTimestamp: number
+  value: string
+  roundIdHex: string
 }

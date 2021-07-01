@@ -43,6 +43,24 @@ export function useController() {
     return new web3.eth.Contract(controllerAbi, address)
   }, [networkId, web3])
 
+  const getNakedCap = useCallback(
+    async (collateral: string) => {
+      if (!controller) return new BigNumber(0)
+      const capAmount = await controller.methods.getNakedCap(collateral).call()
+      return new BigNumber(capAmount.toString())
+    },
+    [controller],
+  )
+
+  const getNakedBalance = useCallback(
+    async (collateral: string) => {
+      if (!controller) return new BigNumber(0)
+      const balance = await controller.methods.getNakedPoolBalance(collateral).call()
+      return new BigNumber(balance.toString())
+    },
+    [controller],
+  )
+
   const payableProxy = useMemo(() => {
     const address = getPayableProxyAddr(networkId).address
     return new web3.eth.Contract(payableProxyAbi, address)
@@ -80,6 +98,14 @@ export function useController() {
   const pushAction = useCallback(newEntry => {
     setActions(actions => [...actions, newEntry])
   }, [])
+
+  const liquidate = useCallback(
+    async (vaultOwner: string, vaultId: string, amount: string, roundId: string) => {
+      const arg = util.createLiquidateArg(vaultOwner, vaultId, user, amount, roundId)
+      await operate([arg])
+    },
+    [operate, user],
+  )
 
   const pushAddCollateralArg = useCallback(
     (account: string, vaultId: BigNumber, from: string, asset: string, amount: BigNumber) => {
@@ -205,7 +231,13 @@ export function useController() {
         await checkAndIncreaseAllowance(addCollateralAction.asset, user, addCollateralAction.amount)
       }
 
-      const actionVaultId = Number(actions.find(action => action.vaultId !== '0')?.vaultId)
+      // find if any action involve operation on a vault
+      const actionVaultId = Number(
+        actions.find(action => {
+          return action.vaultId !== '0' && action.actionType !== ActionType.Liquidate
+        })?.vaultId,
+      )
+
       if (actionVaultId) {
         if (actionVaultId === latestVaultId + 1) {
           // open new vault
@@ -276,6 +308,9 @@ export function useController() {
   )
 
   return {
+    getNakedCap,
+    getNakedBalance,
+
     actions,
     pushAddCollateralArg,
     pushRemoveCollateralArg,
@@ -283,6 +318,8 @@ export function useController() {
     pushRemoveLongArg,
     pushMintArg,
     pushBurnArg,
+    liquidate,
+
     settleBatch,
     redeemBatch,
     refreshConfig,
