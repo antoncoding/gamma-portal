@@ -25,7 +25,9 @@ export default function Liquidation() {
   const [putPage, setPutPage] = useState(0)
   const [callPage, setCallPage] = useState(0)
 
-  const { vaults, isSyncing, isInitializing } = useLiquidationStatus(getWeth(networkId), 30)
+  const weth = useMemo(() => getWeth(networkId), [networkId])
+
+  const { vaults, isSyncing, isInitializing, spotPrice } = useLiquidationStatus(weth, 30)
 
   const putVaults = useMemo(() => vaults.filter(vault => vault.shortOToken?.isPut), [vaults])
 
@@ -64,7 +66,7 @@ export default function Liquidation() {
 
   return (
     <StyledContainer>
-      <Header primary={'Liquidation'} />
+      <Header primary={'Liquidation'} secondary={`ETH Price $${spotPrice}`} />
       {networkId !== SupportedNetworks.Mainnet ? (
         <Info> This monitor is only available on Mainnet </Info>
       ) : (

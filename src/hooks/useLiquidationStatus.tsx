@@ -8,6 +8,7 @@ import { getMostProfitableRoundId } from '../utils/liquidation'
 import { SubgraphVault, SubgraphOToken, ChainlinkRound } from '../types'
 import useMarginCalculator from './useMarginCalculator'
 import { toTokenAmount, fromTokenAmount } from '../utils/math'
+import { useTokenPrice } from './useTokenPrice'
 
 /**
  * get latest roundId
@@ -24,6 +25,8 @@ export const useLiquidationStatus = (underlying, refetchIntervalSec: number) => 
   const { networkId } = useConnectedWallet()
 
   const { getLiquidationPrice } = useMarginCalculator()
+
+  const spotPrice = useTokenPrice(underlying.id, 30)
 
   useEffect(() => {
     let isCancelled = false
@@ -89,7 +92,13 @@ export const useLiquidationStatus = (underlying, refetchIntervalSec: number) => 
             parseInt(short.expiryTimestamp),
           )
 
-          const { isLiquidatable, round } = getMostProfitableRoundId(short, liquidationPrice, rounds)
+          const { isLiquidatable, round } = getMostProfitableRoundId(
+            short,
+            collateralAmount,
+            shortAmount,
+            liquidationPrice,
+            rounds,
+          )
 
           return { ...vault, isLiquidatable, collatRatio, liquidationPrice, round }
         })
@@ -101,5 +110,5 @@ export const useLiquidationStatus = (underlying, refetchIntervalSec: number) => 
     [networkId, toast.error, rawVaults, rounds],
   )
 
-  return { vaults, isSyncing, isInitializing }
+  return { vaults, isSyncing, isInitializing, spotPrice }
 }
