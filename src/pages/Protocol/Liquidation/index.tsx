@@ -133,7 +133,7 @@ export default function Liquidation() {
             }
             status={isInitializing ? 'loading' : 'default'}
             emptyState={LIQ_PUT_VAULT_STATE}
-            fields={['owner', 'collateral', 'ratio', 'Liq price', 'short', '']}
+            fields={['owner', 'status', 'collateral', 'Liq price', 'short', '']}
             entries={putVaults}
             renderEntry={renderVaultRow}
             entriesPerPage={5}

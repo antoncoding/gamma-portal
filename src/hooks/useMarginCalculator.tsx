@@ -73,10 +73,10 @@ const useMarginCalculator = () => {
       const maxPrice = timeLeftToPT(timeLeft)
       const spotShock = new BigNumber(EthSpotShock)
       if (_isPut) {
-        if (collatRatio.gt(1)) return new BigNumber(0)
+        if (collatRatio.gte(1)) return new BigNumber(0)
         return strikePrice.times(collatRatio.minus(1)).div(spotShock.times(maxPrice - 1))
       } else {
-        if (collatRatio.gt(1)) return new BigNumber(Infinity)
+        if (collatRatio.gte(1)) return new BigNumber(Infinity)
         return strikePrice
           .times(spotShock)
           .times(maxPrice - 1)
