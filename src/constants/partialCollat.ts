@@ -18,3 +18,5 @@ export const timeLeftToPT = (timeLeft: number) => {
   if (timeLeft < 16934400) return 0.821
   else return 1
 }
+
+export const AUCTION_TIME = 5400
