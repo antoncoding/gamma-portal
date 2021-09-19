@@ -38,13 +38,15 @@ export const getTokenPriceCoingecko = async (token: string | undefined): Promise
   // WETH
   if (
     requestAddr.toLowerCase() === '0xd0a1e359811322d97991e03f863a0c30c2cf029c' ||
-    requestAddr.toLowerCase() === '0xc778417e063141139fce010982780140aa0cd5ab'
+    requestAddr.toLowerCase() === '0xc778417e063141139fce010982780140aa0cd5ab' ||
+    requestAddr.toLowerCase() === '0x82af49447d8a07e3bd95bd0d56f35241523fbab1'
   )
     requestAddr = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
   // WBTC
   if (
     requestAddr.toLowerCase() === '0xd7c8c2f7b6ebdbc88e5ab0101dd24ed5aca58b0f' ||
-    requestAddr.toLowerCase() === '0xd7c8c2f7b6ebdbc88e5ab0101dd24ed5aca58b0f'
+    requestAddr.toLowerCase() === '0xd7c8c2f7b6ebdbc88e5ab0101dd24ed5aca58b0f' ||
+    requestAddr.toLowerCase() === '0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f'
   )
     requestAddr = '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599'
 
