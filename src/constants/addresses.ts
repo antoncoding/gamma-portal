@@ -84,6 +84,26 @@ export const tokens: Tokens = {
       canMint: true,
     },
   ],
+  [SupportedNetworks.Arbitrum]: [
+    {
+      name: 'USDC',
+      id: '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8',
+      symbol: 'USDC',
+      decimals: 6,
+    },
+    {
+      name: 'Wrapped Ether',
+      id: '0x82af49447d8a07e3bd95bd0d56f35241523fbab1',
+      symbol: 'WETH',
+      decimals: 18,
+    },
+    {
+      name: 'Wrapped Bitcoin',
+      id: '0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f',
+      symbol: 'WBTC',
+      decimals: 8,
+    },
+  ],
 }
 
 type SystemAddresses = {
@@ -126,12 +146,22 @@ export const addresses: SystemAddresses = {
     whitelist: isPublic ? '0x9164eB40a1b59512F1803aB4C2d1dE4B89627A93' : '0xc990BB199c0ed8CEE305bD1A4c50A87029AdfAE3',
     zeroxExchange: '0x4eacd0af335451709e1e7b570b8ea68edec8bc97',
   },
+  [SupportedNetworks.Arbitrum]: {
+    controller: '0xeE30f92cc9Bf896679567d1aCD551f0E179756fC',
+    calculator: '0xC9F007D6F0aa2b6C5f0E4c0Ff79273227C2100A9',
+    factory: '0x4D3a52A0e98144CAf46Ac226d83e8f144b5c654D',
+    addressBook: '0x9a33230f59Cc7Cc9A084E0098A2b2934FC7BF7c0',
+    pool: '0x63d8d20606c048B9B79A30ea45Ca6787F8aEB051',
+    whitelist: '0xB8f0AC1Ab70643ebE8103Db3618EA5eD6901B458',
+    zeroxExchange: '0x0000000000000000000000000000000000000000',
+  },
 }
 
 export const blacklistOTokens = {
   [SupportedNetworks.Mainnet]: [ZERO_ADDR],
   [SupportedNetworks.Ropsten]: [ZERO_ADDR],
   [SupportedNetworks.Kovan]: ['0x81300ac27ac2470713602b4d8a73dfcc85b779b1'],
+  [SupportedNetworks.Arbitrum]: [ZERO_ADDR],
 }
 
 type KnownOperator = {
@@ -166,6 +196,15 @@ export const knownOperators: {
   [SupportedNetworks.Kovan]: [
     {
       address: isPublic ? '0x5957a413f5ac4bcf2ba7c5c461a944b548adb1a5' : '0xe501e882f6e5f049899e02b7e48d89f223cb2a4f',
+      name: 'PayableProxy',
+      description: 'Proxy contract to help mint calls with ETH instead of WETH',
+      audited: true,
+      author: 'Opyn',
+    },
+  ],
+  [SupportedNetworks.Arbitrum]: [
+    {
+      address: '0x91332064B2aB742eFBB0Ee416895dffB5fA85053',
       name: 'PayableProxy',
       description: 'Proxy contract to help mint calls with ETH instead of WETH',
       audited: true,

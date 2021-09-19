@@ -10,7 +10,7 @@ function ConnectButton() {
   const { networkId, connect, disconnect, user } = useConnectedWallet()
 
   const color =
-    networkId === SupportedNetworks.Mainnet
+    networkId === SupportedNetworks.Mainnet || networkId === SupportedNetworks.Arbitrum
       ? 'rgb(3, 135, 137, 0.7)'
       : networkId === SupportedNetworks.Ropsten
       ? '#ff4a8d'

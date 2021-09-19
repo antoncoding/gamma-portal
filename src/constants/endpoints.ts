@@ -16,6 +16,7 @@ export const subgraph: graphEndPointType = {
   [SupportedNetworks.Ropsten]: isPublic
     ? 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-ropsten'
     : 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-internal-ropsten',
+  [SupportedNetworks.Arbitrum]: 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-arbitrum-one',
 }
 
 export const ZeroXEndpoint: { [key in SupportedNetworks]: { http: string; ws: string } } = {
@@ -30,5 +31,9 @@ export const ZeroXEndpoint: { [key in SupportedNetworks]: { http: string; ws: st
   42: {
     http: 'https://kovan.api.0x.org/',
     ws: 'wss://kovan.api.0x.org/sra/v4',
+  },
+  [SupportedNetworks.Arbitrum]: {
+    http: 'https://arbitrum.api.0x.org/',
+    ws: 'wss://arbitrum.api.0x.org/sra/v4',
   },
 }
