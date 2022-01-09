@@ -12,6 +12,7 @@ import TotalAsset from './TotalAsset'
 
 const opeth = require('../../imgs/icons/opeth.png')
 const ribbon = require('../../imgs/icons/ribbon.svg')
+const stakeDao = require('../../imgs/icons/stake-dao.png')
 const opynLogo = require('../../imgs/icons/opyn.png')
 
 function HomePage() {
@@ -79,6 +80,17 @@ function HomePage() {
             icon={<img height={50} src={ribbon} alt={'ribbon finance'} />}
             onClick={() => {
               window.open('https://ribbon.finance/', '_blank')
+            }}
+          />
+        </Col>
+
+        <Col sm={12} md={6} lg={4}>
+          <BoxButton
+            title="Stake Dao"
+            description="Explore automatic option strategies"
+            icon={<img height={50} src={stakeDao} alt={'stake dao'} />}
+            onClick={() => {
+              window.open('https://stakedao.org/', '_blank')
             }}
           />
         </Col>

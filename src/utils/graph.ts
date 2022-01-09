@@ -577,7 +577,7 @@ export async function getBalances(
 ): Promise<OTokenBalance[] | null> {
   const query = `
   {
-    accountBalances (where: {account: "${owner}"}) {
+    accountBalances (where: {account: "${owner}"}, first: 1000) {
       token {
         id
         name
