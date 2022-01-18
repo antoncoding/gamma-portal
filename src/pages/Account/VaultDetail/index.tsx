@@ -177,7 +177,12 @@ export default function VaultDetail() {
     // if using eth, from address is payable proxy
     let from = user
     if (collateralToken.id === ZERO_ADDR) {
-      from = getPayableProxyAddr(networkId).address.toLowerCase()
+      const proxy = getPayableProxyAddr(networkId)
+      if (!proxy) {
+        toast.error('No payable proxy found')
+        return
+      }
+      from = proxy.address.toLowerCase()
     }
     controller.pushAddCollateralArg(
       user,
@@ -189,12 +194,17 @@ export default function VaultDetail() {
 
     setChangeCollateralAmount(new BigNumber(0))
     setPendingCollateralAmount(` + ${changeCollateralAmount.toString()}`)
-  }, [collateralToken, controller, user, vaultId, changeCollateralAmount, networkId])
+  }, [collateralToken, controller, user, vaultId, changeCollateralAmount, networkId, toast])
 
   const pushRemoveCollateral = useCallback(() => {
     let to = user
     if (collateralToken.id === ZERO_ADDR) {
-      to = getPayableProxyAddr(networkId).address.toLowerCase()
+      const proxy = getPayableProxyAddr(networkId)
+      if (!proxy) {
+        toast.error('No payable proxy deployed')
+        return
+      }
+      to = proxy.address.toLowerCase()
     }
     controller.pushRemoveCollateralArg(
       user,
@@ -205,7 +215,16 @@ export default function VaultDetail() {
     )
     setChangeCollateralAmount(new BigNumber(0))
     setPendingCollateralAmount(` - ${changeCollateralAmount.toString()}`)
-  }, [controller, user, vaultId, collateralToken.id, collateralToken.decimals, changeCollateralAmount, networkId])
+  }, [
+    controller,
+    user,
+    vaultId,
+    collateralToken.id,
+    collateralToken.decimals,
+    changeCollateralAmount,
+    networkId,
+    toast,
+  ])
 
   const pushAddLong = useCallback(() => {
     if (!longOtoken) {

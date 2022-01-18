@@ -84,6 +84,20 @@ export const tokens: Tokens = {
       canMint: true,
     },
   ],
+  [SupportedNetworks.Avalanche]: [
+    {
+      name: 'Wrapped AVAX',
+      id: '0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7',
+      symbol: 'WAVAX',
+      decimals: 18,
+    },
+    {
+      name: 'USDC',
+      id: '0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664',
+      symbol: 'USDC',
+      decimals: 6,
+    },
+  ],
   [SupportedNetworks.Arbitrum]: [
     {
       name: 'USDC',
@@ -146,6 +160,15 @@ export const addresses: SystemAddresses = {
     whitelist: isPublic ? '0x9164eB40a1b59512F1803aB4C2d1dE4B89627A93' : '0xc990BB199c0ed8CEE305bD1A4c50A87029AdfAE3',
     zeroxExchange: '0x4eacd0af335451709e1e7b570b8ea68edec8bc97',
   },
+  [SupportedNetworks.Avalanche]: {
+    controller: '0x9e3b94819aaF6de606C4Aa844E3215725b997064',
+    calculator: '0xBD5A1Dc654B5476B94F81755E68d1C8f0AAc2AFd',
+    factory: '0x25bC1cD298512885F0e452833198BCBb149f66a5',
+    addressBook: '0xBCa124824326CF8aBc5E2E569FFf3A6f17110510',
+    pool: '0xCCF6629aEaB734E621Cc59EBb0297196774fDb9D',
+    whitelist: '0xe9963AFfc9a53e293c9bB547c52902071e6087c9',
+    zeroxExchange: '0x0000000000000000000000000000000000000000',
+  },
   [SupportedNetworks.Arbitrum]: {
     controller: '0xeE30f92cc9Bf896679567d1aCD551f0E179756fC',
     calculator: '0xC9F007D6F0aa2b6C5f0E4c0Ff79273227C2100A9',
@@ -157,11 +180,12 @@ export const addresses: SystemAddresses = {
   },
 }
 
-export const blacklistOTokens = {
+export const blacklistOTokens: { [key in SupportedNetworks]: string[] } = {
   [SupportedNetworks.Mainnet]: [ZERO_ADDR],
   [SupportedNetworks.Ropsten]: [ZERO_ADDR],
   [SupportedNetworks.Kovan]: ['0x81300ac27ac2470713602b4d8a73dfcc85b779b1'],
   [SupportedNetworks.Arbitrum]: [ZERO_ADDR],
+  [SupportedNetworks.Avalanche]: [ZERO_ADDR],
 }
 
 type KnownOperator = {
@@ -202,6 +226,7 @@ export const knownOperators: {
       author: 'Opyn',
     },
   ],
+  [SupportedNetworks.Avalanche]: [],
   [SupportedNetworks.Arbitrum]: [
     {
       address: '0x91332064B2aB742eFBB0Ee416895dffB5fA85053',
@@ -228,9 +253,10 @@ export const getUSDC = (networkId: SupportedNetworks) => {
 }
 
 export const getWeth = (networkId: SupportedNetworks) => {
-  return tokens[networkId].find(t => t.symbol === 'WETH') as Token
+  // return the wrapped native token
+  return tokens[networkId].find(t => t.symbol === 'WETH' || t.symbol === 'WAVAX') as Token
 }
 
 export const getPayableProxyAddr = (networkId: SupportedNetworks) => {
-  return knownOperators[networkId].find(o => o.name === 'PayableProxy') as KnownOperator
+  return knownOperators[networkId].find(o => o.name === 'PayableProxy')
 }
