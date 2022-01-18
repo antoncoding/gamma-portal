@@ -5,7 +5,7 @@ import StyledContainer from '../../components/StyledContainer'
 import ThemeSwitch from './Theme'
 import ApproveSwitch from './Approval'
 import ClearCache from './ClearCache'
-import Network from './Network'
+// import Network from './Network'
 import Refresh from './Refresh'
 
 function Settings({ setTheme }: { setTheme: any }) {
@@ -22,8 +22,8 @@ function Settings({ setTheme }: { setTheme: any }) {
       <ClearCache />
       <br />
       <br />
-      <Network />
-      <br />
+      {/* <Network /> */}
+      {/* <br /> */}
       <Refresh />
     </StyledContainer>
   )
