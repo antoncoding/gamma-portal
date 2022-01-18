@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react'
 import Web3 from 'web3'
+import { networkToProvider } from '../constants'
 import { SupportedNetworks } from '../constants/networks'
-const INFURA_KEY = process.env.REACT_APP_INFURA_KEY
 
 export interface Wallet {
   web3: Web3
@@ -13,8 +13,8 @@ export interface Wallet {
 }
 
 export const DEFAULT: Wallet = {
-  networkId: 1,
-  web3: new Web3(`https://mainnet.infura.io/v3/${INFURA_KEY}`),
+  networkId: SupportedNetworks.Mainnet,
+  web3: new Web3(networkToProvider[SupportedNetworks.Mainnet]),
   user: '',
   setUser: (user: string): void => {},
   connect: async () => '',
