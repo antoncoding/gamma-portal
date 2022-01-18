@@ -1,3 +1,7 @@
+import Ethereum from '../imgs/Ethereum.png'
+import AVAX from '../imgs/WAVAX.webp'
+import Arbitrum from '../imgs/Arbitrum.svg'
+
 export enum SupportedNetworks {
   Mainnet = 1,
   Ropsten = 3,
@@ -20,4 +24,12 @@ export const networkIdToAddressUrl = {
   [SupportedNetworks.Ropsten]: 'https://ropsten.etherscan.io/address',
   [SupportedNetworks.Avalanche]: 'https://snowtrace.io/address',
   [SupportedNetworks.Ropsten]: 'https://arbiscan.io/address',
+}
+
+export const networkToLogo: { [key in SupportedNetworks]: string } = {
+  [SupportedNetworks.Mainnet]: Ethereum,
+  [SupportedNetworks.Kovan]: Ethereum,
+  [SupportedNetworks.Ropsten]: Ethereum,
+  [SupportedNetworks.Avalanche]: AVAX,
+  [SupportedNetworks.Arbitrum]: Arbitrum,
 }

@@ -16,11 +16,11 @@ export const networkToProvider: { [key in SupportedNetworks]: string } = {
 }
 
 export const networkIdToName: { [key in SupportedNetworks]: string } = {
-  [SupportedNetworks.Mainnet]: `Ethereum Mainnet`,
-  [SupportedNetworks.Kovan]: `Ethereum Kovan Testnet`,
-  [SupportedNetworks.Ropsten]: `Ethereum Ropsten Testnet`,
-  [SupportedNetworks.Avalanche]: 'Avalanche Mainnet',
-  [SupportedNetworks.Arbitrum]: 'Arbitrum One',
+  [SupportedNetworks.Mainnet]: `Mainnet`,
+  [SupportedNetworks.Kovan]: `Kovan`,
+  [SupportedNetworks.Ropsten]: `Ropsten`,
+  [SupportedNetworks.Avalanche]: 'Avalanche',
+  [SupportedNetworks.Arbitrum]: 'Arbitrum',
 }
 
 export const subgraph: graphEndPointType = {
