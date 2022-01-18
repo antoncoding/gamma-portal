@@ -146,7 +146,9 @@ export default function Otoken() {
                 <AddressField
                   address={tokenDetails.underlyingAsset.id}
                   icon={
-                    <img height={20} src={getTokenImg(tokenDetails.underlyingAsset) || undefined} alt={'underlying'} />
+                    getTokenImg(tokenDetails.underlyingAsset) ? (
+                      <img height={20} src={getTokenImg(tokenDetails.underlyingAsset) as string} alt={'underlying'} />
+                    ) : null
                   }
                 />
               </Box>
@@ -155,7 +157,11 @@ export default function Otoken() {
               <Box heading="Strike">
                 <AddressField
                   address={tokenDetails.strikeAsset.id}
-                  icon={<img height={20} src={getTokenImg(tokenDetails.strikeAsset) || undefined} alt={'strike'} />}
+                  icon={
+                    getTokenImg(tokenDetails.strikeAsset) ? (
+                      <img height={20} src={getTokenImg(tokenDetails.strikeAsset) as string} alt={'strike'} />
+                    ) : null
+                  }
                 />
               </Box>
             </Col>
@@ -163,7 +169,11 @@ export default function Otoken() {
               <Box heading="Collateral">
                 <AddressField
                   address={tokenDetails.collateralAsset.id}
-                  icon={<img height={20} src={getTokenImg(tokenDetails.collateralAsset) || undefined} alt={'colla'} />}
+                  icon={
+                    getTokenImg(tokenDetails.collateralAsset) ? (
+                      <img height={20} src={getTokenImg(tokenDetails.collateralAsset) as string} alt={'colla'} />
+                    ) : null
+                  }
                 />
               </Box>
             </Col>
@@ -173,12 +183,14 @@ export default function Otoken() {
                   <div style={{ fontSize: 20, paddingRight: 10 }}>
                     {toTokenAmount(tokenDetails.totalSupply, 8).toFormat()}
                   </div>
-                  <img
-                    style={{ paddingTop: 3 }}
-                    height={30}
-                    src={getTokenImg(tokenDetails) || undefined}
-                    alt={'colla'}
-                  />
+                  {getTokenImg(tokenDetails) ? (
+                    <img
+                      style={{ paddingTop: 3 }}
+                      height={30}
+                      src={getTokenImg(tokenDetails) || undefined}
+                      alt={'colla'}
+                    />
+                  ) : null}
                 </div>
               </Box>
             </Col>

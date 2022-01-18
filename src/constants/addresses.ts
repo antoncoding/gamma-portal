@@ -180,11 +180,12 @@ export const addresses: SystemAddresses = {
   },
 }
 
-export const blacklistOTokens = {
+export const blacklistOTokens: { [key in SupportedNetworks]: string[] } = {
   [SupportedNetworks.Mainnet]: [ZERO_ADDR],
   [SupportedNetworks.Ropsten]: [ZERO_ADDR],
   [SupportedNetworks.Kovan]: ['0x81300ac27ac2470713602b4d8a73dfcc85b779b1'],
   [SupportedNetworks.Arbitrum]: [ZERO_ADDR],
+  [SupportedNetworks.Avalanche]: [ZERO_ADDR],
 }
 
 type KnownOperator = {
@@ -252,7 +253,8 @@ export const getUSDC = (networkId: SupportedNetworks) => {
 }
 
 export const getWeth = (networkId: SupportedNetworks) => {
-  return tokens[networkId].find(t => t.symbol === 'WETH') as Token
+  // return the wrapped native token
+  return tokens[networkId].find(t => t.symbol === 'WETH' || t.symbol === 'WAVAX') as Token
 }
 
 export const getPayableProxyAddr = (networkId: SupportedNetworks) => {
