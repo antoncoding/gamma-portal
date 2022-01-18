@@ -62,7 +62,9 @@ export function useController() {
   )
 
   const payableProxy = useMemo(() => {
-    const address = getPayableProxyAddr(networkId).address
+    const contract = getPayableProxyAddr(networkId)
+    if (!contract) return null
+    const address = contract.address
     return new web3.eth.Contract(payableProxyAbi, address)
   }, [networkId, web3])
 
@@ -110,7 +112,8 @@ export function useController() {
   const pushAddCollateralArg = useCallback(
     (account: string, vaultId: BigNumber, from: string, asset: string, amount: BigNumber) => {
       let finalAsset = asset
-      if (from === getPayableProxyAddr(networkId).address.toLowerCase()) {
+      const proxy = getPayableProxyAddr(networkId)
+      if (proxy !== undefined && from === proxy.address.toLowerCase()) {
         finalAsset = getWeth(networkId).id
         setUsePayableProxy(true)
         setOperateValue(amount)
@@ -125,7 +128,8 @@ export function useController() {
   const pushRemoveCollateralArg = useCallback(
     (account: string, vaultId: BigNumber, to: string, asset: string, amount: BigNumber) => {
       let finalAsset = asset
-      if (to === getPayableProxyAddr(networkId).address.toLowerCase()) {
+      const proxy = getPayableProxyAddr(networkId)
+      if (proxy !== undefined && to === proxy.address.toLowerCase()) {
         finalAsset = getWeth(networkId).id
         setUsePayableProxy(true)
       }
@@ -250,7 +254,7 @@ export function useController() {
 
       // const contract = usePayableProxy ? payableProxy : controller
       try {
-        if (usePayableProxy) {
+        if (usePayableProxy && payableProxy !== null) {
           await payableProxy.methods
             .operate(actions, user)
             .send({ from: user, value: operateValue.toString() })

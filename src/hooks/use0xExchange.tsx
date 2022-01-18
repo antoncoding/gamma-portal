@@ -155,6 +155,7 @@ export function use0xExchange() {
 
   const broadcastOrder = useCallback(
     async (order: SignedOrder) => {
+      if (httpEndpoint === '') toast.error('0x Not supported on this network')
       const url = `${httpEndpoint}sra/v4/order`
       const res = await fetch(url, {
         method: 'POST',
