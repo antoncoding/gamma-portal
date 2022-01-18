@@ -1,7 +1,15 @@
 import Web3 from 'web3'
 import ENS from 'ethereum-ens'
 import { SubgraphOToken, SubgraphOracleAsset } from '../types'
-import { networkToProvider, WAITINT_PERIOD } from '../constants'
+import {
+  isSupportedByMetaMask,
+  networkIdToExplorer,
+  networkIdToName,
+  networkToProvider,
+  networkToTokenConfig,
+  SupportedNetworks,
+  WAITINT_PERIOD,
+} from '../constants'
 import { toTokenAmount } from './math'
 import BigNumber from 'bignumber.js'
 
@@ -80,4 +88,33 @@ export function simplifyOTokenSymbol(symbol: string) {
   const [, date, strike] = remaining.split('-')
   // return oWETH--15JAN21-680C
   return `${assets.replace('USDC', '')}-${date}-${strike}`
+}
+
+export async function switchNetwork(provider: any, networkId: SupportedNetworks): Promise<boolean> {
+  if (!provider.request) return false
+  if (isSupportedByMetaMask(networkId)) {
+    await provider.request({
+      method: 'wallet_switchEthereumChain',
+      params: [
+        {
+          chainId: `0x${networkId.toString(16)}`,
+        },
+      ],
+    })
+    return true
+  } else {
+    await provider.request({
+      method: 'wallet_addEthereumChain',
+      params: [
+        {
+          chainId: `0x${networkId.toString(16)}`,
+          chainName: networkIdToName[networkId],
+          nativeCurrency: networkToTokenConfig(networkId),
+          rpcUrls: [networkToProvider[networkId]],
+          blockExplorerUrls: [networkIdToExplorer[networkId]],
+        },
+      ],
+    })
+    return true
+  }
 }
