@@ -1,24 +1,28 @@
 import Web3 from 'web3'
 import ENS from 'ethereum-ens'
 import { SubgraphOToken, SubgraphOracleAsset } from '../types'
-import { WAITINT_PERIOD } from '../constants'
+import {
+  isSupportedByMetaMask,
+  networkIdToExplorer,
+  networkIdToName,
+  networkToProvider,
+  networkToTokenConfig,
+  SupportedNetworks,
+  WAITINT_PERIOD,
+} from '../constants'
 import { toTokenAmount } from './math'
 import BigNumber from 'bignumber.js'
 
-const INFURA_KEY = process.env.REACT_APP_INFURA_KEY
-
 // ENS
 export const resolveENS = async (ensName: string, networkId: number) => {
-  const network = networkId === 1 ? 'mainnet' : 'rinkeby'
-  const web3 = new Web3(`https://${network}.infura.io/v3/${INFURA_KEY}`)
+  const web3 = new Web3(networkToProvider[networkId])
   const ens = new ENS(web3)
   const address = await ens.resolver(ensName).addr()
   return address.toLowerCase()
 }
 
 export const isEOA = async (address: string, networkId: number): Promise<Boolean> => {
-  const network = networkId === 1 ? 'mainnet' : networkId === 42 ? 'kovan' : 'rinkeby'
-  const web3 = new Web3(`https://${network}.infura.io/v3/${INFURA_KEY}`)
+  const web3 = new Web3(networkToProvider[networkId])
   return (await web3.eth.getCode(address)) === '0x'
 }
 
@@ -84,4 +88,33 @@ export function simplifyOTokenSymbol(symbol: string) {
   const [, date, strike] = remaining.split('-')
   // return oWETH--15JAN21-680C
   return `${assets.replace('USDC', '')}-${date}-${strike}`
+}
+
+export async function switchNetwork(provider: any, networkId: SupportedNetworks): Promise<boolean> {
+  if (!provider.request) return false
+  if (isSupportedByMetaMask(networkId)) {
+    await provider.request({
+      method: 'wallet_switchEthereumChain',
+      params: [
+        {
+          chainId: `0x${networkId.toString(16)}`,
+        },
+      ],
+    })
+    return true
+  } else {
+    await provider.request({
+      method: 'wallet_addEthereumChain',
+      params: [
+        {
+          chainId: `0x${networkId.toString(16)}`,
+          chainName: networkIdToName[networkId],
+          nativeCurrency: networkToTokenConfig(networkId),
+          rpcUrls: [networkToProvider[networkId]],
+          blockExplorerUrls: [networkIdToExplorer[networkId]],
+        },
+      ],
+    })
+    return true
+  }
 }

@@ -16,7 +16,7 @@ import { getOToken, getHolders, getMintersForOToken, getOTokenTrades } from '../
 import { simplifyOTokenSymbol, isExpired, getExpiryPayout } from '../../../utils/others'
 import { toTokenAmount, fromTokenAmount, timeSince } from '../../../utils/math'
 import { getTokenImg } from '../../../imgs/utils'
-import { networkIdToAddressUrl } from '../../../constants'
+import { networkIdToExplorer } from '../../../constants'
 import BigNumber from 'bignumber.js'
 import { OTokenTrade } from '../../../types'
 
@@ -133,7 +133,7 @@ export default function Otoken() {
                   icon={<IconExternal />}
                   size="mini"
                   onClick={() => {
-                    window.open(`${networkIdToAddressUrl[networkId]}/${tokenDetails.id}`)
+                    window.open(`${networkIdToExplorer[networkId]}/address/${tokenDetails.id}`)
                   }}
                 />
               </div>

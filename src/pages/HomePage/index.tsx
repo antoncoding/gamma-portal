@@ -8,7 +8,6 @@ import { Header, IconUser, IconConfiguration, IconSwap } from '@aragon/ui'
 import Comment from '../../components/Comment'
 import SectionTitle from '../../components/SectionHeader'
 import StyledContainer from '../../components/StyledContainer'
-import TotalAsset from './TotalAsset'
 
 const opeth = require('../../imgs/icons/opeth.png')
 const ribbon = require('../../imgs/icons/ribbon.svg')
@@ -107,7 +106,7 @@ function HomePage() {
         </Col>
       </Row>
 
-      <SectionTitle title={'Stats'} />
+      {/* <SectionTitle title={'Stats'} />
 
       <Row>
         <Col sm={12} md={6} lg={4}>
@@ -117,7 +116,7 @@ function HomePage() {
         <Col sm={12} md={6} lg={4}></Col>
 
         <Col sm={12} md={6} lg={4}></Col>
-      </Row>
+      </Row> */}
     </StyledContainer>
   )
 }

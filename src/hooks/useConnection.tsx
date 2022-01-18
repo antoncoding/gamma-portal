@@ -2,16 +2,15 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { getPreference, storePreference } from '../utils/storage'
 import Onboard from 'bnc-onboard'
 import Web3 from 'web3'
-import { SupportedNetworks } from '../constants'
+import { networkToProvider, SupportedNetworks } from '../constants'
 
-const INFURA_KEY = process.env.REACT_APP_INFURA_KEY
 const BLOCKNATIVE_KEY = process.env.REACT_APP_BLOCKNATIVE_KEY
 const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY
 
 export const useConnection = () => {
   const [user, setUser] = useState<string>('')
 
-  const [web3, setWeb3] = useState<Web3>(new Web3(`https://mainnet.infura.io/v3/${INFURA_KEY}`))
+  const [web3, setWeb3] = useState<Web3>(new Web3(networkToProvider[SupportedNetworks.Mainnet]))
 
   const storedNetwork = Number(getPreference('gamma-networkId', '1'))
   const [networkId, setNetworkId] = useState<SupportedNetworks>(storedNetwork)
@@ -81,8 +80,6 @@ export const useConnection = () => {
 }
 
 export const initOnboard = (addressChangeCallback, walletChangeCallback, networkChangeCallback, networkId) => {
-  const networkname = networkId === 1 ? 'mainnet' : networkId === 3 ? 'ropsten' : 'kovan'
-  const RPC_URL = `https://${networkname}.infura.io/v3/${INFURA_KEY}`
   const onboard = Onboard({
     darkMode: getPreference('theme', 'light') === 'dark',
     dappId: BLOCKNATIVE_KEY, // [String] The API key created by step one above
@@ -99,12 +96,11 @@ export const initOnboard = (addressChangeCallback, walletChangeCallback, network
         {
           walletName: 'walletConnect',
           rpc: {
-            // eslint-disable-next-line
-            [SupportedNetworks.Mainnet]: RPC_URL,
-            // eslint-disable-next-line
-            [SupportedNetworks.Ropsten]: RPC_URL,
-            // eslint-disable-next-line
-            [SupportedNetworks.Kovan]: RPC_URL,
+            [SupportedNetworks.Mainnet]: networkToProvider[SupportedNetworks.Mainnet],
+            [SupportedNetworks.Ropsten]: networkToProvider[SupportedNetworks.Ropsten],
+            [SupportedNetworks.Kovan]: networkToProvider[SupportedNetworks.Kovan],
+            [SupportedNetworks.Arbitrum]: networkToProvider[SupportedNetworks.Arbitrum],
+            [SupportedNetworks.Avalanche]: networkToProvider[SupportedNetworks.Avalanche],
           }, // [Optional]
           preferred: true,
         },
@@ -113,7 +109,7 @@ export const initOnboard = (addressChangeCallback, walletChangeCallback, network
           apiKey: FORTMATIC_KEY,
           preferred: true,
         },
-        { walletName: 'lattice', appName: 'Gamma Portal', rpcUrl: RPC_URL, preferred: true },
+        { walletName: 'lattice', appName: 'Gamma Portal', rpcUrl: networkToProvider[networkId], preferred: true },
       ],
     },
     walletCheck: [

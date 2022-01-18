@@ -5,6 +5,23 @@ type graphEndPointType = {
 }
 
 const isPublic = process.env.REACT_APP_PUBLIC === 'true'
+const INFURA_KEY = process.env.REACT_APP_INFURA_KEY
+
+export const networkToProvider: { [key in SupportedNetworks]: string } = {
+  [SupportedNetworks.Mainnet]: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+  [SupportedNetworks.Kovan]: `https://kovan.infura.io/v3/${INFURA_KEY}`,
+  [SupportedNetworks.Ropsten]: `https://ropsten.infura.io/v3/${INFURA_KEY}`,
+  [SupportedNetworks.Avalanche]: 'https://api.avax.network/ext/bc/C/rpc',
+  [SupportedNetworks.Arbitrum]: 'https://arb1.arbitrum.io/rpc',
+}
+
+export const networkIdToName: { [key in SupportedNetworks]: string } = {
+  [SupportedNetworks.Mainnet]: `Mainnet`,
+  [SupportedNetworks.Kovan]: `Kovan`,
+  [SupportedNetworks.Ropsten]: `Ropsten`,
+  [SupportedNetworks.Avalanche]: 'Avalanche',
+  [SupportedNetworks.Arbitrum]: 'Arbitrum',
+}
 
 export const subgraph: graphEndPointType = {
   [SupportedNetworks.Mainnet]: isPublic

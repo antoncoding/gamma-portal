@@ -4,7 +4,7 @@ import { Doughnut } from 'react-chartjs-2'
 
 import ChartBox from '../../components/ChartBox'
 import { useProtocolAssets, getTokenPriceCoingecko } from '../../hooks'
-import { addresses, themeColors, networkIdToAddressUrl } from '../../constants'
+import { addresses, themeColors, networkIdToExplorer } from '../../constants'
 import { useConnectedWallet } from '../../contexts/wallet'
 import { SubgraphToken } from '../../types'
 import { toTokenAmount } from '../../utils/math'
@@ -98,7 +98,7 @@ export default function TotalAsset() {
     <ChartBox
       title="TVL"
       description={`${tvl.toFormat()} USD`}
-      onClickDescription={() => window.open(`${networkIdToAddressUrl[networkId]}/${poolAddress}`)}
+      onClickDescription={() => window.open(`${networkIdToExplorer[networkId]}/address/${poolAddress}`)}
     >
       <Doughnut data={data} />
     </ChartBox>
