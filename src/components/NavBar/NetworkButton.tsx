@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 
-import { Button, Modal } from '@aragon/ui'
+import { Button, Modal, useTheme } from '@aragon/ui'
 
 import { useConnectedWallet } from '../../contexts/wallet'
 import { isMainnet, networkIdToName, networkToLogo, SupportedNetworks } from '../../constants'
@@ -22,6 +22,12 @@ function NetworkButton() {
 
   const [opened, setOpened] = useState(false)
 
+  const theme = useTheme()
+
+  const onClick = useCallback(networkId => {
+    switchNetwork((window as any).ethereum, networkId)
+  }, [])
+
   return (
     <div>
       <Button
@@ -34,9 +40,7 @@ function NetworkButton() {
       />
       <Modal visible={opened} onClose={() => setOpened(false)} padding={30}>
         <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: '3%' }}>
-          <div>
-            <SectionTitle title="Change Network" />
-          </div>
+          <SectionTitle title="Change Network" />
         </div>
 
         {items
@@ -54,13 +58,9 @@ function NetworkButton() {
                 <Button
                   icon={<img src={i.logo} height={30} alt={i.title} />}
                   label={i.title}
-                  style={{
-                    minWidth: 300,
-                  }}
+                  style={{ minWidth: 300 }}
                   mode={networkId === i.id ? 'strong' : 'normal'}
-                  size="medium"
-                  display="all"
-                  onClick={() => switchNetwork((window as any).ethereum, i.id)}
+                  onClick={() => onClick(i.id)}
                 />
               </div>
             )
@@ -68,6 +68,9 @@ function NetworkButton() {
 
         <br />
         {/* testnets */}
+        <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: '3%' }}>
+          <div style={{ color: theme.contentSecondary, fontSize: 17 }}> Testnets </div>
+        </div>
         {items
           .filter(i => !isMainnet[i.id])
           .map(i => {
@@ -82,13 +85,9 @@ function NetworkButton() {
               >
                 <Button
                   label={i.title}
-                  style={{
-                    minWidth: 300,
-                  }}
+                  style={{ minWidth: 300 }}
                   mode={networkId === i.id ? 'strong' : 'normal'}
-                  size="medium"
-                  display="all"
-                  onClick={() => switchNetwork((window as any).ethereum, i.id)}
+                  onClick={() => onClick(i.id)}
                 />
               </div>
             )
