@@ -1,11 +1,13 @@
 import Ethereum from '../imgs/Ethereum.png'
 import AVAX from '../imgs/WAVAX.webp'
 import Arbitrum from '../imgs/Arbitrum.svg'
+import Matic from '../imgs/matic.svg'
 
 export enum SupportedNetworks {
   Mainnet = 1,
   Ropsten = 3,
   Kovan = 42,
+  Matic = 137,
   Avalanche = 43114,
   Arbitrum = 42161,
 }
@@ -16,6 +18,7 @@ export const networkIdToExplorer = {
   [SupportedNetworks.Kovan]: 'https://kovan.etherscan.io',
   [SupportedNetworks.Avalanche]: 'https://snowtrace.io',
   [SupportedNetworks.Arbitrum]: 'https://arbiscan.io',
+  [SupportedNetworks.Matic]: 'https://polygonscan.com',
 }
 
 export const networkToLogo: { [key in SupportedNetworks]: string } = {
@@ -24,6 +27,7 @@ export const networkToLogo: { [key in SupportedNetworks]: string } = {
   [SupportedNetworks.Ropsten]: Ethereum,
   [SupportedNetworks.Avalanche]: AVAX,
   [SupportedNetworks.Arbitrum]: Arbitrum,
+  [SupportedNetworks.Matic]: Matic,
 }
 
 export const isMainnet: { [key in SupportedNetworks]: boolean } = {
@@ -32,6 +36,7 @@ export const isMainnet: { [key in SupportedNetworks]: boolean } = {
   [SupportedNetworks.Ropsten]: false,
   [SupportedNetworks.Avalanche]: true,
   [SupportedNetworks.Arbitrum]: true,
+  [SupportedNetworks.Matic]: true,
 }
 
 export const isSupportedByMetaMask = (network: SupportedNetworks) => {
@@ -56,6 +61,12 @@ export const networkToTokenConfig = (networkId: SupportedNetworks) => {
     return {
       name: 'Arbitrum ETH',
       symbol: 'AETH',
+      decimals: 18,
+    }
+  if (networkId === SupportedNetworks.Matic)
+    return {
+      name: 'Matic',
+      symbol: 'MATIC',
       decimals: 18,
     }
 }

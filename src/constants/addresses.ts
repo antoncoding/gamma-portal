@@ -37,7 +37,6 @@ export const tokens: Tokens = {
       decimals: 8,
     },
   ],
-
   [SupportedNetworks.Ropsten]: [
     eth,
     {
@@ -118,6 +117,26 @@ export const tokens: Tokens = {
       decimals: 8,
     },
   ],
+  [SupportedNetworks.Matic]: [
+    {
+      name: 'USDC',
+      id: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
+      symbol: 'USDC',
+      decimals: 6,
+    },
+    {
+      name: 'Wrapped Ether',
+      id: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
+      symbol: 'WETH',
+      decimals: 18,
+    },
+    {
+      name: '(POS) Wrapped Bitcoin',
+      id: '0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6',
+      symbol: 'WBTC',
+      decimals: 8,
+    },
+  ],
 }
 
 type SystemAddresses = {
@@ -178,6 +197,15 @@ export const addresses: SystemAddresses = {
     whitelist: '0xB8f0AC1Ab70643ebE8103Db3618EA5eD6901B458',
     zeroxExchange: '0x0000000000000000000000000000000000000000',
   },
+  [SupportedNetworks.Matic]: {
+    controller: '0x7a23c712bddde52b22d8ff52e4cdadb1bcb0b203',
+    calculator: '0x5C16b2fae97ab59814F34632202D7DE69c45c057',
+    factory: '0xedD70E045903D34fBA7302B5094D37EAceb1397c',
+    addressBook: '0xa87ECDaEA486bB0baEeB77FF0630364772A6bbFE',
+    pool: '0x30aE5DEBc9EdF60a23cD19494492b1ef37afA56d',
+    whitelist: '0x9E435A5Cb48aeE2C156a8E541ee645e1c171d012',
+    zeroxExchange: '0x0000000000000000000000000000000000000000',
+  },
 }
 
 export const blacklistOTokens: { [key in SupportedNetworks]: string[] } = {
@@ -186,6 +214,7 @@ export const blacklistOTokens: { [key in SupportedNetworks]: string[] } = {
   [SupportedNetworks.Kovan]: ['0x81300ac27ac2470713602b4d8a73dfcc85b779b1'],
   [SupportedNetworks.Arbitrum]: [ZERO_ADDR],
   [SupportedNetworks.Avalanche]: [ZERO_ADDR],
+  [SupportedNetworks.Matic]: [ZERO_ADDR],
 }
 
 type KnownOperator = {
@@ -232,6 +261,15 @@ export const knownOperators: {
       address: '0x91332064B2aB742eFBB0Ee416895dffB5fA85053',
       name: 'PayableProxy',
       description: 'Proxy contract to help mint calls with ETH instead of WETH',
+      audited: true,
+      author: 'Opyn',
+    },
+  ],
+  [SupportedNetworks.Matic]: [
+    {
+      address: '0xb03036798511912359EDfff10c54E29db718f658',
+      name: 'PayableProxy',
+      description: 'Proxy contract to help mint calls with MATIC instead of WMATIC',
       audited: true,
       author: 'Opyn',
     },

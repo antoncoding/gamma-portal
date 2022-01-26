@@ -76,6 +76,9 @@ export function useController() {
       .then(counter => {
         setLatestVaultId(Number(counter))
       })
+      .catch(error => {
+        console.log(`update vault id error`, error)
+      })
   }, [controller, user])
 
   useEffect(() => {
