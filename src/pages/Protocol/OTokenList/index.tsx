@@ -60,7 +60,6 @@ export default function OtokenList() {
   const renderOTokenRow = useCallback(
     (otoken: SubgraphOToken) => {
       // 'oToken', 'strike', 'expiry', 'type', 'creator', 'created'
-      console.log(otoken)
       return [
         simplifyOTokenSymbol(otoken.symbol),
         toTokenAmount(otoken.strikePrice, 8).toFixed(0),

@@ -56,6 +56,7 @@ export default function VaultDetail() {
   const [pendingShortAmount, setPendingShortAmount] = useState('')
 
   // for dropdown options
+  const [usePayableProxy, setUsePayableProxy] = useState(false)
   const [selectedCollateralIndex, setSelectedCollateralIndex] = useState(0)
   const [selectedLong, setLongOToken] = useState<SubgraphOToken | null>(null)
   const [selectedShort, setShortOToken] = useState<SubgraphOToken | null>(null)
@@ -136,15 +137,19 @@ export default function VaultDetail() {
     if (shortOtoken) {
       setVaultExpiry(shortOtoken.expiryTimestamp)
       const collateralIdx = collateralTokens.findIndex(token => token.id === shortOtoken.collateralAsset.id)
+      // don't update selected collateral to WETH if user chose ETH
+      if (usePayableProxy && collateralTokens[collateralIdx].symbol === 'WETH') return
       setSelectedCollateralIndex(collateralIdx)
     } else if (longOtoken) {
       setVaultExpiry(longOtoken.expiryTimestamp)
       const collateralIdx = collateralTokens.findIndex(token => token.id === longOtoken.collateralAsset.id)
+      // don't update selected collateral to WETH if user chose ETH
+      if (usePayableProxy && collateralTokens[collateralIdx].symbol === 'WETH') return
       setSelectedCollateralIndex(collateralIdx)
     } else {
       setVaultExpiry('0')
     }
-  }, [networkId, shortOtoken, longOtoken, setVaultExpiry, collateralTokens])
+  }, [networkId, shortOtoken, longOtoken, setVaultExpiry, collateralTokens, usePayableProxy])
 
   // short tokens to be shown in dropdown
   const allShorts = useMemo(() => {
@@ -333,11 +338,12 @@ export default function VaultDetail() {
       const weth = getWeth(networkId)
       const ethIdx = collateralTokens.findIndex(t => t.id === ZERO_ADDR)
       const wethIdx = collateralTokens.findIndex(t => t.id === weth.id)
-      const assetOrDropDwon = asset ? (
+      const assetOrDropDown = asset ? (
         asset === weth.id && hasAuthorizedPayalbeProxy ? (
           <div>
             <Button
               onClick={() => {
+                setUsePayableProxy(false)
                 setSelectedCollateralIndex(wethIdx)
               }}
               mode={selectedCollateralIndex === wethIdx ? 'positive' : 'normal'}
@@ -347,6 +353,7 @@ export default function VaultDetail() {
             </Button>
             <Button
               onClick={() => {
+                setUsePayableProxy(true)
                 setSelectedCollateralIndex(ethIdx)
               }}
               mode={selectedCollateralIndex === ethIdx ? 'positive' : 'normal'}
@@ -370,7 +377,7 @@ export default function VaultDetail() {
 
       return [
         <div style={{ opacity: 0.8 }}> {label} </div>,
-        assetOrDropDwon,
+        assetOrDropDown,
         // balanceToDisplay,
         <LinkBase onClick={() => onInputChange(toTokenAmount(balance, decimals))}> {balanceToDisplay} </LinkBase>,
         amountToDisplay,
@@ -524,7 +531,7 @@ export default function VaultDetail() {
       />
       <br />
       <br />
-      <History />
+      <History id={fetchCount} />
     </StyledContainer>
   )
 }

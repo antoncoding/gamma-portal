@@ -20,7 +20,7 @@ import useAsyncMemo from '../../../hooks/useAsyncMemo'
 import { VAULT_HISTORY } from '../../../constants/dataviewContents'
 import { useCustomToast } from '../../../hooks'
 
-export default function VaultHistory() {
+export default function VaultHistory({ id }: { id: number }) {
   const [isLoading, setIsLoading] = useState(true)
 
   const { networkId } = useConnectedWallet()
@@ -48,7 +48,7 @@ export default function VaultHistory() {
       return allEntry
     },
     [],
-    [],
+    [id],
   )
 
   const renderRow = useCallback(
