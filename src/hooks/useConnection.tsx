@@ -127,7 +127,7 @@ export const initOnboard = (addressChangeCallback, walletChangeCallback, network
       { checkName: 'derivationPath' },
       { checkName: 'connect' },
       { checkName: 'accounts' },
-      // { checkName: 'network' },
+      { checkName: 'network' },
     ],
   })
   return onboard
