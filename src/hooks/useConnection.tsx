@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { getPreference, storePreference } from '../utils/storage'
 import Onboard from 'bnc-onboard'
 import Web3 from 'web3'
@@ -9,6 +9,8 @@ const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY
 
 export const useConnection = () => {
   const [user, setUser] = useState<string>('')
+
+  const [onboard, setOnboard] = useState<any>(null)
 
   const [web3, setWeb3] = useState<Web3>(new Web3(networkToProvider[SupportedNetworks.Mainnet]))
 
@@ -31,24 +33,31 @@ export const useConnection = () => {
     setWeb3(web3Instance)
   }, [])
 
-  const onboard = useMemo(() => {
-    function _handleNetworkChange(_networkId) {
+  const handleNetworkChange = useCallback(
+    _networkId => {
+      console.log(`new id ${_networkId}`)
       if (_networkId in SupportedNetworks) {
         setNetworkId(_networkId)
-        storePreference('gamma-networkId', networkId.toString())
+        storePreference('gamma-networkId', _networkId.toString())
       }
       if (onboard)
         onboard.config({
           networkId: _networkId,
         })
-    }
+    },
+    [onboard],
+  )
 
-    return initOnboard(setAddressCallback, setWalletCallback, _handleNetworkChange, networkId)
-  }, [setAddressCallback, setWalletCallback, networkId])
+  useEffect(() => {
+    if (onboard !== null) return
+    const newOnboard = initOnboard(setAddressCallback, setWalletCallback, handleNetworkChange, networkId)
+    setOnboard(newOnboard)
+  }, [setAddressCallback, setWalletCallback, handleNetworkChange, networkId, onboard])
 
   // get last connection info and try to set default user to previous connected account.
   useEffect(() => {
     async function getDefault() {
+      if (!onboard) return
       const previouslySelectedWallet = getPreference('selectedWallet', 'null')
       if (previouslySelectedWallet === 'null') return
       const selected = await onboard.walletSelect(previouslySelectedWallet)
@@ -62,6 +71,7 @@ export const useConnection = () => {
   }, [onboard, setAddressCallback])
 
   const connect = useCallback(async () => {
+    if (!onboard) return
     const selected = await onboard.walletSelect()
     if (!selected) return false
     const checked = await onboard.walletCheck()
@@ -101,6 +111,7 @@ export const initOnboard = (addressChangeCallback, walletChangeCallback, network
             [SupportedNetworks.Kovan]: networkToProvider[SupportedNetworks.Kovan],
             [SupportedNetworks.Arbitrum]: networkToProvider[SupportedNetworks.Arbitrum],
             [SupportedNetworks.Avalanche]: networkToProvider[SupportedNetworks.Avalanche],
+            [SupportedNetworks.Matic]: networkToProvider[SupportedNetworks.Matic],
           }, // [Optional]
           preferred: true,
         },
@@ -116,7 +127,7 @@ export const initOnboard = (addressChangeCallback, walletChangeCallback, network
       { checkName: 'derivationPath' },
       { checkName: 'connect' },
       { checkName: 'accounts' },
-      { checkName: 'network' },
+      // { checkName: 'network' },
     ],
   })
   return onboard
