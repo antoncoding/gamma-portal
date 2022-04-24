@@ -102,6 +102,7 @@ export const initOnboard = (addressChangeCallback, walletChangeCallback, network
     walletSelect: {
       description: 'Please select a wallet to connect to the blockchain',
       wallets: [
+        { walletName: 'walletLink', preferred: true, rpcUrl: networkToProvider[networkId] },
         { walletName: 'metamask', preferred: true },
         {
           walletName: 'walletConnect',
