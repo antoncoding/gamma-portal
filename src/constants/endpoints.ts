@@ -43,7 +43,7 @@ export const subgraph: graphEndPointType = {
 export const ZeroXEndpoint: { [key in SupportedNetworks]: { http: string; ws: string } } = {
   [SupportedNetworks.Mainnet]: {
     http: 'https://api.0x.org/',
-    ws: 'wss://api.0x.org/sra/v4',
+    ws: 'wss://api.0x.org/orderbook/v1',
   },
   [SupportedNetworks.Ropsten]: {
     http: 'https://ropsten.api.0x.org/',
@@ -51,18 +51,18 @@ export const ZeroXEndpoint: { [key in SupportedNetworks]: { http: string; ws: st
   },
   [SupportedNetworks.Kovan]: {
     http: '',
-    ws: 'wss://api.0x.org/sra/v4', // prevent useWebsocket error
+    ws: 'wss://api.0x.org/orderbook/v1', // prevent useWebsocket error
   },
   [SupportedNetworks.Arbitrum]: {
     http: '',
-    ws: 'wss://api.0x.org/sra/v4', // prevent useWebsocket error
+    ws: 'wss://api.0x.org/orderbook/v1', // prevent useWebsocket error
   },
   [SupportedNetworks.Avalanche]: {
     http: 'https://avalanche.api.0x.org/',
-    ws: 'wss://api.0x.org/sra/v4', // prevent useWebsocket error
+    ws: 'wss://api.0x.org/orderbook/v1', // prevent useWebsocket error
   },
   [SupportedNetworks.Matic]: {
     http: '',
-    ws: 'wss://api.0x.org/sra/v4', // prevent useWebsocket error
+    ws: 'wss://api.0x.org/orderbook/v1', // prevent useWebsocket error
   },
 }

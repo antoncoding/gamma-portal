@@ -4,9 +4,12 @@ import { Button, IconConnect, Box, IconPower, IdentityBadge } from '@aragon/ui'
 
 import { checkAddressAndAddToStorage } from '../../utils/storage'
 import { useConnectedWallet } from '../../contexts/wallet'
+import { useENS } from '../../hooks/useENS'
 
 function ConnectButton() {
   const { connect, disconnect, user } = useConnectedWallet()
+
+  const { ensName } = useENS(user)
 
   const connectWeb3 = async () => {
     const address = await connect()
@@ -18,6 +21,7 @@ function ConnectButton() {
     <>
       <Box padding={6}>
         <IdentityBadge
+          label={ensName ? ensName : undefined}
           entity={user}
           popoverAction={{
             label: (

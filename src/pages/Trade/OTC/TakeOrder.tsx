@@ -60,7 +60,7 @@ export default function TakerOrder({ oTokenBalances, paymentTokenBalance, allOto
   useEffect(() => {
     if (encodedOrder === '') return
     try {
-      const order: SignedOrder = JSON.parse(new Buffer(encodedOrder, 'base64').toString(''))
+      const order: SignedOrder = JSON.parse(new Buffer(encodedOrder, 'base64').toString())
       setOrder(order)
       // asset is either oToken or usdc
       const makerAsset = allOtokens.find(t => t.id === order.makerToken) || paymentToken

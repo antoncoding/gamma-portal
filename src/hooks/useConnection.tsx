@@ -35,7 +35,6 @@ export const useConnection = () => {
 
   const handleNetworkChange = useCallback(
     _networkId => {
-      console.log(`new id ${_networkId}`)
       if (_networkId in SupportedNetworks) {
         setNetworkId(_networkId)
         storePreference('gamma-networkId', _networkId.toString())
