@@ -36,6 +36,12 @@ export const tokens: Tokens = {
       symbol: 'WBTC',
       decimals: 8,
     },
+    {
+      name: 'yvUSDC',
+      id: '0x5f18C75AbDAe578b483E5F43f12a39cF75b973a9',
+      symbol: 'yvUSDC',
+      decimals: 6,
+    },
   ],
   [SupportedNetworks.Ropsten]: [
     eth,
