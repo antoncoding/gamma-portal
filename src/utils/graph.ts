@@ -480,7 +480,7 @@ export async function getLiveOTokens(
   const current = new BigNumber(Date.now()).div(1000).integerValue().toString()
   const query = `
   {
-    otokens (where: {expiryTimestamp_gt: ${current}}) {
+    otokens (where: {expiryTimestamp_gt: ${current}}, first: 1000) {
       id
       symbol
       name

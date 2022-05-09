@@ -38,7 +38,7 @@ export const tokens: Tokens = {
     },
     {
       name: 'yvUSDC',
-      id: '0x5f18C75AbDAe578b483E5F43f12a39cF75b973a9',
+      id: '0x5f18c75abdae578b483e5f43f12a39cf75b973a9',
       symbol: 'yvUSDC',
       decimals: 6,
     },
