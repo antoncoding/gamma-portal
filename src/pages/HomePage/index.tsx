@@ -12,6 +12,7 @@ import StyledContainer from '../../components/StyledContainer'
 const opeth = require('../../imgs/icons/opeth.png')
 const ribbon = require('../../imgs/icons/ribbon.svg')
 const stakeDao = require('../../imgs/icons/stake-dao.png')
+const antimatterLogo = require('../../imgs/icons/antimatter.webp')
 const opynLogo = require('../../imgs/icons/opyn.png')
 
 function HomePage() {
@@ -63,11 +64,11 @@ function HomePage() {
       <Row>
         <Col sm={12} md={6} lg={4}>
           <BoxButton
-            title="Opyn.co"
-            description="Trade the most capital efficient defi options"
+            title="v2.Opyn.co"
+            description="Trade options on the orderbook"
             icon={<img height={24} style={{ margin: 13 }} src={opynLogo} alt={'opyn official'} />}
             onClick={() => {
-              window.open('https://opyn.co', '_blank')
+              window.open('https://v2.opyn.co', '_blank')
             }}
           />
         </Col>
@@ -75,7 +76,7 @@ function HomePage() {
         <Col sm={12} md={6} lg={4}>
           <BoxButton
             title="Ribbon Finance"
-            description="Invest in Delta Vault"
+            description="Leading DOV products"
             icon={<img height={50} src={ribbon} alt={'ribbon finance'} />}
             onClick={() => {
               window.open('https://ribbon.finance/', '_blank')
@@ -90,6 +91,17 @@ function HomePage() {
             icon={<img height={50} src={stakeDao} alt={'stake dao'} />}
             onClick={() => {
               window.open('https://stakedao.org/', '_blank')
+            }}
+          />
+        </Col>
+
+        <Col sm={12} md={6} lg={4}>
+          <BoxButton
+            title="Antimatter"
+            description="DOVs and Dual Investment strategies"
+            icon={<img height={50} src={antimatterLogo} alt={'Antimatter'} />}
+            onClick={() => {
+              window.open('https://antimatter.finance/', '_blank')
             }}
           />
         </Col>
