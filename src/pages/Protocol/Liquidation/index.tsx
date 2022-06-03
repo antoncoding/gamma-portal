@@ -6,7 +6,7 @@ import { useConnectedWallet } from '../../../contexts/wallet'
 import Header from '../../../components/Header'
 import CustomIdentityBadge from '../../../components/CustomIdentityBadge'
 import StyledContainer from '../../../components/StyledContainer'
-import { regular, red, green } from '../../../pages/Trade/OrderBookTrade/StyleDiv'
+import { regular, red, green } from '../../../components/StyleDiv'
 import { LIQ_CALL_VAULT_STATE, LIQ_PUT_VAULT_STATE } from '../../../constants/dataviewContents'
 
 import { useLiquidationStatus } from '../../../hooks'

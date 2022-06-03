@@ -18,7 +18,7 @@ import { OTOKENS } from '../../constants/dataviewContents'
 
 import { useController } from '../../hooks/useController'
 import { useExpiryPriceData } from '../../hooks/useExpiryPriceData'
-import { green, secondary } from '../Trade/OrderBookTrade/StyleDiv'
+import { green, secondary } from '../../components/StyleDiv'
 import { useCustomToast } from '../../hooks'
 import { toTokenAmount } from '../../utils/math'
 

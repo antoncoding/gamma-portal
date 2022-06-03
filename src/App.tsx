@@ -5,7 +5,6 @@ import 'moment-timezone'
 
 import { Main } from '@aragon/ui'
 import { walletContext } from './contexts/wallet'
-import { OrderbookProvider } from './contexts/orderbook'
 
 import NavBar from './components/NavBar'
 import SideBar from './components/SideBar'
@@ -26,8 +25,6 @@ import HomePage from './pages/HomePage'
 import Settings from './pages/Settings'
 import Trade from './pages/Trade'
 
-import Orderbook from './pages/Trade/OrderBookTrade'
-import Swap from './pages/Trade/Swap'
 import OTC from './pages/Trade/OTC'
 
 import { useConnection } from './hooks/useConnection'
@@ -53,91 +50,76 @@ function App() {
     <Router>
       <Main layout={false} theme={theme}>
         <walletContext.Provider value={wallet}>
-          <OrderbookProvider>
-            <NavBar isSideBarOpen={isSideBarOpen} setSideBarOpen={setSideBarOpen} />
-            <Row style={{ height: '100%' }} nogutter>
-              {isSideBarOpen && (
-                <Col sm={12} md={2} lg={2} xl={2}>
-                  <SideBar />
-                </Col>
-              )}
-              <Col
-                sm={12}
-                md={isSideBarOpen ? 10 : 12}
-                lg={isSideBarOpen ? 10 : 12}
-                xl={isSideBarOpen ? 10 : 12}
-                // offset={maincontentOffset}
-              >
-                <Switch>
-                  <Route path="/trade/orderbook">
-                    <Row nogutter>
-                      <Col sm={12} md={10} offset={{ md: 1 }}>
-                        <Orderbook />
-                      </Col>
-                    </Row>
-                  </Route>
-                  <Route path="/trade/swap/:otoken">
-                    <Swap />
-                  </Route>
-                  <Route path="/trade/swap/">
-                    <Swap />
-                  </Route>
-                  <Route path="/trade/otc/">
-                    <OTC />
-                  </Route>
-                  <Route path="/trade/">
-                    <Trade />
-                  </Route>
-
-                  <Route path="/account/:account/operators">
-                    <Operators />
-                  </Route>
-                  <Route path="/account/:account/vaults/">
-                    <AccountVault />
-                  </Route>
-                  <Route path="/account/:account">
-                    <Account />
-                  </Route>
-                  <Route path="/account/">
-                    <ConnectWallet />
-                  </Route>
-
-                  <Route path="/vault/:owner/:vaultId">
-                    <Vault />
-                  </Route>
-                  <Route path="/protocol/faucet">
-                    <Faucet />
-                  </Route>
-                  <Route path="/protocol/oracle">
-                    <Oracle />
-                  </Route>
-
-                  <Route path="/protocol/factory/">
-                    <Factory />
-                  </Route>
-                  <Route path="/protocol/otokens/">
-                    <OTokenList />
-                  </Route>
-                  <Route path="/protocol/liquidation/">
-                    <Liquidation />
-                  </Route>
-                  <Route path="/protocol/">
-                    <ProtocolHome />
-                  </Route>
-
-                  <Route path="/otoken/:otoken">
-                    <OToken />
-                  </Route>
-                  <Route path="/settings/">
-                    <Settings setTheme={setTheme} />
-                  </Route>
-                  <Route path="/">
-                    <HomePage />
-                  </Route>
-                </Switch>
+          <NavBar isSideBarOpen={isSideBarOpen} setSideBarOpen={setSideBarOpen} />
+          <Row style={{ height: '100%' }} nogutter>
+            {isSideBarOpen && (
+              <Col sm={12} md={2} lg={2} xl={2}>
+                <SideBar />
               </Col>
-            </Row>
-          </OrderbookProvider>
+            )}
+            <Col
+              sm={12}
+              md={isSideBarOpen ? 10 : 12}
+              lg={isSideBarOpen ? 10 : 12}
+              xl={isSideBarOpen ? 10 : 12}
+              // offset={maincontentOffset}
+            >
+              <Switch>
+                <Route path="/trade/otc/">
+                  <OTC />
+                </Route>
+                <Route path="/trade/">
+                  <Trade />
+                </Route>
+
+                <Route path="/account/:account/operators">
+                  <Operators />
+                </Route>
+                <Route path="/account/:account/vaults/">
+                  <AccountVault />
+                </Route>
+                <Route path="/account/:account">
+                  <Account />
+                </Route>
+                <Route path="/account/">
+                  <ConnectWallet />
+                </Route>
+
+                <Route path="/vault/:owner/:vaultId">
+                  <Vault />
+                </Route>
+                <Route path="/protocol/faucet">
+                  <Faucet />
+                </Route>
+                <Route path="/protocol/oracle">
+                  <Oracle />
+                </Route>
+
+                <Route path="/protocol/factory/">
+                  <Factory />
+                </Route>
+                <Route path="/protocol/otokens/">
+                  <OTokenList />
+                </Route>
+                <Route path="/protocol/liquidation/">
+                  <Liquidation />
+                </Route>
+                <Route path="/protocol/">
+                  <ProtocolHome />
+                </Route>
+
+                <Route path="/otoken/:otoken">
+                  <OToken />
+                </Route>
+                <Route path="/settings/">
+                  <Settings setTheme={setTheme} />
+                </Route>
+                <Route path="/">
+                  <HomePage />
+                </Route>
+              </Switch>
+            </Col>
+          </Row>
         </walletContext.Provider>
       </Main>
     </Router>

@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Button, TextInput, Modal, IconEdit, DropDown } from '@aragon/ui'
-import { DeadlineUnit } from '../../../constants'
+import { DeadlineUnit } from '../constants'
 
-import SectionHeader from '../../../components/SectionHeader'
+import SectionHeader from './SectionHeader'
 
 type EditOrderDeadlineModalProps = {
   setDeadline: React.Dispatch<React.SetStateAction<number>>

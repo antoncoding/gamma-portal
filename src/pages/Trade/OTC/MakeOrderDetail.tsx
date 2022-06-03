@@ -24,7 +24,7 @@ import USDCIcon from '../../../imgs/USDC.png'
 import { use0xExchange } from '../../../hooks/use0xExchange'
 import { useUserAllowance } from '../../../hooks/useAllowance'
 
-import EditOrderDeadlineModal from '../OrderBookTrade/EditOrderDeadlineModal'
+import EditOrderDeadlineModal from '../../../components/EditOrderDeadlineModal'
 
 import WarningText from '../../../components/Warning'
 import TokenBalanceEntry from '../../../components/TokenBalanceEntry'
