@@ -57,19 +57,33 @@ export const isITM = (token: SubgraphOToken, expiryPrice: string) => {
   )
 }
 
-export const getExpiryPayout = (token: SubgraphOToken, amount: string, expiryPrice: string) => {
+export const getExpiryPayout = (
+  token: SubgraphOToken,
+  amount: string,
+  expiryPrice: string,
+  collateralPrice?: string,
+) => {
   if (token.isPut) {
+    // assume that underlying is stable asset
+    const denominator =
+      token.collateralAsset.id === token.strikeAsset.id || !collateralPrice ? 1 : new BigNumber(collateralPrice)
     return BigNumber.max(
       toTokenAmount(new BigNumber(token.strikePrice).minus(new BigNumber(expiryPrice)), 8).times(
         toTokenAmount(amount, 8),
       ),
       0,
-    )
+    ).div(denominator)
   } else {
+    const denominator =
+      token.collateralAsset.id === token.underlyingAsset.id || !collateralPrice
+        ? 1
+        : new BigNumber(collateralPrice).div(expiryPrice)
     return BigNumber.max(
       toTokenAmount(new BigNumber(expiryPrice).minus(token.strikePrice), 8).times(toTokenAmount(amount, 8)),
       0,
-    ).div(toTokenAmount(token.strikePrice, 8))
+    )
+      .div(toTokenAmount(expiryPrice, 8))
+      .div(denominator)
   }
 }
 

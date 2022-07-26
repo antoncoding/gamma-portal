@@ -9,7 +9,6 @@ import USDT from './USDT.png'
 import WAVAX from './WAVAX.webp'
 
 export function getTokenImg(token: { id: string; symbol: string } | null) {
-  console.log(`token.symbol`, token ? token.symbol : null)
   return token === null
     ? null
     : token.symbol === 'USDC' || token.symbol === 'USDC.e' // USDC on avax is USDC.e

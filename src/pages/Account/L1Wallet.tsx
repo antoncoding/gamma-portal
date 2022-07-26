@@ -110,11 +110,22 @@ export default function L1Balances({ account }: { account: string }) {
 
       const asset = allOracleAssets.find(a => a.asset.id === token.underlyingAsset.id)
       if (asset) {
+        // if collateral is different from underlying or strike, fetch its price
+        let collatPrice: string | undefined = undefined
+        if (
+          (token.isPut && token.collateralAsset.id !== token.strikeAsset.id) ||
+          (!token.isPut && token.collateralAsset.id !== token.underlyingAsset.id)
+        ) {
+          console.log('gettting kkkk')
+          const collatPrices = allOracleAssets.find(a => a.asset.id === token.collateralAsset.id)
+          if (collatPrices) collatPrice = collatPrices.prices.find(p => p.expiry === token.expiryTimestamp)?.price
+        }
+
         expiryPrice = asset.prices.find(p => p.expiry === token.expiryTimestamp)?.price
         hasPrice = expiryPrice !== undefined
         if (expiryPrice !== undefined) {
           expiredITM = isITM(token, expiryPrice)
-          payout = getExpiryPayout(token, balance.toString(), expiryPrice)
+          payout = getExpiryPayout(token, balance.toString(), expiryPrice, collatPrice)
         }
       }
 
