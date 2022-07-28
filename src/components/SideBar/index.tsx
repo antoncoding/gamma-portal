@@ -133,15 +133,6 @@ export default function SideBar() {
           }}
           isSelected={selectedTab === 4}
         />
-
-        <SubButton
-          title="Swap"
-          onClick={() => {
-            history.push(`/trade/swap/`)
-          }}
-          isSelected={selectedTab === 4 && subSelected === 'swap'}
-          shown={selectedTab === 4}
-        />
         <SubButton
           title="OTC"
           onClick={() => {
@@ -151,11 +142,11 @@ export default function SideBar() {
           shown={selectedTab === 4}
         />
         <SubButton
-          title="Orderbook"
+          title="Squeeth OTC"
           onClick={() => {
-            history.push(`/trade/orderbook/`)
+            history.push(`/trade/otc-squeeth/`)
           }}
-          isSelected={selectedTab === 4 && subSelected === 'orderbook'}
+          isSelected={selectedTab === 4 && subSelected === 'otc-squeeth'}
           shown={selectedTab === 4}
         />
       </div>
@@ -206,8 +197,8 @@ function locationToSubButtomId(location) {
     ? 'oracle'
     : location.pathname.includes('/otokens/')
     ? 'otokens'
-    : location.pathname.includes('/swap/')
-    ? 'swap'
+    : location.pathname.includes('/otc-squeeth/')
+    ? 'otc-squeeth'
     : location.pathname.includes('/orderbook/')
     ? 'orderbook'
     : location.pathname.includes('/otc/')

@@ -26,6 +26,7 @@ import Settings from './pages/Settings'
 import Trade from './pages/Trade'
 
 import OTC from './pages/Trade/OTC'
+import OTCSqueeth from './pages/Trade/OTC_Squeeth'
 
 import { useConnection } from './hooks/useConnection'
 
@@ -67,6 +68,9 @@ function App() {
               <Switch>
                 <Route path="/trade/otc/">
                   <OTC />
+                </Route>
+                <Route path="/trade/otc-squeeth/">
+                  <OTCSqueeth />
                 </Route>
                 <Route path="/trade/">
                   <Trade />
