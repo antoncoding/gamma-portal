@@ -24,8 +24,8 @@ export default function OTC() {
     <StyledContainer>
       <Header primary={'Squeeth OTC'} />
 
-      {(networkId !== SupportedNetworks.Mainnet && networkId !== SupportedNetworks.Ropsten) ? (
-      <Info mode="error"> Squeeth is only on mainnet and ropsten </Info>
+      {(networkId !== SupportedNetworks.Mainnet) ? (
+      <Info mode="error"> Squeeth OTC is only on mainnet </Info>
       ) : (
         <>
       <Row>
