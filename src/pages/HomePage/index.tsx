@@ -9,11 +9,9 @@ import Comment from '../../components/Comment'
 import SectionTitle from '../../components/SectionHeader'
 import StyledContainer from '../../components/StyledContainer'
 
-const opeth = require('../../imgs/icons/opeth.png')
+const rysk = require('../../imgs/icons/rysk.svg')
 const ribbon = require('../../imgs/icons/ribbon.svg')
 const stakeDao = require('../../imgs/icons/stake-dao.png')
-const antimatterLogo = require('../../imgs/icons/antimatter.webp')
-const opynLogo = require('../../imgs/icons/opyn.png')
 
 function HomePage() {
   const history = useHistory()
@@ -64,17 +62,6 @@ function HomePage() {
       <Row>
         <Col sm={12} md={6} lg={4}>
           <BoxButton
-            title="v2.Opyn.co"
-            description="Trade options on the orderbook"
-            icon={<img height={24} style={{ margin: 13 }} src={opynLogo} alt={'opyn official'} />}
-            onClick={() => {
-              window.open('https://v2.opyn.co', '_blank')
-            }}
-          />
-        </Col>
-
-        <Col sm={12} md={6} lg={4}>
-          <BoxButton
             title="Ribbon Finance"
             description="Leading DOV products"
             icon={<img height={50} src={ribbon} alt={'ribbon finance'} />}
@@ -94,25 +81,13 @@ function HomePage() {
             }}
           />
         </Col>
-
         <Col sm={12} md={6} lg={4}>
           <BoxButton
-            title="Antimatter"
-            description="DOVs and Dual Investment strategies"
-            icon={<img height={50} src={antimatterLogo} alt={'Antimatter'} />}
+            title="Rysk Finance"
+            description="Dynamic Hedging Vault"
+            icon={<img height={50} src={rysk} alt={'Opeth Finance'} />}
             onClick={() => {
-              window.open('https://antimatter.finance/', '_blank')
-            }}
-          />
-        </Col>
-
-        <Col sm={12} md={6} lg={4}>
-          <BoxButton
-            title="Opeth Finance"
-            description="Smart collateral for DeFi powered by Options"
-            icon={<img height={50} src={opeth} alt={'Opeth Finance'} />}
-            onClick={() => {
-              window.open('https://opeth.finance/', '_blank')
+              window.open('https://www.rysk.finance/', '_blank')
             }}
           />
         </Col>

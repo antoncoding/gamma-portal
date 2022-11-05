@@ -22,7 +22,7 @@ export const useConnection = () => {
     if (!address) {
       setUser('')
     } else {
-      setUser(address)
+      setUser(address.toLowerCase())
     }
   }, [])
 
@@ -76,7 +76,7 @@ export const useConnection = () => {
     const checked = await onboard.walletCheck()
     if (!checked) return false
     const account = onboard.getState().address
-    setUser(account)
+    setUser(account.toLowerCase())
     return account
   }, [onboard])
 

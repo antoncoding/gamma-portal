@@ -71,8 +71,8 @@ function Login() {
                 renderEntry={(address: string) => [
                   <LinkBase
                     onClick={() => {
-                      checkAddressAndAddToStorage(address)
-                      setUser(address)
+                      checkAddressAndAddToStorage(address.toLowerCase())
+                      setUser(address.toLowerCase())
                       // goToAccount(address)
                     }}
                   >
@@ -93,13 +93,13 @@ function Login() {
             onClick={async () => {
               if (isAddress(InAddress)) {
                 checkAddressAndAddToStorage(InAddress)
-                setUser(InAddress)
+                setUser(InAddress.toLowerCase())
                 // goToAccount(InAddress)
               } else {
                 try {
                   const address = await resolveENS(InAddress, networkId)
                   checkAddressAndAddToStorage(address)
-                  setUser(address)
+                  setUser(address.toLowerCase())
                   // goToAccount(address)
                 } catch (error) {
                   toast.error('Invalid Address')
