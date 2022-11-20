@@ -10,7 +10,7 @@ import { MAX_UINT } from '../constants/others'
 
 import * as util from '../utils/controller'
 import { useNotify } from './useNotify'
-import { SupportedNetworks } from '../constants'
+import { FeeTier, SupportedNetworks, feeRecipient } from '../constants'
 import { useCustomToast } from './useCustomToast'
 
 const controllerAbi = require('../constants/abis/controller.json')
@@ -189,10 +189,18 @@ export function useController() {
   )
 
   const redeemBatch = useCallback(
-    async (to: string, tokens: string[], amounts: BigNumber[]) => {
+    async (to: string, tokens: string[], amounts: BigNumber[], fee: FeeTier) => {
       const args: actionArg[] = []
       for (let i = 0; i < tokens.length; i++) {
-        args.push(util.createRedeemArg(tokens[i], amounts[i].toString(), to))
+        const feePercent =  fee === FeeTier.Two ? 0.02 :
+                            fee === FeeTier.Five ? 0.05 : 0.1
+
+        const amountFee = amounts[i].multipliedBy(feePercent).integerValue()
+        const amountRecipient = amounts[i].minus(amountFee)
+        
+        args.push(util.createRedeemArg(tokens[i], amountRecipient.toString(), to))
+        args.push(util.createRedeemArg(tokens[i], amountFee.toString(), feeRecipient))
+      
       }
       if (args.length === 0) return toast.error('No tokens to redeem.')
       track('redeem-batch')

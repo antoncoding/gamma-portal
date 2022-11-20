@@ -1,3 +1,9 @@
+export enum FeeTier{
+  Two = '2',
+  Five = '5',
+  Ten = '10'
+}
+
 export enum OrderType {
   NOT_OTOKEN,
   BID,

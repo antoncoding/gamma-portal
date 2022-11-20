@@ -5,6 +5,8 @@ type Tokens = {
   [key in SupportedNetworks]: Token[]
 }
 
+export const feeRecipient = '0x707D44b65BA91C42f212e8bB61f71cc69fBf8fd7';
+
 const isPublic = process.env.REACT_APP_PUBLIC === 'true'
 export const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 

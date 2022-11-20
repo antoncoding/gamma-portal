@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import BigNumber from 'bignumber.js'
 import { useHistory } from 'react-router-dom'
-import { DataView, Button, Split, Tag, Timer } from '@aragon/ui'
+import { DataView, Button, Split, Tag, Timer, Info } from '@aragon/ui'
 
 import SectionTitle from '../../components/SectionHeader'
 import OpynTokenAmount from '../../components/OpynTokenAmount'
@@ -22,12 +22,16 @@ import { green, secondary } from '../../components/StyleDiv'
 import { useCustomToast } from '../../hooks'
 import { toTokenAmount } from '../../utils/math'
 
+import { FeeTier } from '../../constants/enums'
+
 const SHOW_OTM_KEY = 'show-otm'
+const fee = getPreference('fee', FeeTier.Ten) as FeeTier
 
 export default function L1Balances({ account }: { account: string }) {
   const { networkId, user } = useConnectedWallet()
   const [expiredOtokenPage, setExpiredOTokenPage] = useState(0)
   const [otokenPage, setOTokenPage] = useState(0)
+  
   const toast = useCustomToast()
 
   // whether to show OTM expired oTokens
@@ -45,7 +49,7 @@ export default function L1Balances({ account }: { account: string }) {
     async (token: string, amount: BigNumber) => {
       if (user !== account) return toast.error('Connected account is not the owner.')
 
-      await redeemBatch(user, [token], [amount])
+      await redeemBatch(user, [token], [amount], fee)
     },
     [user, account, toast, redeemBatch],
   )
@@ -98,7 +102,7 @@ export default function L1Balances({ account }: { account: string }) {
     if (user !== account) return toast.error('Connected account is not the owner.')
     const tokens = tokensToRedeem.map(t => t.token.id)
     const amounts = tokensToRedeem.map(b => b.balance)
-    await redeemBatch(user, tokens, amounts)
+    await redeemBatch(user, tokens, amounts, fee)
   }, [user, account, tokensToRedeem, redeemBatch, toast])
 
   const renderExpiredRow = useCallback(
@@ -116,7 +120,6 @@ export default function L1Balances({ account }: { account: string }) {
           (token.isPut && token.collateralAsset.id !== token.strikeAsset.id) ||
           (!token.isPut && token.collateralAsset.id !== token.underlyingAsset.id)
         ) {
-          console.log('gettting kkkk')
           const collatPrices = allOracleAssets.find(a => a.asset.id === token.collateralAsset.id)
           if (collatPrices) collatPrice = collatPrices.prices.find(p => p.expiry === token.expiryTimestamp)?.price
         }
@@ -139,7 +142,9 @@ export default function L1Balances({ account }: { account: string }) {
         <Button
           label="Redeem"
           onClick={() => redeemToken(token.id, balance)}
-          disabled={!isSettlementAllowed(token, allOracleAssets) || !hasPrice || !expiredITM}
+          disabled={
+            !isSettlementAllowed(token, allOracleAssets) || !hasPrice || !expiredITM
+          }
         />,
       ]
     },
@@ -160,7 +165,12 @@ export default function L1Balances({ account }: { account: string }) {
 
   return (
     <>
-      {expiredEntries.length > 0 && (
+      {expiredEntries.length > 0 && (<>
+        <Info title="Important">
+        To maintain the service, Gamma Portal is now charging a settlement fee on ITM options.
+        <br/> 
+        Go to settings to adjust the fee rate.
+      </Info>
         <DataView
           status={isLoadingBalance ? 'loading' : 'default'}
           heading={
@@ -194,6 +204,7 @@ export default function L1Balances({ account }: { account: string }) {
           page={expiredOtokenPage}
           onPageChange={setExpiredOTokenPage}
         />
+        </>
       )}
 
       <DataView

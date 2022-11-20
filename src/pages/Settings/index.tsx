@@ -5,7 +5,7 @@ import StyledContainer from '../../components/StyledContainer'
 import ThemeSwitch from './Theme'
 import ApproveSwitch from './Approval'
 import ClearCache from './ClearCache'
-// import Network from './Network'
+import SettlementFee from './SettlementFee'
 import Refresh from './Refresh'
 
 function Settings({ setTheme }: { setTheme: any }) {
@@ -14,6 +14,8 @@ function Settings({ setTheme }: { setTheme: any }) {
     <StyledContainer>
       <Header primary="Settings" />
       <ThemeSwitch setTheme={setTheme} />
+      <br />
+      <SettlementFee />
       <br />
       <ApproveSwitch />
       <br />
