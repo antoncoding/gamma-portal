@@ -12,7 +12,7 @@ import { useOTokenBalances } from '../../hooks/useOTokenBalances'
 import { useConnectedWallet } from '../../contexts/wallet'
 import { OTokenBalance } from '../../types'
 import { sortByExpiryThanStrike, isExpired, isSettlementAllowed, isITM, getExpiryPayout } from '../../utils/others'
-import { getPreference } from '../../utils/storage'
+import { getPreference, storePreference } from '../../utils/storage'
 
 import { OTOKENS } from '../../constants/dataviewContents'
 
@@ -25,14 +25,27 @@ import { toTokenAmount } from '../../utils/math'
 import { FeeTier } from '../../constants/enums'
 
 const SHOW_OTM_KEY = 'show-otm'
+
+const hideFeeMessageRaw = getPreference('hide-fee-message', 'false')
+
 const fee = getPreference('fee', FeeTier.Ten) as FeeTier
 
 export default function L1Balances({ account }: { account: string }) {
   const { networkId, user } = useConnectedWallet()
   const [expiredOtokenPage, setExpiredOTokenPage] = useState(0)
   const [otokenPage, setOTokenPage] = useState(0)
+  const [hideFeeMessage, setHideFeeMessage] = useState<boolean>(hideFeeMessageRaw === 'true')
   
   const toast = useCustomToast()
+
+  const [isHover, setIsHover] = useState(false);
+
+   const handleMouseEnter = () => {
+      setIsHover(true);
+   };
+   const handleMouseLeave = () => {
+      setIsHover(false);
+   };
 
   // whether to show OTM expired oTokens
   const [showOTM, setShowOTM] = useState(getPreference(SHOW_OTM_KEY, 'false') === 'true')
@@ -89,7 +102,7 @@ export default function L1Balances({ account }: { account: string }) {
     () =>
       expiredEntries
         .filter(e => isSettlementAllowed(e.token, allOracleAssets))
-        // onnly redeem otokens that's ITM
+        // only redeem otokens that's ITM
         .filter(({ token }) => {
           const asset = allOracleAssets.find(a => a.asset.id === token.underlyingAsset.id)
           const price = asset && asset.prices.find(p => p.expiry === token.expiryTimestamp)?.price
@@ -166,11 +179,20 @@ export default function L1Balances({ account }: { account: string }) {
   return (
     <>
       {expiredEntries.length > 0 && (<>
-        <Info title="Important">
-        To maintain the service, Gamma Portal is now charging a settlement fee on ITM options.
-        <br/> 
-        Go to settings to adjust the fee rate.
-      </Info>
+       { 
+        !hideFeeMessage && <Info title="Important">
+          To maintain the service, Gamma Portal is now charging a settlement fee on ITM options. Go to settings to adjust the fee rate.
+          <br />
+          <br />
+          <p
+          onMouseEnter={handleMouseEnter} 
+          onMouseLeave={handleMouseLeave} 
+          style={{ fontWeight: isHover ? 800 : 300 }} onClick={() => {
+            setHideFeeMessage(true)
+            storePreference('hide-fee-message', 'true')
+          }}> Got it, don't show again </p>
+        </Info>
+        }
         <DataView
           status={isLoadingBalance ? 'loading' : 'default'}
           heading={

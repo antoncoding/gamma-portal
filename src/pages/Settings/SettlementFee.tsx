@@ -7,10 +7,11 @@ import { storePreference, getPreference } from '../../utils/storage'
 
 import { FeeTier } from '../../constants/enums'
 
-function SettlementFee() {
-  const mode = getPreference('fee', FeeTier.Ten)
+const fee = getPreference('fee', FeeTier.Ten)
 
-  const [feeTier, setFeeTier] = useState<FeeTier>(mode as FeeTier)
+function SettlementFee() {
+
+  const [feeTier, setFeeTier] = useState<FeeTier>(fee as FeeTier)
   const toast = useToast()
 
   return (
