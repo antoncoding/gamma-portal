@@ -9,6 +9,9 @@ const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY
 
 export const useConnection = () => {
   const [user, setUser] = useState<string>('')
+  const [isWatchMode, setIsWatchMode] = useState<Boolean>(false)
+
+  console.log('isWatchMode', isWatchMode)
 
   const [onboard, setOnboard] = useState<any>(null)
 
@@ -21,8 +24,10 @@ export const useConnection = () => {
   const setAddressCallback = useCallback((address: string | undefined) => {
     if (!address) {
       setUser('')
+      setIsWatchMode(false)
     } else {
       setUser(address.toLowerCase())
+      setIsWatchMode(false)
     }
   }, [])
 
@@ -77,15 +82,17 @@ export const useConnection = () => {
     if (!checked) return false
     const account = onboard.getState().address
     setUser(account.toLowerCase())
+    setIsWatchMode(false)
     return account
   }, [onboard])
 
   const disconnect = useCallback(async () => {
     onboard.walletReset()
     setUser('')
+    setIsWatchMode(false)
   }, [onboard])
 
-  return { networkId, user, setUser, web3, connect, disconnect }
+  return { networkId, user, setUser, setIsWatchMode, web3, connect, disconnect, isWatchMode, setNetworkId }
 }
 
 export const initOnboard = (addressChangeCallback, walletChangeCallback, networkChangeCallback, networkId) => {

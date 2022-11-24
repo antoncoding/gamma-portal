@@ -13,7 +13,7 @@ import { resolveENS } from '../../../utils/others'
 import { useCustomToast } from '../../../hooks'
 
 function Login() {
-  const { user, setUser, networkId } = useConnectedWallet()
+  const { user, setUser, networkId, setIsWatchMode } = useConnectedWallet()
   const history = useHistory()
   const toast = useCustomToast()
   const [InAddress, setAddress] = useState('')
@@ -73,7 +73,7 @@ function Login() {
                     onClick={() => {
                       checkAddressAndAddToStorage(address.toLowerCase())
                       setUser(address.toLowerCase())
-                      // goToAccount(address)
+                      setIsWatchMode(true)
                     }}
                   >
                     {/* <IdentityBadge entity={address} /> */}
@@ -100,6 +100,7 @@ function Login() {
                   const address = await resolveENS(InAddress, networkId)
                   checkAddressAndAddToStorage(address)
                   setUser(address.toLowerCase())
+                  setIsWatchMode(true)
                   // goToAccount(address)
                 } catch (error) {
                   toast.error('Invalid Address')

@@ -9,7 +9,7 @@ import { useENS } from '../../hooks/useENS'
 function ConnectButton() {
   const { connect, disconnect, user } = useConnectedWallet()
 
-  const { ensName } = useENS(user)
+  const { ensName } = useENS()
 
   const connectWeb3 = async () => {
     const address = await connect()

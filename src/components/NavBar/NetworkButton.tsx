@@ -18,15 +18,21 @@ const items = networkKeys.map(k => {
 })
 
 function NetworkButton() {
-  const { networkId } = useConnectedWallet()
+  const { networkId, isWatchMode, setNetworkId } = useConnectedWallet()
 
   const [opened, setOpened] = useState(false)
 
   const theme = useTheme()
 
-  const onClick = useCallback(networkId => {
-    switchNetwork((window as any).ethereum, networkId)
-  }, [])
+  const onClick = useCallback(_networkId => {
+    // if is connected to a wallet, send request to update network
+    if (!isWatchMode) {
+      switchNetwork((window as any).ethereum, _networkId)
+    } else {
+      setNetworkId(_networkId)
+    }
+    
+  }, [isWatchMode, setNetworkId])
 
   return (
     <div>
