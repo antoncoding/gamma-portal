@@ -1,5 +1,5 @@
 import React from 'react'
-
+import { useHistory } from 'react-router-dom'
 import { Button, IconConnect, Box, IconPower, IdentityBadge } from '@aragon/ui'
 
 import { checkAddressAndAddToStorage } from '../../utils/storage'
@@ -17,6 +17,8 @@ function ConnectButton() {
     checkAddressAndAddToStorage(address)
   }
 
+  const history = useHistory()
+
   return user !== '' ? (
     <>
       <Box padding={6}>
@@ -29,7 +31,10 @@ function ConnectButton() {
                 <IconPower></IconPower> Disconnect{' '}
               </>
             ),
-            onClick: disconnect,
+            onClick: () => {
+              disconnect()
+              history.push('/account')
+            },
           }}
         />
       </Box>

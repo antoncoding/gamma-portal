@@ -63,7 +63,7 @@ export const OTOKENS_BOARD_FILTERED = {
 export const OTOKENS = {
   default: {
     title: 'No oTokens',
-    subtitle: "You don't have any oToken in your wallet ",
+    subtitle: "You don't have any oTokens. Switch network to check other chains ",
     illustration: EmptyState,
   },
   loading: {

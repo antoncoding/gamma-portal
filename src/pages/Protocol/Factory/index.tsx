@@ -53,7 +53,7 @@ export default function CreateOption() {
     [allProducts, selectedProductIndex],
   )
 
-  // reset stikeprice when selected underlying changed
+  // reset strike price when selected underlying changed
   useEffect(() => {
     getTokenPriceCoingecko(selectedUnderlying.id).then(price => {
       const defaultPrice = price.div(100).integerValue().times(100).integerValue()
