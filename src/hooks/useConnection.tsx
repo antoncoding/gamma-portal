@@ -114,6 +114,7 @@ export const initOnboard = (addressChangeCallback, walletChangeCallback, network
           walletName: 'walletConnect',
           rpc: {
             [SupportedNetworks.Mainnet]: networkToProvider[SupportedNetworks.Mainnet],
+            [SupportedNetworks.Goerli]: networkToProvider[SupportedNetworks.Goerli],
             [SupportedNetworks.Arbitrum]: networkToProvider[SupportedNetworks.Arbitrum],
             [SupportedNetworks.Avalanche]: networkToProvider[SupportedNetworks.Avalanche],
             [SupportedNetworks.Matic]: networkToProvider[SupportedNetworks.Matic],

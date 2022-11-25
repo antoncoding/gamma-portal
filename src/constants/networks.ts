@@ -8,6 +8,7 @@ export enum SupportedNetworks {
   Matic = 137,
   Avalanche = 43114,
   Arbitrum = 42161,
+  Goerli = 5,
 }
 
 export const networkIdToExplorer = {
@@ -15,10 +16,12 @@ export const networkIdToExplorer = {
   [SupportedNetworks.Avalanche]: 'https://snowtrace.io',
   [SupportedNetworks.Arbitrum]: 'https://arbiscan.io',
   [SupportedNetworks.Matic]: 'https://polygonscan.com',
+  [SupportedNetworks.Goerli]: 'https://goerli.etherscan.io'
 }
 
 export const networkToLogo: { [key in SupportedNetworks]: string } = {
   [SupportedNetworks.Mainnet]: Ethereum,
+  [SupportedNetworks.Goerli]: Ethereum,
   [SupportedNetworks.Avalanche]: AVAX,
   [SupportedNetworks.Arbitrum]: Arbitrum,
   [SupportedNetworks.Matic]: Matic,
@@ -26,13 +29,14 @@ export const networkToLogo: { [key in SupportedNetworks]: string } = {
 
 export const isMainnet: { [key in SupportedNetworks]: boolean } = {
   [SupportedNetworks.Mainnet]: true,
+  [SupportedNetworks.Goerli]: false,
   [SupportedNetworks.Avalanche]: true,
   [SupportedNetworks.Arbitrum]: true,
   [SupportedNetworks.Matic]: true,
 }
 
 export const isSupportedByMetaMask = (network: SupportedNetworks) => {
-  if (network === SupportedNetworks.Mainnet) return true
+  if (network === SupportedNetworks.Mainnet || network === SupportedNetworks.Goerli) return true
   return false
 }
 

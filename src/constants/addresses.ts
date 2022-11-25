@@ -45,6 +45,27 @@ export const tokens: Tokens = {
       decimals: 6,
     },
   ],
+  [SupportedNetworks.Goerli]: [
+    eth,
+    {
+      name: 'USDC',
+      id: '0xd87ba7a50b2e7e660f678a895e4b72e7cb4ccd9c',
+      symbol: 'USDC',
+      decimals: 6
+    },
+    {
+      name: 'Wrapped Ether',
+      id: '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
+      symbol: 'WETH',
+      decimals: 18,
+    },
+    {
+      name: 'Wrapped Bitcoin',
+      id: '0xc04b0d3107736c32e19f1c62b2af67be61d63a05',
+      symbol: 'WBTC',
+      decimals: 8,
+    },
+  ],
   [SupportedNetworks.Avalanche]: [
     {
       name: 'Wrapped AVAX',
@@ -123,6 +144,15 @@ export const addresses: SystemAddresses = {
     whitelist: isPublic ? '0xa5EA18ac6865f315ff5dD9f1a7fb1d41A30a6779' : '0x2244364c94a9FCb6f9ae3A4cF38f279706011882',
     zeroxExchange: '0xdef1c0ded9bec7f1a1670819833240f027b25eff',
   },
+  [SupportedNetworks.Goerli]: {
+    controller: '0x45fD0117d2eE5d70840880cCDcD3e03Dc328aef1',
+    calculator: '0xAc536Eb464dF9284f9BEB02226329827Ed69Cd5D',
+    factory: '0xd7A7ec5c82b847A3d30Fed3052f5C2bb42069317',
+    addressBook: '0x234241E33909F3dA1fB2B9DC2bCa2BB5116f50eE',
+    pool: '0xdE576696Ed6e64328355d5c87fC031e1198609F6',
+    whitelist: '0x14235E3AEEFc155D6d48fA942ee84F15Cbd62a28',
+    zeroxExchange: '0x0000000000000000000000000000000000000000',
+  },
   [SupportedNetworks.Avalanche]: {
     controller: '0x9e3b94819aaF6de606C4Aa844E3215725b997064',
     calculator: '0xBD5A1Dc654B5476B94F81755E68d1C8f0AAc2AFd',
@@ -154,6 +184,7 @@ export const addresses: SystemAddresses = {
 
 export const blacklistOTokens: { [key in SupportedNetworks]: string[] } = {
   [SupportedNetworks.Mainnet]: [ZERO_ADDR],
+  [SupportedNetworks.Goerli]: [ZERO_ADDR],
   [SupportedNetworks.Arbitrum]: [ZERO_ADDR],
   [SupportedNetworks.Avalanche]: [ZERO_ADDR],
   [SupportedNetworks.Matic]: [ZERO_ADDR],
@@ -179,6 +210,7 @@ export const knownOperators: {
       author: 'Opyn',
     },
   ],
+  [SupportedNetworks.Goerli]: [],
   [SupportedNetworks.Avalanche]: [],
   [SupportedNetworks.Arbitrum]: [
     {
