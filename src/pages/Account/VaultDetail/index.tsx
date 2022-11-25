@@ -47,6 +47,14 @@ export default function VaultDetail() {
 
   const [isSendingTx, setIsSendingTx] = useState(false)
 
+  const [collatInputString, setCollatInputString] = useState('0')
+  const [longInputString, setLongInputString] = useState('0')
+  const [shortInputString, setShortInputString] = useState('0')
+
+  const [collatInputError, setCollatInputError] = useState(false)
+  const [longInputError, setLongInputError] = useState(false)
+  const [shortInputError, setShortInputError] = useState(false)
+
   const [changeCollateralAmount, setChangeCollateralAmount] = useState(new BigNumber(0))
   const [changeLongAmount, setChangeLongAmount] = useState(new BigNumber(0))
   const [changeShortAmount, setChangeShortAmount] = useState(new BigNumber(0))
@@ -179,6 +187,10 @@ export default function VaultDetail() {
   }, [allOtokens, balances, allShorts])
 
   const pushAddCollateral = useCallback(() => {
+    if (collatInputError) {
+      toast.error('Bad input')
+      return
+    }
     // if using eth, from address is payable proxy
     let from = user
     if (collateralToken.id === ZERO_ADDR) {
@@ -199,9 +211,13 @@ export default function VaultDetail() {
 
     setChangeCollateralAmount(new BigNumber(0))
     setPendingCollateralAmount(` + ${changeCollateralAmount.toString()}`)
-  }, [collateralToken, controller, user, vaultId, changeCollateralAmount, networkId, toast])
+  }, [collateralToken, controller, user, vaultId, changeCollateralAmount, networkId, toast, collatInputError])
 
   const pushRemoveCollateral = useCallback(() => {
+    if (collatInputError) {
+      toast.error('Bad input')
+      return
+    }
     let to = user
     if (collateralToken.id === ZERO_ADDR) {
       const proxy = getPayableProxyAddr(networkId)
@@ -229,9 +245,14 @@ export default function VaultDetail() {
     changeCollateralAmount,
     networkId,
     toast,
+    collatInputError
   ])
 
   const pushAddLong = useCallback(() => {
+    if (longInputError) {
+      toast.error('Bad input')
+      return
+    }
     if (!longOtoken) {
       toast.info('No long token selected')
       return
@@ -240,9 +261,13 @@ export default function VaultDetail() {
     controller.pushAddLongArg(user, vaultId, user, oToken, fromTokenAmount(changeLongAmount, 8))
     setChangeLongAmount(new BigNumber(0))
     setPendingLongAmount(` + ${changeLongAmount.toString()}`)
-  }, [toast, vaultDetail, longOtoken, controller, user, vaultId, changeLongAmount])
+  }, [toast, vaultDetail, longOtoken, controller, user, vaultId, changeLongAmount, longInputError])
 
   const pushRemoveLong = useCallback(() => {
+    if (longInputError) {
+      toast.error('Bad input')
+      return
+    }
     if (!longOtoken) {
       toast.info('No long token selected')
       return
@@ -251,9 +276,13 @@ export default function VaultDetail() {
     controller.pushRemoveLongArg(user, vaultId, user, oToken, fromTokenAmount(changeLongAmount, 8))
     setChangeLongAmount(new BigNumber(0))
     setPendingLongAmount(` - ${changeLongAmount.toString()}`)
-  }, [toast, vaultDetail, longOtoken, controller, user, vaultId, changeLongAmount])
+  }, [toast, vaultDetail, longOtoken, controller, user, vaultId, changeLongAmount, longInputError])
 
   const pushMint = useCallback(() => {
+    if (shortInputError) {
+      toast.error('Bad input')
+      return
+    }
     if (!shortOtoken) {
       toast.info('No short token selected')
       return
@@ -262,9 +291,13 @@ export default function VaultDetail() {
     controller.pushMintArg(user, vaultId, user, oToken, fromTokenAmount(changeShortAmount, 8))
     setChangeShortAmount(new BigNumber(0))
     setPendingShortAmount(` + ${changeShortAmount.toString()}`)
-  }, [toast, vaultDetail, shortOtoken, controller, user, vaultId, changeShortAmount])
+  }, [toast, vaultDetail, shortOtoken, controller, user, vaultId, changeShortAmount, shortInputError])
 
   const pushBurn = useCallback(async () => {
+    if (shortInputError) {
+      toast.error('Bad input')
+      return
+    }
     if (!shortOtoken) {
       toast.info('No short token selected')
       return
@@ -273,7 +306,7 @@ export default function VaultDetail() {
     controller.pushBurnArg(user, vaultId, user, oToken, fromTokenAmount(changeShortAmount, 8))
     setChangeShortAmount(new BigNumber(0))
     setPendingShortAmount(` - ${changeShortAmount.toString()}`)
-  }, [toast, vaultDetail, shortOtoken, controller, user, vaultId, changeShortAmount])
+  }, [toast, vaultDetail, shortOtoken, controller, user, vaultId, changeShortAmount, shortInputError])
 
   const expired = useMemo(() => {
     if (!vaultDetail) return false
@@ -383,7 +416,7 @@ export default function VaultDetail() {
         amountToDisplay,
         <>
           <TextInput
-            type="number"
+            type="string"
             disabled={expired}
             onChange={event => onInputChange(event.target.value)}
             value={inputValue}
@@ -476,9 +509,16 @@ export default function VaultDetail() {
             asset: vaultDetail?.collateralAsset?.id,
             amount: vaultDetail?.collateralAmount,
             pendingAmount: pendingCollateralAmount,
-            inputValue: changeCollateralAmount,
-            onInputChange: value =>
-              value ? setChangeCollateralAmount(new BigNumber(value)) : setChangeCollateralAmount(new BigNumber(0)),
+            inputValue: collatInputString,
+            onInputChange: (value: string) => {
+              setCollatInputString(value)
+              if (!new BigNumber(value).isNaN()) {
+                setCollatInputError(false)
+                setChangeCollateralAmount(new BigNumber(value))
+              } else {
+                setCollatInputError(true)
+              }    
+            },
             onClickAdd: pushAddCollateral,
             onClickMinus: pushRemoveCollateral,
             dropdownSelected: selectedCollateralIndex,
@@ -493,9 +533,16 @@ export default function VaultDetail() {
             asset: vaultDetail?.longOToken?.id,
             amount: vaultDetail?.longAmount,
             pendingAmount: pendingLongAmount,
-            inputValue: changeLongAmount,
-            onInputChange: value =>
-              value ? setChangeLongAmount(new BigNumber(value)) : setChangeLongAmount(new BigNumber(0)),
+            inputValue: longInputString,
+            onInputChange: (value: string) => {
+              setLongInputString(value)
+              if (!new BigNumber(value).isNaN()) {
+                setLongInputError(false)
+                setChangeLongAmount(new BigNumber(value))
+              } else {
+                setLongInputError(true)
+              }    
+            },
             onClickAdd: pushAddLong,
             onClickMinus: pushRemoveLong,
             dropdownSelected: longOtoken ? allLongs.findIndex(o => o.id === longOtoken.id) : -1,
@@ -513,9 +560,16 @@ export default function VaultDetail() {
             asset: vaultDetail?.shortOToken?.id,
             amount: vaultDetail?.shortAmount,
             pendingAmount: pendingShortAmount,
-            inputValue: changeShortAmount,
-            onInputChange: value =>
-              value ? setChangeShortAmount(new BigNumber(value)) : setChangeShortAmount(new BigNumber(0)),
+            inputValue: shortInputString,
+            onInputChange: (value: string) => {
+              setShortInputString(value)
+              if (!new BigNumber(value).isNaN()) {
+                setShortInputError(false)
+                setChangeShortAmount(new BigNumber(value))
+              } else {
+                setShortInputError(true)
+              }    
+            },
             onClickAdd: pushMint,
             onClickMinus: pushBurn,
             dropdownSelected: shortOtoken ? allShorts.findIndex(o => o.id === shortOtoken.id) : -1,
