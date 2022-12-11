@@ -17,6 +17,7 @@ import { toTokenAmount, timeSince } from '../../../utils/math'
 
 import useAsyncMemo from '../../../hooks/useAsyncMemo'
 import { useCustomToast } from '../../../hooks'
+import { getTokenImg } from '../../../imgs/utils'
 
 export default function OtokenList() {
   useEffect(() => {
@@ -59,11 +60,18 @@ export default function OtokenList() {
 
   const renderOTokenRow = useCallback(
     (otoken: SubgraphOToken) => {
-      // 'oToken', 'strike', 'expiry', 'type', 'creator', 'created'
+      // 'oToken', 'underlying','strike', 'expiry', 'type', 'creator', 'created'
       return [
         simplifyOTokenSymbol(otoken.symbol),
+        getTokenImg(otoken.underlyingAsset) ? (
+          <img 
+            height={20} 
+            src={getTokenImg(otoken.underlyingAsset) as string} 
+            alt={'colla'} 
+          />
+        ) : otoken.underlyingAsset.symbol,
         toTokenAmount(otoken.strikePrice, 8).toFixed(0),
-        <Timer end={Number(otoken.expiryTimestamp) * 1000} />,
+        <Timer format="Mdh" end={Number(otoken.expiryTimestamp) * 1000} />,
         otoken.isPut ? (
           <Tag color="#800000" background="#ffb3b3">
             {' '}
@@ -101,7 +109,7 @@ export default function OtokenList() {
 
       <DataView
         status={isLoading ? 'loading' : 'default'}
-        fields={['oToken', 'strike', 'expiry', 'type', 'creator', 'created', '']}
+        fields={['oToken', 'token', 'strike', 'expiry', 'type', 'creator', 'created', '']}
         entries={oTokensToShow}
         renderEntry={renderOTokenRow}
         entriesPerPage={8}

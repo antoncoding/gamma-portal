@@ -7,6 +7,7 @@ import oBTC from './oBTC.png'
 import USDC from './USDC.png'
 import USDT from './USDT.png'
 import WAVAX from './WAVAX.webp'
+import AAVE from './aave.png'
 
 export function getTokenImg(token: { id: string; symbol: string } | null) {
   return token === null
@@ -21,6 +22,8 @@ export function getTokenImg(token: { id: string; symbol: string } | null) {
     ? WBTC
     : token.symbol === 'WAVAX'
     ? WAVAX
+    : token.symbol === 'AAVE'
+    ? AAVE
     : (token as SubgraphOToken).underlyingAsset
     ? (token as SubgraphOToken).underlyingAsset.symbol === 'WETH'
       ? oETH
